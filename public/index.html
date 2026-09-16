@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HIVE — Test Automation Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <div class="mark"><svg width="15" height="15" viewBox="0 0 26 26" fill="none"><path d="M13 1.5 24 7.5v11L13 24.5 2 18.5v-11L13 1.5Z" stroke="var(--accent)" stroke-width="1.8" fill="none"/><path d="M13 8.5 18.5 11.5v6L13 20.5 7.5 17.5v-6L13 8.5Z" fill="var(--accent)"/></svg></div>
+        <span class="name">HIVE</span><span class="ver">v2.4.0</span>
+        <button class="theme-toggle" id="theme-toggle" title="Toggle light / dark theme" aria-label="Toggle light / dark theme">
+          <svg class="i-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+          <svg class="i-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" hidden><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+        </button>
+      </div>
+
+      <div class="navgroup">
+        <div class="glabel">Monitor</div>
+        <nav class="navlist">
+          <button class="navitem active" data-view="overview">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+            Overview
+          </button>
+        </nav>
+      </div>
+
+      <div class="navgroup">
+        <div class="glabel">Run</div>
+        <nav class="navlist">
+          <button class="navitem" data-view="runs">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M10 8.5 16 12l-6 3.5v-7Z" fill="currentColor" stroke="none"/></svg>
+            Test Runs
+          </button>
+          <button class="navitem" data-view="live">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+            Live Run
+            <span class="navdot" id="live-nav-dot" hidden></span>
+          </button>
+          <button class="navitem" data-view="cases">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h11v16H9z"/><path d="M4 4h2v16H4z"/><path d="M13 9h4M13 13h4M13 17h2"/></svg>
+            Test Cases <span class="navcount" id="nav-test-count">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="navgroup">
+        <div class="glabel">Analyse</div>
+        <nav class="navlist">
+          <button class="navitem" data-view="results">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 12 2.5 2.5L16 9"/></svg>
+            Results
+          </button>
+          <button class="navitem" data-view="reports">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+            Reports
+          </button>
+        </nav>
+      </div>
+
+      <div class="navgroup">
+        <div class="glabel">Configure</div>
+        <nav class="navlist">
+          <button class="navitem" data-view="settings">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V20a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H4a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H10a1.7 1.7 0 0 0 1-1.55V4a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V10c.1.03.2.07.3.1a1.7 1.7 0 0 0 1.7 1V11a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z" stroke-width="1.2"/></svg>
+            Settings
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="connect-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v6M15 3v6M6 9h12l-1 4a5 5 0 0 1-10 0L6 9Z"/><path d="M12 17v4"/></svg>
+        Connect CI
+      </div>
+      <div class="stat-block">
+        <div class="sh"><span class="l">Tests</span><span class="v" id="sb-ratio">0 / 0</span></div>
+        <div class="stat-track"><div class="stat-fill" id="sb-fill" style="width:0%;"></div></div>
+        <div class="stat-legend">
+          <span><span class="d" style="background:var(--danger);"></span><span id="sb-failed">0</span> failed</span>
+          <span><span class="d" style="background:var(--skip);"></span><span id="sb-skipped">0</span> skipped</span>
+        </div>
+      </div>
+      <div class="sidebar-foot">
+        <div class="avatar">JT</div>
+        <div class="who"><div class="n">Jordan Teale</div><div class="r">QA Engineer</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- OVERVIEW -->
+    <section class="view" id="view-overview">
+      <div class="topbar">
+        <div><h1>Overview</h1><div class="sub">Playwright suite health across environments</div></div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div class="live-pill"><span class="dot"></span>Live</div>
+          <button class="icon-btn" title="Environment"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
+        </div>
+      </div>
+      <div class="content view">
+        <div class="kpi-row">
+          <div class="kpi"><div class="lbl">Test cases</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h11v16H9z"/><path d="M4 4h2v16H4z"/></svg><div class="val" id="kpi-cases">—</div><div class="sub" id="kpi-cases-sub">—</div></div>
+          <div class="kpi"><div class="lbl">Passed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 12 2.5 2.5L16 9"/></svg><div class="val success" id="kpi-passed">—</div><div class="sub">last run</div></div>
+          <div class="kpi"><div class="lbl">Failed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m9 9 6 6M15 9l-6 6"/></svg><div class="val danger" id="kpi-failed">—</div><div class="sub">last run</div></div>
+          <div class="kpi"><div class="lbl">Skipped</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9v6h-6"/></svg><div class="val skip" id="kpi-skipped">—</div><div class="sub">last run</div></div>
+          <div class="kpi"><div class="lbl">Pass rate</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M11 19V5M18 19v-6"/></svg><div class="val accent" id="kpi-passrate">—</div><div class="sub" id="kpi-passrate-sub">last run</div></div>
+          <div class="kpi"><div class="lbl">Avg exec time</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><div class="val" id="kpi-avgtime">—</div><div class="sub">per execution</div></div>
+          <div class="kpi"><div class="lbl">Latest run</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M10 8.5 16 12l-6 3.5v-7Z" fill="currentColor" stroke="none"/></svg><div class="val" id="kpi-latest">—</div><div class="sub" id="kpi-latest-sub">—</div></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div><h2>Recent test runs</h2><div class="sub">Across Chromium, Firefox &amp; WebKit</div></div>
+            <button class="link-btn" data-view="results">View all results →</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Run</th><th>Suite</th><th>Browser</th><th>Tests</th><th>Passed</th><th>Failed</th><th>Duration</th><th>Status</th><th>When</th></tr></thead>
+              <tbody id="runs-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEST CASES -->
+    <section class="view" id="view-cases" hidden>
+      <div class="topbar">
+        <div><h1>Test Cases</h1><div class="sub" id="cases-count-sub">Loading…</div></div>
+        <button class="btn primary" data-view="runs"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 4l14 8-14 8V4z"/></svg> Run tests</button>
+      </div>
+      <div class="content">
+        <div class="panel">
+          <div class="filter-bar">
+            <div class="search" style="max-width:280px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Search test cases…" id="cases-search"></div>
+            <select id="cases-suite-filter">
+              <option value="">All suites</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Suite</th><th>Tags</th><th>Last status</th><th>Avg duration</th></tr></thead>
+              <tbody id="cases-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEST RUNS / CONFIGURATION -->
+    <section class="view" id="view-runs" hidden>
+      <div class="topbar">
+        <div><h1>Test Runs</h1><div class="sub">Configure and launch a Playwright run</div></div>
+        <div class="live-pill"><span class="dot"></span>Live</div>
+      </div>
+      <div class="content">
+
+        <div class="exec-grid">
+          <div class="left-col">
+
+            <div class="panel step-panel">
+              <div class="panel-head">
+                <div class="step-title-wrap"><div class="step-num">1</div><div><h2>Select test cases</h2><div class="sub">Choose suites, cases, or select all</div></div></div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <span class="step-count" id="sum-cases-chip">12 selected</span>
+                  <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;cursor:pointer;">
+                    <input type="checkbox" id="select-all" style="accent-color:var(--accent);width:15px;height:15px;"> All
+                  </label>
+                </div>
+              </div>
+              <div style="padding:12px 18px;border-bottom:1px solid var(--border);">
+                <div class="search"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Filter test cases…" id="suite-search"></div>
+              </div>
+              <div id="suite-tree"></div>
+              <div class="alert-banner" id="cases-warning" hidden>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg>
+                No test cases selected. Choose at least one suite or case to continue.
+              </div>
+            </div>
+
+            <div class="panel step-panel">
+              <div class="panel-head">
+                <div class="step-title-wrap"><div class="step-num">2</div><div><h2>Browsers</h2><div class="sub">Run across one or more engines</div></div></div>
+                <span class="step-count" id="sum-browsers-chip">2 selected</span>
+              </div>
+              <div style="padding:16px 18px; display:flex; gap:10px; flex-wrap:wrap;">
+                <label class="chip-check on" data-browser="chromium">
+                  <input type="checkbox" checked>
+                  <svg class="b-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/><path d="M12 3v6M5.6 8l5.2 3M18.4 8l-5.2 3M12 21v-6M5.6 16l5.2-3M18.4 16l-5.2-3"/></svg>
+                  <div><div class="lbl">Chromium</div><div class="sub2">v128.0</div></div>
+                </label>
+                <label class="chip-check on" data-browser="firefox">
+                  <input type="checkbox" checked>
+                  <svg class="b-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M8 5c3 2 3 12 0 14M16 5c-3 2-3 12 0 14M4 12h16"/></svg>
+                  <div><div class="lbl">Firefox</div><div class="sub2">v129.0</div></div>
+                </label>
+                <label class="chip-check" data-browser="webkit">
+                  <input type="checkbox">
+                  <svg class="b-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M9 18h6"/></svg>
+                  <div><div class="lbl">WebKit</div><div class="sub2">Safari 17</div></div>
+                </label>
+              </div>
+              <div class="alert-banner" id="browsers-warning" hidden>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4M12 17h.01"/></svg>
+                Select at least one browser to continue.
+              </div>
+            </div>
+
+            <div class="panel step-panel">
+              <div class="panel-head">
+                <div class="step-title-wrap"><div class="step-num">3</div><div><h2>Configure</h2><div class="sub">Environment, mode &amp; retries</div></div></div>
+              </div>
+              <div style="padding:16px 18px 6px;">
+                <div class="field" style="margin-bottom:14px;">
+                  <label>Environment</label>
+                  <div class="env-cards" id="env-cards">
+                    <div class="env-card on" data-env="local"><div class="r-row"><span class="radio"></span><span class="name">Dev</span></div><div class="d">hive-dev.thegritcity.com — shared dev environment</div></div>
+                    <div class="env-card" data-env="staging"><div class="r-row"><span class="radio"></span><span class="name">Staging</span></div><div class="d">Mirrors production, safe for full regression</div></div>
+                    <div class="env-card" data-env="production"><div class="r-row"><span class="radio"></span><span class="name">Production</span></div><div class="d">Live data — smoke checks only</div></div>
+                  </div>
+                </div>
+              </div>
+              <div style="padding:0 18px 16px; display:flex; flex-direction:column; gap:14px;">
+                <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                  <div class="field" style="flex:1; min-width:160px;">
+                    <label>Execution mode</label>
+                    <div class="seg" id="mode-seg">
+                      <button class="on" data-mode="headless">Headless</button>
+                      <button data-mode="headed">Headed</button>
+                    </div>
+                  </div>
+                  <div class="field" style="flex:1; min-width:160px;">
+                    <label>Parallel workers</label>
+                    <select id="workers-select">
+                      <option>1 (serial)</option><option selected>4 workers</option><option>8 workers</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <div class="toggle-row">
+                    <div><div class="t">Retry failed tests</div><div class="d">Up to 2 retries on failure</div></div>
+                    <div class="switch on" data-toggle="retry"><div class="knob"></div></div>
+                  </div>
+                  <div class="toggle-row">
+                    <div><div class="t">Parallel execution</div><div class="d">Run across workers concurrently</div></div>
+                    <div class="switch on" data-toggle="parallel"><div class="knob"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="panel ready-panel">
+            <div class="rp-top">
+              <div class="rp-lbl">Ready to run</div>
+              <div class="rp-num" id="sum-exec">24</div>
+              <div class="rp-sub"><b id="sum-cases" class="mono" style="color:var(--accent);">12</b> test cases · <b id="sum-browsers" class="mono" style="color:var(--accent);">2</b> browsers</div>
+            </div>
+            <div class="rp-kv">
+              <div class="row"><span class="k">Environment</span><span class="v" id="rp-env">Dev</span></div>
+              <div class="row"><span class="k">Mode</span><span class="v" id="rp-mode">Headless</span></div>
+              <div class="row"><span class="k">Workers</span><span class="v" id="rp-workers">4</span></div>
+              <div class="row"><span class="k">Retry on failure</span><span class="v">Yes</span></div>
+            </div>
+            <div class="rp-actions">
+              <button class="btn primary" id="run-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 4l14 8-14 8V4z"/></svg>
+                Run tests
+              </button>
+              <button class="link-btn">Save as preset</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- LIVE RUN (separate page, one column per browser) -->
+    <section class="view" id="view-live" hidden>
+      <div class="topbar">
+        <div><h1 id="live-title">Live Run</h1><div class="sub" id="live-sub">No run in progress</div></div>
+        <button class="btn sm danger-out" id="cancel-btn" hidden>Cancel run</button>
+      </div>
+      <div class="content">
+
+        <!-- idle state: no run started yet -->
+        <div id="live-idle">
+          <div class="panel">
+            <div style="padding:60px 20px; text-align:center;">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.6" style="margin:0 auto 14px;"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+              <div style="font-weight:800; font-size:15px;">Nothing running right now</div>
+              <div style="font-size:12.5px; color:var(--text-faint); margin-top:4px;">Start a run from Test Runs to watch it live, one column per browser.</div>
+              <button class="btn primary" data-view="runs" style="margin-top:18px;">Go to Test Runs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- active/complete run -->
+        <div id="live-active" hidden>
+          <div class="panel">
+            <div style="padding:18px;">
+              <div class="live-head">
+                <div class="progress-wrap">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:12.5px;font-weight:700;">
+                    <span id="live-progress-label">Running 0 / 24 executions</span>
+                    <span class="mono" id="live-elapsed" style="color:var(--text-faint);">00:00</span>
+                  </div>
+                  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
+                </div>
+              </div>
+              <div class="live-stats" style="margin-top:18px;">
+                <div class="live-stat"><div class="n success" id="live-pass">0</div><div class="l">Passed</div></div>
+                <div class="live-stat"><div class="n danger" id="live-fail">0</div><div class="l">Failed</div></div>
+                <div class="live-stat"><div class="n" id="live-running-n">0</div><div class="l">Running</div></div>
+                <div class="live-stat"><div class="n" style="color:var(--text-faint);" id="live-queued">0</div><div class="l">Queued</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="live-cols" id="live-cols" style="margin-top:16px;"></div>
+
+          <div class="panel" id="live-complete-panel" style="margin-top:16px;" hidden>
+            <div class="panel-head">
+              <div><h2 id="complete-title">Run complete</h2><div class="sub" id="complete-sub"></div></div>
+              <button class="btn primary sm" data-view="results">View full results →</button>
+            </div>
+            <div class="kpi-row" style="grid-template-columns:repeat(4,1fr); padding:18px;">
+              <div class="kpi"><div class="lbl">Executions</div><div class="val" id="complete-total">24</div></div>
+              <div class="kpi"><div class="lbl">Passed</div><div class="val success" id="complete-pass">21</div></div>
+              <div class="kpi"><div class="lbl">Failed</div><div class="val danger" id="complete-fail">2</div></div>
+              <div class="kpi"><div class="lbl">Skipped</div><div class="val skip">0</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="view" id="view-results" hidden>
+      <div class="topbar">
+        <div><h1>Results</h1><div class="sub" id="results-run-sub">No runs yet</div></div>
+        <select style="width:auto;min-width:150px;" id="results-run-select">
+          <option>No runs yet</option>
+        </select>
+      </div>
+      <div class="content">
+        <div class="panel">
+          <div class="filter-bar">
+            <div class="status-tabs" id="status-tabs">
+              <button class="status-tab on" data-status="">All 0</button>
+              <button class="status-tab" data-status="passed">Passed 0</button>
+              <button class="status-tab" data-status="failed">Failed 0</button>
+              <button class="status-tab" data-status="skipped">Skipped 0</button>
+            </div>
+            <select id="results-browser-filter"><option value="">All browsers</option><option>chromium</option><option>firefox</option><option>webkit</option></select>
+            <select id="results-suite-filter"><option value="">All suites</option></select>
+            <div class="search" style="flex:1;min-width:160px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Search results…" id="results-search"></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Suite</th><th>Browser</th><th>Status</th><th>Duration</th><th>Timestamp</th></tr></thead>
+              <tbody id="results-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="view" id="view-reports" hidden>
+      <div class="topbar"><div><h1>Reports</h1><div class="sub">Trends across the last 10 runs</div></div></div>
+      <div class="content">
+        <div class="panel" style="padding:20px;" id="trend-panel">
+          <h2 style="font-size:14.5px;margin:0 0 16px;">Pass rate trend</h2>
+          <div id="trend-empty" style="text-align:center; color:var(--text-faint); font-size:12.5px; padding:30px 0;">Run the suite a few times to see a trend here.</div>
+          <svg viewBox="0 0 640 180" width="100%" style="overflow:visible;" id="trend-svg" hidden></svg>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);" id="trend-labels"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Flaky tests</h2><div class="sub">Tests with both passes and failures across recent runs</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Suite</th><th>Browser</th><th>Flake rate</th><th>Last seen</th></tr></thead>
+              <tbody id="flaky-table"><tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">No flaky tests detected yet.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="view-settings" hidden>
+      <div class="topbar"><div><h1>Settings</h1><div class="sub">Environments, defaults &amp; notifications</div></div></div>
+      <div class="content">
+        <div class="settings-grid">
+          <div class="panel">
+            <div class="panel-head"><h2>Environments</h2></div>
+            <div style="padding:6px 18px;">
+              <div class="toggle-row"><div><div class="t">Dev</div><div class="d mono" style="font-family:var(--font-mono);">https://hive-dev.thegritcity.com</div></div><span class="badge pass"><span class="dot"></span>Reachable</span></div>
+              <div class="toggle-row"><div><div class="t">Staging</div><div class="d" style="font-family:var(--font-mono);">https://staging.hive-app.dev</div></div><span class="badge pass"><span class="dot"></span>Reachable</span></div>
+              <div class="toggle-row"><div><div class="t">Production</div><div class="d" style="font-family:var(--font-mono);">https://hive-app.dev</div></div><span class="badge skip"><span class="dot"></span>Locked</span></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>Default run settings</h2></div>
+            <div style="padding:6px 18px;">
+              <div class="toggle-row"><div><div class="t">Headless by default</div><div class="d">New runs start headless</div></div><div class="switch on"><div class="knob"></div></div></div>
+              <div class="toggle-row"><div><div class="t">Auto-retry on failure</div><div class="d">2 retries before marking failed</div></div><div class="switch on"><div class="knob"></div></div></div>
+              <div class="toggle-row"><div><div class="t">Capture video on failure</div><div class="d">Attach .webm to failed results</div></div><div class="switch"><div class="knob"></div></div></div>
+              <div class="toggle-row"><div><div class="t">Slack notifications</div><div class="d">Post run summary to #qa-automation</div></div><div class="switch on"><div class="knob"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <div style="font-weight:800;font-size:15px;" id="d-title">sends email digest on schedule</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px;" id="d-sub">Notifications · Firefox · Run #482</div>
+    </div>
+    <button class="btn ghost sm" id="drawer-close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="d-section" id="d-error-section">
+      <h3>Error</h3>
+      <div class="code-block" id="d-error">—</div>
+    </div>
+    <div class="d-section" id="d-steps-section" hidden>
+      <h3>Steps</h3>
+      <div class="steps" id="d-steps"></div>
+    </div>
+    <div class="d-section" id="d-attachments-section" style="border-bottom:none;" hidden>
+      <h3>Attachments</h3>
+      <div id="d-attachments"></div>
+    </div>
+  </div>
+</aside>
+
+<script src="app.js"></script>
+</body>
+</html>

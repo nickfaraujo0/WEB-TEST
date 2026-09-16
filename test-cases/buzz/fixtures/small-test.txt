@@ -1,0 +1,1 @@
+Hive Buzz QA fixture — small text file used by the "Attach a File" test cases.

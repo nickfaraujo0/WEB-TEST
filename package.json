@@ -1,0 +1,18 @@
+{
+  "name": "hive-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HIVE — a web dashboard for selecting, running, and reviewing Playwright test suites",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "postinstall": "echo \"Next: run 'npx playwright install' to download browser binaries, then 'npm start'.\""
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.47.0"
+  }
+}
