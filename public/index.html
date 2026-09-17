@@ -147,7 +147,7 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Test</th><th>Suite</th><th>Tags</th><th>Last status</th><th>Avg duration</th></tr></thead>
+              <thead><tr><th>Test</th><th>Suite</th><th>Tags</th><th>Last status</th><th>Duration</th><th>Last run</th></tr></thead>
               <tbody id="cases-table"></tbody>
             </table>
           </div>
@@ -395,6 +395,24 @@
             </table>
           </div>
         </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Currently failing</h2><div class="sub">How long each broken test has been failing, per browser</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Suite</th><th>Browser</th><th>Failing for</th><th>Since</th></tr></thead>
+              <tbody id="broken-table"><tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently failing.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Browser mismatches</h2><div class="sub">Tests whose latest result differs across browsers</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Suite</th><th>Chromium</th><th>Firefox</th><th>WebKit</th></tr></thead>
+              <tbody id="mismatch-table"><tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">No browser-specific differences detected.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -447,6 +465,31 @@
     <div class="d-section" id="d-attachments-section" style="border-bottom:none;" hidden>
       <h3>Attachments</h3>
       <div id="d-attachments"></div>
+    </div>
+  </div>
+</aside>
+
+<aside class="drawer" id="history-drawer">
+  <div class="drawer-head">
+    <div>
+      <div style="font-weight:800;font-size:15px;" id="h-title">Test name</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px;" id="h-sub">Suite</div>
+    </div>
+    <button class="btn ghost sm" id="history-drawer-close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="d-section">
+      <h3>Last run per browser</h3>
+      <div id="h-last-per-browser" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+    <div class="d-section" style="border-bottom:none;">
+      <h3>History</h3>
+      <div class="table-wrap">
+        <table style="font-size:12.5px;">
+          <thead><tr><th style="padding:6px 0;">Run</th><th>Browser</th><th>Status</th><th>Duration</th><th>When</th></tr></thead>
+          <tbody id="h-history-table"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </aside>

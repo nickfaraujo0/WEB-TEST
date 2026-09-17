@@ -1,0 +1,15 @@
+services:
+  hive:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      # Saved run history and Playwright's own trace/screenshot/video output survive a
+      # rebuild instead of resetting every time the image is recreated.
+      - ./results:/app/results
+      - ./test-results:/app/test-results
+      # Edit or add specs on the host and they show up immediately — no image rebuild needed,
+      # `playwright test --list` runs fresh every time the dashboard asks for the test tree.
+      - ./test-cases:/app/test-cases
+    environment:
+      - BASE_URL=${BASE_URL:-https://hive-dev.thegritcity.com}

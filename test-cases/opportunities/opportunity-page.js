@@ -19,7 +19,7 @@ export class OpportunityPage {
   }
 
   async goto() {
-    await this.page.goto(OPPORTUNITY_URL);
+    await this.page.goto(OPPORTUNITY_URL, { waitUntil: 'domcontentloaded' });
   }
 
   /** The active tab's wrapper carries an extra "bg-adminSubtle" class; others don't. */

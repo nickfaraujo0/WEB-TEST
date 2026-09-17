@@ -20,7 +20,7 @@ import { SignupPage } from './signup-page.js';
  */
 test('TC002 - Verify navigation to Sign-Up page', async ({ page }) => {
   // Document the gap: no Sign Up affordance exists on the login screen itself.
-  await page.goto('https://hive-dev.thegritcity.com/login');
+  await page.goto('https://hive-dev.thegritcity.com/login', { waitUntil: 'domcontentloaded' });
   await expect(page.getByText(/sign up/i)).toHaveCount(0);
 
   // The sign-up screen does exist and works when reached directly.

@@ -12,7 +12,7 @@ import { test, expect } from '../_hive-live.mjs';
  * Expected: the login screen is displayed first.
  */
 test('TC001 - Verify login screen on app launch', async ({ page }) => {
-  await page.goto('https://hive-dev.thegritcity.com/');
+  await page.goto('https://hive-dev.thegritcity.com/', { waitUntil: 'domcontentloaded' });
 
   await expect(page).toHaveURL(/\/login/i);
   await expect(page.getByText('Log in to your account.')).toBeVisible();

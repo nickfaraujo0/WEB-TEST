@@ -140,6 +140,7 @@
     retries: true,
     parallel: true,
     historyRuns: [],
+    testHistory: {}, // "file:line" -> {file,line,title,suite,lastRunAt,byProject,history}
     latestRun: null,
     resultsRun: null,
     resultsFilters: { status: '', browser: '', suite: '', q: '' },
@@ -380,13 +381,17 @@
   // ---------------------------------------------------------------------
   // Test Cases page
   // ---------------------------------------------------------------------
-  function lastResultFor(fileLine) {
-    if (!STATE.latestRun) return null;
-    var hit = null;
-    STATE.latestRun.tests.forEach(function (t) {
-      if (t.file + ':' + t.line === fileLine) hit = t;
+  // The single most recent point across all browsers for one test — used for the Test
+  // Cases table's "last status"/"duration"/"last run" columns, which don't distinguish
+  // browsers (the history drawer does).
+  function mostRecentPoint(historyEntry) {
+    if (!historyEntry) return null;
+    var last = null;
+    Object.keys(historyEntry.byProject).forEach(function (p) {
+      var pt = historyEntry.byProject[p];
+      if (!last || pt.finishedAt > last.finishedAt) last = pt;
     });
-    return hit;
+    return last;
   }
   function renderCasesTable(filterText, filterSuite) {
     var rows = [];
@@ -394,20 +399,27 @@
       if (filterSuite && s.name !== filterSuite) return;
       s.cases.forEach(function (c) {
         if (filterText && c.title.toLowerCase().indexOf(filterText.toLowerCase()) === -1) return;
-        var last = lastResultFor(c.id);
+        var entry = STATE.testHistory[c.id];
+        var last = mostRecentPoint(entry);
         rows.push(
-          '<tr><td class="cell-name">' + esc(c.title) + '</td><td>' + esc(s.name) + '</td><td>' +
+          '<tr class="clickable" data-test-key="' + esc(c.id) + '"><td class="cell-name">' + esc(c.title) + '</td><td>' + esc(s.name) + '</td><td>' +
             (c.tags && c.tags.length
               ? c.tags.map(function (t) {
                   return '<span class="badge skip" style="margin-right:4px;">' + esc(t) + '</span>';
                 }).join('')
               : '<span style="color:var(--text-faint);">—</span>') +
             '</td><td>' + (last ? badge(last.status) : '<span style="color:var(--text-faint);">Not run</span>') + '</td>' +
-            '<td class="mono">' + (last ? fmtDuration(last.duration) : '—') + '</td></tr>'
+            '<td class="mono">' + (last ? fmtDuration(last.duration) : '—') + '</td>' +
+            '<td class="cell-id">' + (last ? fmtWhen(last.finishedAt) : '—') + '</td></tr>'
         );
       });
     });
-    $('cases-table').innerHTML = rows.join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:30px;">No test cases match.</td></tr>';
+    $('cases-table').innerHTML = rows.join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:30px;">No test cases match.</td></tr>';
+    document.querySelectorAll('#cases-table tr.clickable').forEach(function (tr) {
+      tr.addEventListener('click', function () {
+        openHistoryDrawer(tr.dataset.testKey);
+      });
+    });
   }
   $('cases-search').addEventListener('input', function (e) {
     renderCasesTable(e.target.value, $('cases-suite-filter').value);
@@ -667,7 +679,9 @@
         $('complete-fail').textContent = run.stats.failed;
 
         loadHistory();
-        renderCasesTable($('cases-search').value, $('cases-suite-filter').value);
+        loadTestHistory().then(function () {
+          renderCasesTable($('cases-search').value, $('cases-suite-filter').value);
+        });
       })
       .catch(function () {})
       .then(function () {
@@ -867,6 +881,7 @@
   // Result detail drawer
   // ---------------------------------------------------------------------
   function openDrawer(test, testIndex) {
+    $('history-drawer').classList.remove('show');
     $('d-title').textContent = test.title;
     $('d-sub').textContent = (test.suite || '') + ' · ' + (BROWSER_META[test.project] ? BROWSER_META[test.project].label : test.project) + ' · ' + shortId(STATE.resultsRun.id);
 
@@ -916,7 +931,71 @@
     $('drawer').classList.remove('show');
   }
   $('drawer-close').addEventListener('click', closeDrawer);
-  $('scrim').addEventListener('click', closeDrawer);
+  $('scrim').addEventListener('click', function () {
+    closeDrawer();
+    closeHistoryDrawer();
+  });
+
+  // ---------------------------------------------------------------------
+  // Test history drawer (Test Cases page — "when was this last run", full history)
+  // ---------------------------------------------------------------------
+  function loadTestHistory() {
+    return fetch('/api/test-history')
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (data) {
+        STATE.testHistory = data.tests || {};
+      })
+      .catch(function () {});
+  }
+
+  function openHistoryDrawer(key) {
+    $('drawer').classList.remove('show');
+    var entry = STATE.testHistory[key];
+    var meta = STATE.testsById[key];
+    $('h-title').textContent = (meta && meta.title) || (entry && entry.title) || 'Test';
+    $('h-sub').textContent = (meta && meta.suite) || (entry && entry.suite) || '';
+
+    var perBrowser = $('h-last-per-browser');
+    var historyTable = $('h-history-table');
+    if (!entry || !entry.history.length) {
+      perBrowser.innerHTML = '<div style="color:var(--text-faint); font-size:12.5px;">This test hasn\'t been run yet.</div>';
+      historyTable.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:20px;">No history yet.</td></tr>';
+    } else {
+      perBrowser.innerHTML = Object.keys(entry.byProject)
+        .map(function (p) {
+          var pt = entry.byProject[p];
+          return (
+            '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">' +
+            bchip(p) + '<span style="display:flex;align-items:center;gap:10px;">' + badge(pt.status) +
+            '<span class="mono" style="font-size:11.5px;color:var(--text-faint);">' + fmtWhen(pt.finishedAt) + '</span></span></div>'
+          );
+        })
+        .join('');
+
+      var rows = entry.history
+        .slice()
+        .reverse() // newest first
+        .map(function (p) {
+          return (
+            '<tr><td class="cell-id" style="padding:6px 0;">' + shortId(p.runId) + '</td><td>' + bchip(p.project) + '</td><td>' +
+            badge(p.status) + '</td><td class="mono">' + fmtDuration(p.duration) + '</td><td class="cell-id">' + fmtWhen(p.finishedAt) + '</td></tr>'
+          );
+        });
+      historyTable.innerHTML = rows.join('');
+    }
+
+    $('scrim').classList.add('show');
+    $('history-drawer').classList.add('show');
+  }
+  function closeHistoryDrawer() {
+    $('history-drawer').classList.remove('show');
+  }
+  $('history-drawer-close').addEventListener('click', function () {
+    $('scrim').classList.remove('show');
+    closeHistoryDrawer();
+  });
 
   // ---------------------------------------------------------------------
   // Reports page
@@ -932,6 +1011,8 @@
         if (myId !== reportsReqId) return; // a newer request already landed — drop this stale one
         renderTrend(data.trend || []);
         renderFlaky(data.flaky || []);
+        renderBroken(data.broken || []);
+        renderMismatch(data.crossBrowser || []);
       })
       .catch(function () {});
   }
@@ -995,6 +1076,38 @@
         })
         .join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">No flaky tests detected yet.</td></tr>';
   }
+  function renderBroken(broken) {
+    $('broken-table').innerHTML =
+      broken
+        .map(function (b) {
+          return (
+            '<tr><td class="cell-name">' + esc(b.title) + '</td><td>' + esc(b.suite || '') + '</td><td>' + bchip(b.project) + '</td>' +
+            '<td class="mono">' + b.runsFailing + ' run' + (b.runsFailing === 1 ? '' : 's') + '</td><td class="cell-id">' + fmtWhen(b.failingSince) + '</td></tr>'
+          );
+        })
+        .join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently failing.</td></tr>';
+  }
+
+  function renderMismatch(mismatches) {
+    var order = ['chromium', 'firefox', 'webkit'];
+    $('mismatch-table').innerHTML =
+      mismatches
+        .map(function (m) {
+          var byProject = {};
+          m.results.forEach(function (r) {
+            byProject[r.project] = r;
+          });
+          var cells = order
+            .map(function (p) {
+              var r = byProject[p];
+              return '<td>' + (r ? badge(r.status) : '<span style="color:var(--text-faint);">—</span>') + '</td>';
+            })
+            .join('');
+          return '<tr><td class="cell-name">' + esc(m.title) + '</td><td>' + esc(m.suite || '') + '</td>' + cells + '</tr>';
+        })
+        .join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">No browser-specific differences detected.</td></tr>';
+  }
+
   document.querySelector('[data-view="reports"]').addEventListener('click', loadReports);
 
   // ---------------------------------------------------------------------
@@ -1005,6 +1118,10 @@
       return loadHistory();
     })
     .then(function () {
+      return loadTestHistory();
+    })
+    .then(function () {
+      renderCasesTable('', '');
       resumeIfActive();
     });
 })();

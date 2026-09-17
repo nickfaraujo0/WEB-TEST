@@ -5,13 +5,55 @@ locally as a small Node/Express app — no build step, no framework.
 
 ## Setup
 
+### Docker (recommended — same environment on every machine)
+
+Playwright browsers need real OS-level libraries (fonts, codecs, GPU/display deps) that
+differ by platform and are the single biggest source of "works on my machine" failures —
+Docker sidesteps all of that by using Microsoft's own Playwright image, which ships
+Chromium/Firefox/WebKit already installed and working. What this actually buys anyone
+else running HIVE:
+
+- **One prerequisite instead of several** — just Docker installed. No "do you have
+  Node.js, the right version, did `npm install` run in the repo root and not
+  `test-cases/`, does Playwright have the OS libraries it needs" — all of that is already
+  baked into the image.
+- **Identical environment everywhere** — Windows, Mac, and Linux all run the exact same
+  container, so there's no host `node_modules` to get wrong and no OS-specific failure
+  mode (this is what fixes a "module not found" error from a fresh clone on Windows).
+- **One command to run it** — `docker compose up --build`, then open the dashboard. No
+  install dance to walk someone through.
+
+The one real tradeoff: a ~2-3GB one-time image download, since it bundles all three real
+browser engines *and* their OS-level dependencies (Playwright installed the normal way
+downloads less because it assumes the host already has those libraries — which is exactly
+the assumption that breaks on an unfamiliar machine).
+
+```bash
+docker compose up --build
+```
+
+Then open **http://localhost:4000**. Saved run history (`results/`), Playwright's
+screenshot/video/trace output (`test-results/`), and `test-cases/` are bind-mounted from
+the host, so run history survives a rebuild and editing or adding a spec doesn't need one.
+
+Without Compose:
+
+```bash
+docker build -t hive .
+docker run -p 4000:4000 -v "$(pwd)/results:/app/results" -v "$(pwd)/test-cases:/app/test-cases" hive
+```
+
+### Without Docker
+
 ```bash
 npm install
 npx playwright install   # downloads the Chromium/Firefox/WebKit binaries Playwright drives
 npm start
 ```
 
-Then open **http://localhost:4000**.
+Then open **http://localhost:4000**. `npm install` must run from the repo root (not
+`test-cases/`, which has its own `package.json` for an unrelated reason — see below) or the
+server's own dependencies (Express, Playwright) never get installed.
 
 ## How it works
 
@@ -28,8 +70,13 @@ Then open **http://localhost:4000**.
 - **Results** — every run is saved to `results/<runId>.json`, including real error messages,
   stack traces, step-by-step breakdowns, and attachments (screenshots, video, trace.zip)
   that Playwright captured on failure. Click a failed row to see all of it.
-- **Reports** — pass-rate trend and flaky-test detection are computed from your last 10
-  saved runs.
+- **Test Cases** — each row shows when it was last run and its latest status; click a row
+  to open its full history (every saved run it appeared in, per browser).
+- **Reports** — pass-rate trend and flaky-test detection over the last 10 runs, plus two
+  reports built from your full saved history (`server/testHistory.js`): **Currently
+  failing**, showing how many consecutive runs (and how long) each broken test has stayed
+  broken, per browser; and **Browser mismatches**, tests whose latest result differs
+  across browsers (passing on Chromium, failing on WebKit, etc.).
 
 ## Project layout
 

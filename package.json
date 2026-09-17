@@ -7,12 +7,10 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node server/index.js",
-    "postinstall": "echo \"Next: run 'npx playwright install' to download browser binaries, then 'npm start'.\""
+    "postinstall": "node -e \"console.log('Next: run npx playwright install, then npm start.')\""
   },
   "dependencies": {
-    "express": "^4.19.2"
-  },
-  "devDependencies": {
-    "@playwright/test": "^1.47.0"
+    "express": "^4.19.2",
+    "@playwright/test": "1.63.0"
   }
 }

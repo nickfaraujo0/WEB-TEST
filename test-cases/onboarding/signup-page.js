@@ -30,7 +30,7 @@ export class SignupPage {
   }
 
   async goto() {
-    await this.page.goto(SIGNUP_URL);
+    await this.page.goto(SIGNUP_URL, { waitUntil: 'domcontentloaded' });
   }
 
   async fill({ name, email, password, confirmPassword }) {

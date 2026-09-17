@@ -26,7 +26,7 @@ test('TC009 - Login Session Expiry', async ({ page }) => {
 
   // "Try accessing any APIs" — reload a protected route so the app has to use the now-invalid
   // session to fetch data.
-  await page.goto('https://hive-dev.thegritcity.com/Buzz');
+  await page.goto('https://hive-dev.thegritcity.com/Buzz', { waitUntil: 'domcontentloaded' });
 
   await expect(page).toHaveURL(/\/login/i, { timeout: 15000 });
 

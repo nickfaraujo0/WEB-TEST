@@ -7,6 +7,7 @@ const express = require('express');
 const store = require('./store');
 const { listTests } = require('./testLister');
 const { getPlaywrightBin, playwrightInstalled } = require('./playwrightBin');
+const testHistory = require('./testHistory');
 
 const PORT = process.env.PORT || 4000;
 const ROOT = path.join(__dirname, '..');
@@ -360,7 +361,19 @@ app.get('/api/reports', (req, res) => {
     .sort((a, b) => b.flakeRate - a.flakeRate)
     .slice(0, 10);
 
-  res.json({ trend, flaky });
+  // Broken-duration and cross-browser mismatch both benefit from a longer look-back than
+  // the 10-run trend chart, so they're computed from a separate, wider history build.
+  const history = testHistory.buildHistory(200);
+  const broken = testHistory.computeBroken(history).slice(0, 20);
+  const crossBrowser = testHistory.computeCrossBrowserMismatches(history).slice(0, 20);
+
+  res.json({ trend, flaky, broken, crossBrowser });
+});
+
+// Full per-test history (every saved run each test appeared in), keyed by "file:line" — powers
+// the "last run" column on Test Cases and the history drawer when a row is clicked.
+app.get('/api/test-history', (req, res) => {
+  res.json({ tests: testHistory.buildHistory(200) });
 });
 
 // ---------------------------------------------------------------------------

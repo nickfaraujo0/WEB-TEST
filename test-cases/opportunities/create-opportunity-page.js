@@ -28,7 +28,7 @@ export class CreateOpportunityPage {
   }
 
   async goto(type) {
-    await this.page.goto(`https://hive-dev.thegritcity.com/opportunity/create?type=${type}`);
+    await this.page.goto(`https://hive-dev.thegritcity.com/opportunity/create?type=${type}`, { waitUntil: 'domcontentloaded' });
   }
 
   async selectJobType(optionText) {

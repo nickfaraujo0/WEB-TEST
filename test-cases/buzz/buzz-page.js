@@ -36,7 +36,7 @@ export class BuzzPage {
   }
 
   async goto() {
-    await this.page.goto(BUZZ_URL);
+    await this.page.goto(BUZZ_URL, { waitUntil: 'domcontentloaded' });
   }
 
   async openCreateBuzz() {
