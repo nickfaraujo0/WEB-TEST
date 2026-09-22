@@ -59,6 +59,14 @@ function pickError(result) {
   }
 }
 
+function safeAnnotations(test) {
+  try {
+    return (test.annotations || []).map((a) => ({ type: a.type, description: a.description || null }));
+  } catch (e) {
+    return [];
+  }
+}
+
 function safeTotal(suite) {
   try {
     return suite.allTests().length;
@@ -111,6 +119,7 @@ class HiveReporter {
       error: pickError(result),
       steps,
       attachments,
+      annotations: safeAnnotations(test),
     });
   }
 

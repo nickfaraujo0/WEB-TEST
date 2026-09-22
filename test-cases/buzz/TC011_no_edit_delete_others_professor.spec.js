@@ -21,6 +21,6 @@ import { test } from '../_hive-live.mjs';
  * Professor A, publish a marker post; sign in as Professor B, locate that post, assert its
  * "..." trigger has count 0.
  */
-test.skip('TC011 - Verify a Professor cannot edit/delete another Professor\'s Buzz', async () => {
-  // No second faculty account available — see file header.
+test('TC011 - Verify a Professor cannot edit/delete another Professor\'s Buzz', async () => {
+  test.skip(true, 'No second faculty account available to test with — see file header.');
 });

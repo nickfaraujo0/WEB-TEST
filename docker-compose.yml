@@ -8,6 +8,8 @@ services:
       # rebuild instead of resetting every time the image is recreated.
       - ./results:/app/results
       - ./test-results:/app/test-results
+      # The bug log (data/bugs.json) survives a rebuild the same way.
+      - ./data:/app/data
       # Edit or add specs on the host and they show up immediately — no image rebuild needed,
       # `playwright test --list` runs fresh every time the dashboard asks for the test tree.
       - ./test-cases:/app/test-cases

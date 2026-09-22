@@ -25,9 +25,27 @@ import { CreateOpportunityPage, PreviewOpportunityPage } from './create-opportun
  * place. Split into two fresh page loads because submitting the empty form once mutates the
  * Organization field's placeholder attribute, which would make the second half unreliable if
  * chained on the same page.
+ *
+ * Each scenario (empty/complete) is duplicated per type (Jobs/Internship) so all four are
+ * tracked as distinct test cases rather than one case standing in for both types.
  */
 test.describe('TC007 - Publish is only reachable after mandatory fields are filled', () => {
-  test('empty form: Preview shows inline validation and does not navigate', async ({ page }) => {
+  test('TC007a-Jobs - empty Jobs form: Preview shows inline validation and does not navigate', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Jobs');
+
+    await createPage.previewButton.click();
+
+    await expect(createPage.fieldError.first()).toBeVisible();
+    await expect(page).toHaveURL(/\/opportunity\/create/i);
+  });
+
+  test('TC007a-Internship - empty Internship form: Preview shows inline validation and does not navigate', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
     await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
@@ -42,7 +60,26 @@ test.describe('TC007 - Publish is only reachable after mandatory fields are fill
     await expect(page).toHaveURL(/\/opportunity\/create/i);
   });
 
-  test('complete form: Preview navigates to a page with a visible Publish button', async ({ page }) => {
+  test('TC007b-Jobs - complete Jobs form: Preview navigates to a page with a visible Publish button', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Jobs');
+
+    await createPage.titleInput.fill('QA Test - TC007b-Jobs (safe to delete)');
+    await createPage.fillDescription('QA automated test listing for TC007b-Jobs. Safe to delete.');
+    await createPage.selectOrganization('City', 'Grit City');
+
+    await createPage.previewButton.click();
+
+    const previewPage = new PreviewOpportunityPage(page);
+    await expect(previewPage.publishButton).toBeVisible({ timeout: 15000 });
+  });
+
+  test('TC007b-Internship - complete Internship form: Preview navigates to a page with a visible Publish button', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
     await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
@@ -51,8 +88,8 @@ test.describe('TC007 - Publish is only reachable after mandatory fields are fill
     const createPage = new CreateOpportunityPage(page);
     await createPage.goto('Internship');
 
-    await createPage.titleInput.fill('QA Test - TC007 (safe to delete)');
-    await createPage.fillDescription('QA automated test listing for TC007. Safe to delete.');
+    await createPage.titleInput.fill('QA Test - TC007b-Internship (safe to delete)');
+    await createPage.fillDescription('QA automated test listing for TC007b-Internship. Safe to delete.');
     await createPage.selectOrganization('City', 'Grit City');
 
     await createPage.previewButton.click();

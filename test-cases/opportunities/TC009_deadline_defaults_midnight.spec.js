@@ -22,31 +22,62 @@ import { CreateOpportunityPage, PreviewOpportunityPage } from './create-opportun
  * gap, not a wording difference like the login/onboarding suites' cases.
  *
  * Cost note: like any real create-flow E2E test, running this creates one new "QA Test"
- * Internship listing in the dev database each time.
+ * listing in the dev database each time (one per type below).
+ *
+ * Split per type so Jobs and Internship are tracked as distinct test cases.
  */
-test('TC009 - Verify the deadline never displays a time (does not default to 11:59 PM)', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+test.describe('TC009 - Deadline never displays a time (does not default to 11:59 PM)', () => {
+  test('TC009-Jobs', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
 
-  const createPage = new CreateOpportunityPage(page);
-  await createPage.goto('Internship');
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Jobs');
 
-  await createPage.titleInput.fill('QA Test - TC009 automated (safe to delete)');
-  await createPage.fillDescription('QA automated test listing for TC009. Safe to delete.');
-  await createPage.selectOrganization('City', 'Grit City');
+    await createPage.titleInput.fill('QA Test - TC009-Jobs automated (safe to delete)');
+    await createPage.fillDescription('QA automated test listing for TC009-Jobs. Safe to delete.');
+    await createPage.selectOrganization('City', 'Grit City');
 
-  // Date only — deliberately leave the time picker untouched.
-  await createPage.deadlineDateInput.click();
-  await page.locator('.ant-picker-cell-in-view').last().click();
-  await expect(createPage.deadlineTimeInput).toHaveValue('');
+    // Date only — deliberately leave the time picker untouched.
+    await createPage.deadlineDateInput.click();
+    await page.locator('.ant-picker-cell-in-view').last().click();
+    await expect(createPage.deadlineTimeInput).toHaveValue('');
 
-  await createPage.previewButton.click();
+    await createPage.previewButton.click();
 
-  const previewPage = new PreviewOpportunityPage(page);
-  await expect(previewPage.deadlineText).toBeVisible({ timeout: 15000 });
-  const deadlineText = await previewPage.deadlineText.textContent();
-  expect(deadlineText).not.toMatch(/\d{1,2}\s*[:.]\s*\d{2}\s*(am|pm)/i);
-  expect(deadlineText).not.toContain('11:59');
+    const previewPage = new PreviewOpportunityPage(page);
+    await expect(previewPage.deadlineText).toBeVisible({ timeout: 15000 });
+    const deadlineText = await previewPage.deadlineText.textContent();
+    expect(deadlineText).not.toMatch(/\d{1,2}\s*[:.]\s*\d{2}\s*(am|pm)/i);
+    expect(deadlineText).not.toContain('11:59');
+  });
+
+  test('TC009-Internship', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Internship');
+
+    await createPage.titleInput.fill('QA Test - TC009-Internship automated (safe to delete)');
+    await createPage.fillDescription('QA automated test listing for TC009-Internship. Safe to delete.');
+    await createPage.selectOrganization('City', 'Grit City');
+
+    // Date only — deliberately leave the time picker untouched.
+    await createPage.deadlineDateInput.click();
+    await page.locator('.ant-picker-cell-in-view').last().click();
+    await expect(createPage.deadlineTimeInput).toHaveValue('');
+
+    await createPage.previewButton.click();
+
+    const previewPage = new PreviewOpportunityPage(page);
+    await expect(previewPage.deadlineText).toBeVisible({ timeout: 15000 });
+    const deadlineText = await previewPage.deadlineText.textContent();
+    expect(deadlineText).not.toMatch(/\d{1,2}\s*[:.]\s*\d{2}\s*(am|pm)/i);
+    expect(deadlineText).not.toContain('11:59');
+  });
 });

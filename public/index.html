@@ -61,6 +61,10 @@
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
             Reports
           </button>
+          <button class="navitem" data-view="bugs">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="8" height="11" rx="4"/><path d="M9 8a3 3 0 0 1 6 0M4 13h4M16 13h4M5 7l3 2M19 7l-3 2M5 20l3-2M19 20l-3-2"/></svg>
+            Bug Log <span class="navcount" id="nav-bug-count">0</span>
+          </button>
         </nav>
       </div>
 
@@ -138,18 +142,21 @@
         <button class="btn primary" data-view="runs"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 4l14 8-14 8V4z"/></svg> Run tests</button>
       </div>
       <div class="content">
-        <div class="panel">
-          <div class="filter-bar">
-            <div class="search" style="max-width:280px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Search test cases…" id="cases-search"></div>
-            <select id="cases-suite-filter">
-              <option value="">All suites</option>
-            </select>
+        <div class="git-bar" id="cases-git-bar" hidden></div>
+        <div class="cases-layout">
+          <div class="panel cases-sidebar" id="cases-sidebar">
+            <div class="cases-sidebar-head">
+              <div class="search" style="flex:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Filter by name or suite…" id="cases-search"></div>
+              <button type="button" class="icon-btn" id="cases-collapse-btn" title="Collapse"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button>
+            </div>
+            <div class="cases-sidebar-body" id="cases-tree"></div>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Test</th><th>Suite</th><th>Tags</th><th>Last status</th><th>Duration</th><th>Last run</th></tr></thead>
-              <tbody id="cases-table"></tbody>
-            </table>
+          <div class="panel code-viewer" id="cases-viewer">
+            <div class="code-viewer-tab" id="cases-viewer-tab">Pick a test case on the left. Editing happens in your editor — this is a read-only view of what's on disk.</div>
+            <div class="git-strip" id="cases-git-strip" hidden></div>
+            <div class="code-viewer-body" id="cases-viewer-body">
+              <div class="live-col-empty">Select a test case to view its source.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -399,17 +406,55 @@
           <div class="panel-head"><h2>Currently failing</h2><div class="sub">How long each broken test has been failing, per browser</div></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Test</th><th>Suite</th><th>Browser</th><th>Failing for</th><th>Since</th></tr></thead>
-              <tbody id="broken-table"><tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently failing.</td></tr></tbody>
+              <thead><tr><th>Test</th><th>Suite</th><th>Browser</th><th>Reason</th><th>Failing for</th><th>Since</th></tr></thead>
+              <tbody id="broken-table"><tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently failing.</td></tr></tbody>
             </table>
           </div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h2>Browser mismatches</h2><div class="sub">Tests whose latest result differs across browsers</div></div>
+          <div class="panel-head"><h2>Browser mismatches</h2><div class="sub">Tests whose latest result differs across browsers — hover a status for the error/reason</div></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Test</th><th>Suite</th><th>Chromium</th><th>Firefox</th><th>WebKit</th></tr></thead>
               <tbody id="mismatch-table"><tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">No browser-specific differences detected.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Currently skipped</h2><div class="sub">Skipped tests and why — coverage gaps that need a look</div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Test</th><th>Suite</th><th>Browsers</th><th>Reason</th><th>Last run</th></tr></thead>
+              <tbody id="skipped-table"><tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently skipped.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUG LOG -->
+    <section class="view" id="view-bugs" hidden>
+      <div class="topbar">
+        <div><h1>Bug Log</h1><div class="sub" id="bugs-sub">Bugs found while running the suites</div></div>
+        <button class="btn primary" id="bug-add">+ Log a bug</button>
+      </div>
+      <div class="content">
+        <div class="panel">
+          <div class="filter-bar">
+            <div class="status-tabs" id="bug-status-tabs">
+              <button class="status-tab on" data-status="">All 0</button>
+              <button class="status-tab" data-status="open">Open 0</button>
+              <button class="status-tab" data-status="fixed">Fixed 0</button>
+              <button class="status-tab" data-status="wontfix">Won't fix 0</button>
+            </div>
+            <select id="bug-severity-filter"><option value="">All severities</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+            <select id="bug-suite-filter"><option value="">All suites</option></select>
+            <div class="search" style="flex:1;min-width:160px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="bug-search" placeholder="Search bugs or test cases"></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Bug</th><th>Severity</th><th>Status</th><th>Date found</th><th>Found by test case</th><th>Browsers</th></tr></thead>
+              <tbody id="bug-table"><tr><td colspan="7" style="text-align:center;color:var(--text-faint);padding:26px;">No bugs logged yet.</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -455,7 +500,7 @@
   </div>
   <div class="drawer-body">
     <div class="d-section" id="d-error-section">
-      <h3>Error</h3>
+      <h3 id="d-error-heading">Error <span id="d-error-category"></span></h3>
       <div class="code-block" id="d-error">—</div>
     </div>
     <div class="d-section" id="d-steps-section" hidden>
@@ -491,6 +536,47 @@
         </table>
       </div>
     </div>
+  </div>
+</aside>
+
+<aside class="drawer" id="bug-drawer">
+  <div class="drawer-head">
+    <div>
+      <div style="font-weight:800;font-size:15px;" id="bug-drawer-title">Log a bug</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px;" id="bug-drawer-sub">Record what was found and which test case found it</div>
+    </div>
+    <button class="btn ghost sm" id="bug-drawer-close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <form class="bug-form" id="bug-form" novalidate>
+      <div class="field"><label class="lbl" for="bug-title">Title</label><input type="text" id="bug-title" maxlength="200" placeholder="Short summary of the bug"></div>
+      <div class="field"><label class="lbl" for="bug-description">Description</label><textarea id="bug-description" rows="4" maxlength="5000" placeholder="What happens, and what should happen instead"></textarea></div>
+      <div class="bug-row">
+        <div class="field"><label class="lbl" for="bug-severity">Severity</label><select id="bug-severity"><option value="critical">Critical</option><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></div>
+        <div class="field"><label class="lbl" for="bug-status">Status</label><select id="bug-status"><option value="open">Open</option><option value="fixed">Fixed</option><option value="wontfix">Won't fix</option></select></div>
+        <div class="field"><label class="lbl" for="bug-found">Date found</label><input type="date" id="bug-found"></div>
+      </div>
+      <div class="field"><span class="lbl">Browsers affected</span>
+        <div class="bug-checks" id="bug-browsers">
+          <label><input type="checkbox" value="chromium"> Chromium</label>
+          <label><input type="checkbox" value="firefox"> Firefox</label>
+          <label><input type="checkbox" value="webkit"> WebKit</label>
+        </div>
+      </div>
+      <div class="field"><span class="lbl">Test cases that found it</span>
+        <div class="bug-selected" id="bug-tc-selected"></div>
+        <input type="text" id="bug-tc-search" placeholder="Search test cases to link">
+        <div class="bug-tc-list" id="bug-tc-list"></div>
+      </div>
+      <div class="field"><label class="lbl" for="bug-run">Found in run (optional)</label><select id="bug-run"><option value="">Not linked to a saved run</option></select></div>
+      <div class="field"><label class="lbl" for="bug-notes">Notes (optional)</label><textarea id="bug-notes" rows="3" maxlength="5000" placeholder="Workarounds, links, root cause"></textarea></div>
+      <div class="alert-banner" id="bug-error" hidden></div>
+      <div class="bug-actions">
+        <button type="submit" class="btn primary" id="bug-save">Save bug</button>
+        <button type="button" class="btn ghost" id="bug-cancel">Cancel</button>
+        <button type="button" class="btn ghost" id="bug-delete" style="margin-left:auto;color:var(--danger);" hidden>Delete</button>
+      </div>
+    </form>
   </div>
 </aside>
 

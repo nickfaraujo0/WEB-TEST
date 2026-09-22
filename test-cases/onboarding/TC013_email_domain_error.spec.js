@@ -19,7 +19,6 @@ import { test } from '../_hive-live.mjs';
  * restriction at all. Per user decision (2026-09-14), that risk wasn't worth taking, so the
  * actual submit was never attempted and this case is left unverified rather than guessed at.
  */
-test.skip('TC013 - Verify error for email not matching domain', async () => {
-  // Not run — see file header. No client-side domain check exists, and a real submit risks
-  // creating an account with an unfamiliar email, which needs explicit sign-off first.
+test('TC013 - Verify error for email not matching domain', async () => {
+  test.skip(true, 'No client-side domain check exists; a real submit risks creating an account with an unfamiliar email — needs explicit sign-off first — see file header.');
 });

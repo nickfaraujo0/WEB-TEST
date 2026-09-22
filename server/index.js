@@ -8,10 +8,14 @@ const store = require('./store');
 const { listTests } = require('./testLister');
 const { getPlaywrightBin, playwrightInstalled } = require('./playwrightBin');
 const testHistory = require('./testHistory');
+const bugStore = require('./bugStore');
+const gitInfo = require('./gitInfo');
+const { classifyFailure, skipReason } = require('./classify');
 
 const PORT = process.env.PORT || 4000;
 const ROOT = path.join(__dirname, '..');
 const TEST_RESULTS_DIR = path.join(ROOT, 'test-results');
+const TEST_CASES_DIR = path.join(ROOT, 'test-cases');
 
 const app = express();
 app.use(express.json({ limit: '4mb' })); // frame screenshots (base64 JPEG) can be larger than the 100kb default
@@ -262,6 +266,8 @@ function buildRunRecord(state, code, signal) {
       error: ev.error,
       steps: ev.steps,
       attachments: ev.attachments,
+      category: classifyFailure(ev.status, ev.error),
+      reason: ev.status === 'skipped' ? skipReason(ev.annotations) : null,
     };
   });
 
@@ -366,14 +372,74 @@ app.get('/api/reports', (req, res) => {
   const history = testHistory.buildHistory(200);
   const broken = testHistory.computeBroken(history).slice(0, 20);
   const crossBrowser = testHistory.computeCrossBrowserMismatches(history).slice(0, 20);
+  const skipped = testHistory.computeSkipped(history).slice(0, 20);
 
-  res.json({ trend, flaky, broken, crossBrowser });
+  res.json({ trend, flaky, broken, crossBrowser, skipped });
 });
 
 // Full per-test history (every saved run each test appeared in), keyed by "file:line" — powers
 // the "last run" column on Test Cases and the history drawer when a row is clicked.
 app.get('/api/test-history', (req, res) => {
   res.json({ tests: testHistory.buildHistory(200) });
+});
+
+// ---------------------------------------------------------------------------
+// Version control (read-only) — git status/history/diff for the specs in test-cases/, shown on
+// the Test Cases tab. Nothing here ever commits, pushes or otherwise changes the repository.
+// ---------------------------------------------------------------------------
+app.get('/api/git/status', async (req, res) => {
+  res.json(await gitInfo.status());
+});
+
+app.get('/api/git/history', async (req, res) => {
+  const out = await gitInfo.history(req.query.file);
+  if (out.error) return res.status(out.status).json({ error: out.error });
+  res.json(out);
+});
+
+app.get('/api/git/diff', async (req, res) => {
+  const out = await gitInfo.diff(req.query.file, req.query.commit);
+  if (out.error) return res.status(out.status).json({ error: out.error });
+  res.json(out);
+});
+
+// ---------------------------------------------------------------------------
+// Bug log — bugs found while running the suites, each with the date it was found and the
+// test case(s) that exposed it. Persisted to data/bugs.json (see bugStore.js).
+// ---------------------------------------------------------------------------
+function sendBugError(res, err) {
+  res.status(err.status || 500).json({ error: err.status ? err.message : 'Could not save the bug log' });
+}
+
+app.get('/api/bugs', (req, res) => {
+  res.json({ bugs: bugStore.list() });
+});
+
+app.post('/api/bugs', (req, res) => {
+  try {
+    res.status(201).json({ bug: bugStore.create(req.body) });
+  } catch (err) {
+    sendBugError(res, err);
+  }
+});
+
+app.put('/api/bugs/:id', (req, res) => {
+  try {
+    const bug = bugStore.update(req.params.id, req.body);
+    if (!bug) return res.status(404).json({ error: 'Bug not found' });
+    res.json({ bug });
+  } catch (err) {
+    sendBugError(res, err);
+  }
+});
+
+app.delete('/api/bugs/:id', (req, res) => {
+  try {
+    if (!bugStore.remove(req.params.id)) return res.status(404).json({ error: 'Bug not found' });
+    res.status(204).end();
+  } catch (err) {
+    sendBugError(res, err);
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -394,6 +460,20 @@ app.get('/api/attachment/:runId/:testIndex/:attIndex', (req, res) => {
   }
   if (!fs.existsSync(resolved)) return res.status(404).end();
   res.sendFile(resolved);
+});
+
+// Raw source of a spec file, for the Test Cases code viewer — served only from inside
+// test-cases/, same path-containment check used for attachments above.
+app.get('/api/source', (req, res) => {
+  const file = req.query.file;
+  if (!file) return res.status(400).end();
+  const resolved = path.resolve(file);
+  if (!resolved.startsWith(TEST_CASES_DIR + path.sep)) return res.status(403).end();
+  if (!fs.existsSync(resolved)) return res.status(404).end();
+  fs.readFile(resolved, 'utf8', (err, content) => {
+    if (err) return res.status(500).end();
+    res.json({ file: resolved, content });
+  });
 });
 
 app.listen(PORT, () => {

@@ -21,6 +21,6 @@ import { test } from '../_hive-live.mjs';
  * to deactivate one), then this becomes a normal login attempt asserting the dialog text
  * above, the same shape as TC002/TC003/TC004/TC007.
  */
-test.skip('TC008 - Login with Deactivated Account', async () => {
-  // No deactivated Hive account available — see file header.
+test('TC008 - Login with Deactivated Account', async () => {
+  test.skip(true, 'No deactivated Hive account available to test with — see file header.');
 });

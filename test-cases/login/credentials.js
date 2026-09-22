@@ -28,6 +28,11 @@ const FALLBACKS = Object.freeze({
   // Same throwaway-account source as HIVE_VALID_EMAIL: tests/appium/credentials.mjs.
   HIVE_STUDENT_EMAIL: 'student0003@test.com',
   HIVE_STUDENT_PASSWORD: 'Stud@123',
+
+  // A second Professor, distinct from nolan@wafer.ee — for tests that need "another
+  // professor" (e.g. one professor cannot edit/delete another's posts).
+  HIVE_PROFESSOR2_EMAIL: 'peters@gmail.com',
+  HIVE_PROFESSOR2_PASSWORD: 'peters123',
 });
 
 /** One credential, by name. Throws for a name nobody defined. */

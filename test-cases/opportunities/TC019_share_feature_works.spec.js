@@ -20,24 +20,47 @@ import { OpportunityPage } from './opportunity-page.js';
  */
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
-test('TC019 - Verify Copy Link actually copies a URL to the clipboard', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+// Split per type (was Jobs-tab only) so Jobs and Internship are tracked as distinct cases.
+test.describe('TC019 - Copy Link actually copies a URL to the clipboard', () => {
+  test('TC019-Jobs', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
 
-  const opportunityPage = new OpportunityPage(page);
-  await opportunityPage.goto();
-  await opportunityPage.jobsTab.click();
+    const opportunityPage = new OpportunityPage(page);
+    await opportunityPage.goto();
+    await opportunityPage.jobsTab.click();
 
-  await opportunityPage.openFirstCardMenu();
-  await opportunityPage.clickMenuItem('Share');
+    await opportunityPage.openFirstCardMenu();
+    await opportunityPage.clickMenuItem('Share');
 
-  await expect(opportunityPage.shareDialog()).toBeVisible();
-  await page.getByText('Copy Link', { exact: true }).click();
+    await expect(opportunityPage.shareDialog()).toBeVisible();
+    await page.getByText('Copy Link', { exact: true }).click();
 
-  // Copy Link copies a full share message (title/description) with a real deep link
-  // embedded at the end, not a bare URL.
-  const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipboardText).toMatch(/https?:\/\/\S+/);
+    // Copy Link copies a full share message (title/description) with a real deep link
+    // embedded at the end, not a bare URL.
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toMatch(/https?:\/\/\S+/);
+  });
+
+  test('TC019-Internship', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+
+    const opportunityPage = new OpportunityPage(page);
+    await opportunityPage.goto();
+    await opportunityPage.internshipTab.click();
+
+    await opportunityPage.openFirstCardMenu();
+    await opportunityPage.clickMenuItem('Share');
+
+    await expect(opportunityPage.shareDialog()).toBeVisible();
+    await page.getByText('Copy Link', { exact: true }).click();
+
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toMatch(/https?:\/\/\S+/);
+  });
 });

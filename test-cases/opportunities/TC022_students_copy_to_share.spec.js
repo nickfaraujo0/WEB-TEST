@@ -18,29 +18,57 @@ import { OpportunityPage } from './opportunity-page.js';
  */
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
-test('TC022 - Verify a student can copy an opportunity link to share', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_STUDENT_EMAIL'), credential('HIVE_STUDENT_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+// Split per type (was Jobs-tab only) so Jobs and Internship are tracked as distinct cases.
+test.describe('TC022 - A student can copy an opportunity link to share', () => {
+  test('TC022-Jobs', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_STUDENT_EMAIL'), credential('HIVE_STUDENT_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
 
-  const opportunityPage = new OpportunityPage(page);
-  await opportunityPage.goto();
-  await opportunityPage.jobsTab.click();
+    const opportunityPage = new OpportunityPage(page);
+    await opportunityPage.goto();
+    await opportunityPage.jobsTab.click();
 
-  await opportunityPage.openFirstCardMenu();
-  // Students only ever see View/Share — no Edit or Unpublish.
-  await expect(opportunityPage.menuItem('View')).toBeVisible();
-  await expect(opportunityPage.menuItem('Share')).toBeVisible();
-  await expect(opportunityPage.menuItem('Edit')).toHaveCount(0);
-  await expect(opportunityPage.menuItem('Unpublish')).toHaveCount(0);
+    await opportunityPage.openFirstCardMenu();
+    // Students only ever see View/Share — no Edit or Unpublish.
+    await expect(opportunityPage.menuItem('View')).toBeVisible();
+    await expect(opportunityPage.menuItem('Share')).toBeVisible();
+    await expect(opportunityPage.menuItem('Edit')).toHaveCount(0);
+    await expect(opportunityPage.menuItem('Unpublish')).toHaveCount(0);
 
-  await opportunityPage.clickMenuItem('Share');
-  const dialog = opportunityPage.shareDialog();
-  await expect(dialog).toBeVisible();
-  await dialog.getByText('Copy Link', { exact: true }).click();
+    await opportunityPage.clickMenuItem('Share');
+    const dialog = opportunityPage.shareDialog();
+    await expect(dialog).toBeVisible();
+    await dialog.getByText('Copy Link', { exact: true }).click();
 
-  // Copy Link copies a full share message with a real deep link embedded, not a bare URL.
-  const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipboardText).toMatch(/https?:\/\/\S+/);
+    // Copy Link copies a full share message with a real deep link embedded, not a bare URL.
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toMatch(/https?:\/\/\S+/);
+  });
+
+  test('TC022-Internship', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_STUDENT_EMAIL'), credential('HIVE_STUDENT_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+
+    const opportunityPage = new OpportunityPage(page);
+    await opportunityPage.goto();
+    await opportunityPage.internshipTab.click();
+
+    await opportunityPage.openFirstCardMenu();
+    await expect(opportunityPage.menuItem('View')).toBeVisible();
+    await expect(opportunityPage.menuItem('Share')).toBeVisible();
+    await expect(opportunityPage.menuItem('Edit')).toHaveCount(0);
+    await expect(opportunityPage.menuItem('Unpublish')).toHaveCount(0);
+
+    await opportunityPage.clickMenuItem('Share');
+    const dialog = opportunityPage.shareDialog();
+    await expect(dialog).toBeVisible();
+    await dialog.getByText('Copy Link', { exact: true }).click();
+
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toMatch(/https?:\/\/\S+/);
+  });
 });

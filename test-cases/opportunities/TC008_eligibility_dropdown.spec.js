@@ -17,18 +17,29 @@ import { CreateOpportunityPage } from './create-opportunity-page.js';
  * types. The actual mandatory/optional field set is: Job Type, Title, Description,
  * Organization Name, Website URL, Registration URL, Registration Deadline, and a file
  * upload. This test documents the absence for both types rather than skip outright.
+ *
+ * Split per type (was one test checking both) so Jobs and Internship are tracked separately.
  */
-test('TC008 - Verify Eligibility dropdown (N/A on web)', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+test.describe('TC008 - Eligibility dropdown (N/A on web)', () => {
+  test('TC008-Jobs - Eligibility dropdown for Jobs (N/A on web)', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
 
-  const createPage = new CreateOpportunityPage(page);
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Jobs');
+    await expect(page.getByText(/eligib/i)).toHaveCount(0);
+  });
 
-  await createPage.goto('Jobs');
-  await expect(page.getByText(/eligib/i)).toHaveCount(0);
+  test('TC008-Internship - Eligibility dropdown for Internship (N/A on web)', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
 
-  await createPage.goto('Internship');
-  await expect(page.getByText(/eligib/i)).toHaveCount(0);
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Internship');
+    await expect(page.getByText(/eligib/i)).toHaveCount(0);
+  });
 });

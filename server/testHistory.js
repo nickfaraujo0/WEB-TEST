@@ -25,6 +25,9 @@ function buildHistory(limitRuns) {
           duration: t.duration,
           attempts: t.attempts,
           finishedAt: run.finishedAt,
+          category: t.category || null,
+          reason: t.reason || null,
+          errorMessage: (t.error && t.error.message) || null,
         };
         entry.history.push(point);
         entry.byProject[t.project] = point;
@@ -73,11 +76,37 @@ function computeBroken(history) {
         project,
         failingSince: since,
         runsFailing,
+        category: latest.category || null,
+        errorMessage: latest.errorMessage || null,
       });
     });
   });
   broken.sort((a, b) => (a.failingSince < b.failingSince ? -1 : 1)); // longest-broken first
   return broken;
+}
+
+// Tests whose most recent result on any browser is 'skipped' — a pass/fail dashboard hides
+// these entirely, but a skip usually has a real reason (missing test data, an unsafe
+// side effect) worth surfacing rather than silently excluding the case from coverage.
+function computeSkipped(history) {
+  const skipped = [];
+  Object.keys(history).forEach((key) => {
+    const entry = history[key];
+    const skippedProjects = Object.keys(entry.byProject).filter((p) => entry.byProject[p].status === 'skipped');
+    if (!skippedProjects.length) return;
+    const reason = skippedProjects.map((p) => entry.byProject[p].reason).find(Boolean) || null;
+    skipped.push({
+      file: entry.file,
+      line: entry.line,
+      title: entry.title,
+      suite: entry.suite,
+      projects: skippedProjects,
+      reason,
+      lastRunAt: entry.lastRunAt,
+    });
+  });
+  skipped.sort((a, b) => (a.title < b.title ? -1 : 1));
+  return skipped;
 }
 
 // Tests where the most recent result differs across browsers — passing on one, not on another.
@@ -94,10 +123,17 @@ function computeCrossBrowserMismatches(history) {
       line: entry.line,
       title: entry.title,
       suite: entry.suite,
-      results: projects.map((p) => ({ project: p, status: entry.byProject[p].status, finishedAt: entry.byProject[p].finishedAt })),
+      results: projects.map((p) => ({
+        project: p,
+        status: entry.byProject[p].status,
+        finishedAt: entry.byProject[p].finishedAt,
+        category: entry.byProject[p].category || null,
+        reason: entry.byProject[p].reason || null,
+        errorMessage: entry.byProject[p].errorMessage || null,
+      })),
     });
   });
   return mismatches;
 }
 
-module.exports = { buildHistory, computeBroken, computeCrossBrowserMismatches };
+module.exports = { buildHistory, computeBroken, computeCrossBrowserMismatches, computeSkipped };

@@ -20,7 +20,6 @@ import { test } from '../_hive-live.mjs';
  * NOT confirmed: where the app navigates to after a real submit. That would need either an
  * explicit go-ahead to create a throwaway account, or a specific account the user wants used.
  */
-test.skip('TC005 - Verify navigation after completing sign-up', async () => {
-  // Not run — see file header. TC004 already confirms the button reaches an enabled state;
-  // actually clicking it would create a real account, which needs explicit sign-off first.
+test('TC005 - Verify navigation after completing sign-up', async () => {
+  test.skip(true, 'Actually submitting would create a real account in the dev database — needs explicit sign-off first — see file header.');
 });

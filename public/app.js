@@ -45,6 +45,10 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  function truncate(s, n) {
+    s = String(s || '').split('\n')[0];
+    return s.length > n ? s.slice(0, n - 1) + '…' : s;
+  }
   var BROWSER_META = {
     chromium: {
       label: 'Chromium',
@@ -109,7 +113,7 @@
   // ---------------------------------------------------------------------
   // Nav / view switching
   // ---------------------------------------------------------------------
-  var VIEWS = ['overview', 'cases', 'runs', 'live', 'results', 'reports', 'settings'];
+  var VIEWS = ['overview', 'cases', 'runs', 'live', 'results', 'reports', 'bugs', 'settings'];
   function showView(v) {
     VIEWS.forEach(function (name) {
       $('view-' + name).hidden = name !== v;
@@ -191,7 +195,7 @@
         populateSuiteFilters();
         buildTree('');
         updateSummary();
-        renderCasesTable('', '');
+        buildCaseTree('');
       })
       .catch(function (e) {
         $('suite-tree').innerHTML =
@@ -206,7 +210,6 @@
       return s.name;
     });
     [
-      { id: 'cases-suite-filter', keep: '' },
       { id: 'results-suite-filter', keep: '' },
     ].forEach(function (cfg) {
       var el = $(cfg.id);
@@ -393,39 +396,105 @@
     });
     return last;
   }
-  function renderCasesTable(filterText, filterSuite) {
-    var rows = [];
-    STATE.suites.forEach(function (s) {
-      if (filterSuite && s.name !== filterSuite) return;
-      s.cases.forEach(function (c) {
-        if (filterText && c.title.toLowerCase().indexOf(filterText.toLowerCase()) === -1) return;
-        var entry = STATE.testHistory[c.id];
-        var last = mostRecentPoint(entry);
-        rows.push(
-          '<tr class="clickable" data-test-key="' + esc(c.id) + '"><td class="cell-name">' + esc(c.title) + '</td><td>' + esc(s.name) + '</td><td>' +
-            (c.tags && c.tags.length
-              ? c.tags.map(function (t) {
-                  return '<span class="badge skip" style="margin-right:4px;">' + esc(t) + '</span>';
-                }).join('')
-              : '<span style="color:var(--text-faint);">—</span>') +
-            '</td><td>' + (last ? badge(last.status) : '<span style="color:var(--text-faint);">Not run</span>') + '</td>' +
-            '<td class="mono">' + (last ? fmtDuration(last.duration) : '—') + '</td>' +
-            '<td class="cell-id">' + (last ? fmtWhen(last.finishedAt) : '—') + '</td></tr>'
+  // ---------------------------------------------------------------------
+  // Test Cases page — collapsible suite tree + VSCode-style read-only source viewer
+  // ---------------------------------------------------------------------
+  STATE.caseTreeOpen = STATE.caseTreeOpen || {};
+  STATE.activeCaseId = null;
+
+  function buildCaseTree(filterText) {
+    var q = (filterText || '').toLowerCase();
+    var html = STATE.suites
+      .map(function (s) {
+        var visible = s.cases.filter(function (c) {
+          return !q || c.title.toLowerCase().indexOf(q) >= 0 || s.name.toLowerCase().indexOf(q) >= 0;
+        });
+        if (!visible.length) return '';
+        var isOpen = q ? true : STATE.caseTreeOpen[s.name] !== false; // default open
+        var items = visible
+          .map(function (c) {
+            return (
+              '<button type="button" class="case-tree-item' + (STATE.activeCaseId === c.id ? ' active' : '') + '" data-case-id="' + esc(c.id) + '" title="' + esc(c.title) + '">' +
+              gitDot(c) + esc(c.title) + '</button>'
+            );
+          })
+          .join('');
+        return (
+          '<div class="suite" data-suite="' + esc(s.name) + '">' +
+          '<div class="suite-head' + (isOpen ? ' open' : '') + '" data-case-suite-toggle="' + esc(s.name) + '">' +
+          '<svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 6l6 6-6 6"/></svg>' +
+          '<span class="name">' + esc(s.name) + '</span><span class="cnt">(' + visible.length + ')</span>' +
+          '</div>' +
+          '<div style="display:' + (isOpen ? 'block' : 'none') + ';">' + items + '</div></div>'
         );
+      })
+      .join('');
+    $('cases-tree').innerHTML = html || '<div class="live-col-empty">No test cases match.</div>';
+
+    document.querySelectorAll('[data-case-suite-toggle]').forEach(function (h) {
+      h.addEventListener('click', function () {
+        var name = h.dataset.caseSuiteToggle;
+        STATE.caseTreeOpen[name] = !(STATE.caseTreeOpen[name] !== false);
+        buildCaseTree($('cases-search').value);
       });
     });
-    $('cases-table').innerHTML = rows.join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:30px;">No test cases match.</td></tr>';
-    document.querySelectorAll('#cases-table tr.clickable').forEach(function (tr) {
-      tr.addEventListener('click', function () {
-        openHistoryDrawer(tr.dataset.testKey);
+    document.querySelectorAll('[data-case-id]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        openCaseSource(btn.dataset.caseId);
       });
     });
   }
+
+  function openCaseSource(caseId) {
+    var c = STATE.testsById[caseId];
+    if (!c) return;
+    STATE.activeCaseId = caseId;
+    document.querySelectorAll('.case-tree-item').forEach(function (el) {
+      el.classList.toggle('active', el.dataset.caseId === caseId);
+    });
+
+    var entry = STATE.testHistory[caseId];
+    var last = mostRecentPoint(entry);
+    var fileName = c.file.split('/').pop();
+    $('cases-viewer-tab').innerHTML =
+      '<span class="file">' + esc(fileName) + '</span>' +
+      '<span>' + esc(c.suite || '') + '</span>' +
+      (last ? badge(last.status) : '<span style="color:var(--text-faint);">Not run</span>') +
+      '<button type="button" class="hist-link" id="cases-view-history">View history</button>';
+    $('cases-view-history').addEventListener('click', function () {
+      openHistoryDrawer(caseId);
+    });
+
+    STATE.caseMode = 'source';
+    STATE.caseSourceHtml = '';
+    renderGitStrip();
+    $('cases-viewer-body').innerHTML = '<div class="live-col-empty">Loading…</div>';
+    fetch('/api/source?file=' + encodeURIComponent(c.file))
+      .then(function (r) {
+        if (!r.ok) throw new Error('Could not read file (' + r.status + ')');
+        return r.json();
+      })
+      .then(function (data) {
+        if (STATE.activeCaseId !== caseId) return;
+        var lines = data.content.replace(/\r\n/g, '\n').split('\n');
+        STATE.caseSourceHtml = lines
+          .map(function (line, i) {
+            return '<div class="code-line"><span class="ln">' + (i + 1) + '</span><span class="lc">' + esc(line) + '</span></div>';
+          })
+          .join('');
+        if (STATE.caseMode === 'source') $('cases-viewer-body').innerHTML = STATE.caseSourceHtml;
+      })
+      .catch(function (e) {
+        if (STATE.activeCaseId !== caseId) return;
+        $('cases-viewer-body').innerHTML = '<div class="alert-banner">Could not load source: ' + esc(e.message) + '</div>';
+      });
+  }
+
   $('cases-search').addEventListener('input', function (e) {
-    renderCasesTable(e.target.value, $('cases-suite-filter').value);
+    buildCaseTree(e.target.value);
   });
-  $('cases-suite-filter').addEventListener('change', function (e) {
-    renderCasesTable($('cases-search').value, e.target.value);
+  $('cases-collapse-btn').addEventListener('click', function () {
+    $('cases-sidebar').classList.toggle('collapsed');
   });
 
   // ---------------------------------------------------------------------
@@ -680,7 +749,8 @@
 
         loadHistory();
         loadTestHistory().then(function () {
-          renderCasesTable($('cases-search').value, $('cases-suite-filter').value);
+          buildCaseTree($('cases-search').value);
+          if (STATE.activeCaseId) openCaseSource(STATE.activeCaseId);
         });
       })
       .catch(function () {})
@@ -841,8 +911,14 @@
         .map(function (t) {
           var clickable = t.status !== 'passed';
           var retriedTag = t.attempts > 1 ? '<div class="cell-sub">retried ' + (t.attempts - 1) + 'x</div>' : '';
+          var reasonTag = '';
+          if (t.status === 'skipped') {
+            reasonTag = '<div class="cell-sub" style="white-space:normal;">' + esc(truncate(t.reason || 'No reason given', 80)) + '</div>';
+          } else if (t.category) {
+            reasonTag = '<div class="cell-sub" style="white-space:normal;">' + esc(t.category) + (t.error && t.error.message ? ' — ' + esc(truncate(t.error.message, 70)) : '') + '</div>';
+          }
           return (
-            '<tr class="' + (clickable ? 'clickable' : '') + '" data-idx="' + t.__index + '"><td class="cell-name">' + esc(t.title) + retriedTag + '</td><td>' + esc(t.suite || '') + '</td><td>' +
+            '<tr class="' + (clickable ? 'clickable' : '') + '" data-idx="' + t.__index + '"><td class="cell-name">' + esc(t.title) + retriedTag + reasonTag + '</td><td>' + esc(t.suite || '') + '</td><td>' +
             bchip(t.project) + '</td><td>' + badge(t.status) + '</td><td class="mono">' + fmtDuration(t.duration) + '</td><td class="cell-id">' + fmtWhen(run.finishedAt) + '</td></tr>'
           );
         })
@@ -885,12 +961,19 @@
     $('d-title').textContent = test.title;
     $('d-sub').textContent = (test.suite || '') + ' · ' + (BROWSER_META[test.project] ? BROWSER_META[test.project].label : test.project) + ' · ' + shortId(STATE.resultsRun.id);
 
-    if (test.error) {
+    var catEl = $('d-error-category');
+    if (catEl) {
+      catEl.innerHTML = test.category ? '<span class="badge fail">' + esc(test.category) + '</span>' : '';
+    }
+    var headingEl = $('d-error-heading');
+    if (headingEl) headingEl.firstChild.textContent = test.status === 'skipped' ? 'Skip reason' : 'Error';
+
+    if (test.status === 'skipped') {
+      $('d-error').textContent = test.reason || 'This test was skipped (no reason given).';
+    } else if (test.error) {
       $('d-error').innerHTML =
         '<span class="err">' + esc(test.error.message || 'Test failed') + '</span>' +
         (test.error.stack ? '\n\n<span class="dim">' + esc(test.error.stack) + '</span>' : '');
-    } else if (test.status === 'skipped') {
-      $('d-error').textContent = 'This test was skipped.';
     } else {
       $('d-error').textContent = 'No error recorded.';
     }
@@ -1013,6 +1096,7 @@
         renderFlaky(data.flaky || []);
         renderBroken(data.broken || []);
         renderMismatch(data.crossBrowser || []);
+        renderSkipped(data.skipped || []);
       })
       .catch(function () {});
   }
@@ -1080,12 +1164,30 @@
     $('broken-table').innerHTML =
       broken
         .map(function (b) {
+          var reason = (b.category ? '<span class="badge fail" style="margin-right:6px;">' + esc(b.category) + '</span>' : '') +
+            (b.errorMessage ? '<span class="cell-sub" style="white-space:normal;">' + esc(truncate(b.errorMessage, 90)) + '</span>' : '');
           return (
             '<tr><td class="cell-name">' + esc(b.title) + '</td><td>' + esc(b.suite || '') + '</td><td>' + bchip(b.project) + '</td>' +
+            '<td>' + (reason || '—') + '</td>' +
             '<td class="mono">' + b.runsFailing + ' run' + (b.runsFailing === 1 ? '' : 's') + '</td><td class="cell-id">' + fmtWhen(b.failingSince) + '</td></tr>'
           );
         })
-        .join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently failing.</td></tr>';
+        .join('') || '<tr><td colspan="6" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently failing.</td></tr>';
+  }
+
+  function renderSkipped(skipped) {
+    var el = $('skipped-table');
+    if (!el) return;
+    el.innerHTML =
+      skipped
+        .map(function (s) {
+          return (
+            '<tr><td class="cell-name">' + esc(s.title) + '</td><td>' + esc(s.suite || '') + '</td><td>' +
+            s.projects.map(bchip).join(' ') + '</td><td style="white-space:normal;">' + esc(s.reason || 'No reason given') + '</td>' +
+            '<td class="cell-id">' + fmtWhen(s.lastRunAt) + '</td></tr>'
+          );
+        })
+        .join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-faint);padding:26px;">Nothing currently skipped.</td></tr>';
   }
 
   function renderMismatch(mismatches) {
@@ -1100,7 +1202,10 @@
           var cells = order
             .map(function (p) {
               var r = byProject[p];
-              return '<td>' + (r ? badge(r.status) : '<span style="color:var(--text-faint);">—</span>') + '</td>';
+              if (!r) return '<td><span style="color:var(--text-faint);">—</span></td>';
+              var reason = r.reason || r.errorMessage;
+              var title = reason ? ' title="' + esc(truncate(reason, 200)) + '"' : '';
+              return '<td' + title + '>' + badge(r.status) + (r.category ? '<div class="cell-sub">' + esc(r.category) + '</div>' : '') + '</td>';
             })
             .join('');
           return '<tr><td class="cell-name">' + esc(m.title) + '</td><td>' + esc(m.suite || '') + '</td>' + cells + '</tr>';
@@ -1109,6 +1214,561 @@
   }
 
   document.querySelector('[data-view="reports"]').addEventListener('click', loadReports);
+
+  // ---------------------------------------------------------------------
+  // Version control (read-only) — git status, per-file history and diffs on the Test Cases
+  // tab. Data comes from /api/git/*; nothing here commits or pushes.
+  // ---------------------------------------------------------------------
+  STATE.git = { available: false, reason: 'Loading…', files: {} };
+  STATE.caseMode = 'source'; // 'source' | 'history' | 'diff'
+  STATE.caseDiffSha = null;
+  STATE.caseSourceHtml = '';
+  STATE.gitHistory = {}; // repo-relative path -> commits[]
+  var GIT_STATUS_LABEL = { new: 'New, not committed', modified: 'Modified', renamed: 'Renamed', deleted: 'Deleted', committed: 'Committed' };
+
+  function caseRel(c) {
+    return 'test-cases/' + relFile(c.file);
+  }
+  function gitFileStatus(c) {
+    var g = STATE.git;
+    if (!g || !g.available) return null;
+    return g.files[caseRel(c)] || 'committed';
+  }
+  function gitDot(c) {
+    var s = gitFileStatus(c);
+    var cls = { modified: 'mod', renamed: 'mod', new: 'new', deleted: 'del' }[s];
+    if (!cls) return '';
+    return '<i class="git-dot ' + cls + '" title="' + esc(s === 'new' ? 'New file, not committed yet' : 'Uncommitted changes') + '"></i>';
+  }
+
+  function loadGit() {
+    return fetch('/api/git/status')
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (g) {
+        STATE.git = g;
+      })
+      .catch(function () {
+        STATE.git = { available: false, reason: 'the dashboard server could not be reached.', files: {} };
+      })
+      .then(function () {
+        STATE.gitHistory = {};
+        renderGitBar();
+        buildCaseTree($('cases-search').value);
+        renderGitStrip();
+      });
+  }
+
+  function renderGitBar() {
+    var bar = $('cases-git-bar');
+    var g = STATE.git;
+    bar.hidden = false;
+    if (!g.available) {
+      bar.innerHTML = '<span>Version control is unavailable — ' + esc(g.reason || '') + '</span><button type="button" class="git-refresh" id="git-refresh">Retry</button>';
+    } else {
+      var counts = { modified: 0, new: 0, deleted: 0 };
+      Object.keys(g.files).forEach(function (k) {
+        var s = g.files[k] === 'renamed' ? 'modified' : g.files[k];
+        counts[s] = (counts[s] || 0) + 1;
+      });
+      var parts = [];
+      if (counts.modified) parts.push(counts.modified + ' modified');
+      if (counts.new) parts.push(counts.new + ' new');
+      if (counts.deleted) parts.push(counts.deleted + ' deleted');
+      var sync = '';
+      if (g.ahead === null) sync = '<span class="git-warn">No upstream branch set</span>';
+      else {
+        if (g.ahead > 0) sync += '<span class="git-warn">↑ ' + g.ahead + ' unpushed commit' + (g.ahead === 1 ? '' : 's') + '</span> ';
+        if (g.behind > 0) sync += '<span class="git-warn">↓ ' + g.behind + ' behind origin (as of the last fetch)</span>';
+        if (!g.ahead && !g.behind) sync = '<span>In sync with origin</span>';
+      }
+      bar.innerHTML =
+        '<span class="git-chip">' + esc(g.branch || 'detached') + (g.head ? ' · ' + esc(g.head) : '') + '</span>' +
+        (g.webUrl ? '<a href="' + esc(g.webUrl) + '" target="_blank" rel="noopener">' + esc(g.slug) + ' ↗</a>' : '<span>No GitHub remote</span>') +
+        '<span class="sep">|</span><span>' + (parts.length ? esc(parts.join(' · ')) + ' test file' + (parts.length === 1 && counts.modified + counts.new + counts.deleted === 1 ? '' : 's') + ' not committed' : 'All test files committed') + '</span>' +
+        '<span class="sep">|</span>' + sync +
+        '<button type="button" class="git-refresh" id="git-refresh">Refresh</button>';
+    }
+    $('git-refresh').addEventListener('click', loadGit);
+  }
+
+  function activeCase() {
+    return STATE.activeCaseId ? STATE.testsById[STATE.activeCaseId] : null;
+  }
+
+  function renderGitStrip() {
+    var strip = $('cases-git-strip');
+    var c = activeCase();
+    var g = STATE.git;
+    if (!c || !g || !g.available) {
+      strip.hidden = true;
+      return;
+    }
+    var rel = caseRel(c);
+    var st = gitFileStatus(c);
+    var hist = STATE.gitHistory[rel];
+    if (hist === undefined) loadGitHistory(rel, c);
+
+    var last;
+    if (hist === undefined) last = 'Loading history…';
+    else if (!hist.length) last = 'No commits yet for this file';
+    else {
+      var h = hist[0];
+      last =
+        'Last commit <a href="' + esc(g.webUrl ? g.webUrl + '/commit/' + h.sha : '#') + '" target="_blank" rel="noopener">' + esc(h.short) + '</a> — ' +
+        esc(truncate(h.subject, 70)) + ' · ' + esc(h.author) + ' · ' + esc(fmtWhen(h.date));
+    }
+    var mode = STATE.caseMode;
+    var onHistory = mode === 'history' || (mode === 'diff' && STATE.caseDiffSha);
+    var canDiff = st === 'modified' || st === 'renamed' || st === 'new';
+    strip.hidden = false;
+    strip.innerHTML =
+      '<span class="badge git-' + esc(st) + '">' + esc(GIT_STATUS_LABEL[st] || st) + '</span>' +
+      '<span class="git-last">' + last + '</span>' +
+      '<span class="git-tabs">' +
+      '<button type="button" class="git-tab' + (mode === 'source' ? ' on' : '') + '" data-case-mode="source">Source</button>' +
+      '<button type="button" class="git-tab' + (onHistory ? ' on' : '') + '" data-case-mode="history">History' + (hist ? ' (' + hist.length + ')' : '') + '</button>' +
+      (canDiff ? '<button type="button" class="git-tab' + (mode === 'diff' && !STATE.caseDiffSha ? ' on' : '') + '" data-case-mode="changes">Changes</button>' : '') +
+      '</span>' +
+      (g.webUrl && st !== 'new' ? '<a href="' + esc(g.webUrl + '/blob/' + encodeURI(g.branch || 'main') + '/' + encodeURI(rel)) + '" target="_blank" rel="noopener">View on GitHub ↗</a>' : '');
+    strip.querySelectorAll('[data-case-mode]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var m = btn.dataset.caseMode;
+        if (m === 'changes') showCaseDiff(null);
+        else setCaseMode(m);
+      });
+    });
+  }
+
+  var gitHistoryPending = {};
+  function loadGitHistory(rel, c) {
+    if (gitHistoryPending[rel]) return;
+    gitHistoryPending[rel] = true;
+    fetch('/api/git/history?file=' + encodeURIComponent(c.file))
+      .then(function (r) {
+        return r.ok ? r.json() : { commits: [] };
+      })
+      .catch(function () {
+        return { commits: [] };
+      })
+      .then(function (data) {
+        delete gitHistoryPending[rel];
+        STATE.gitHistory[rel] = data.commits || [];
+        var cur = activeCase();
+        if (cur && caseRel(cur) === rel) {
+          renderGitStrip();
+          if (STATE.caseMode === 'history') renderCaseHistory();
+        }
+      });
+  }
+
+  function setCaseMode(mode) {
+    STATE.caseMode = mode;
+    STATE.caseDiffSha = null;
+    renderGitStrip();
+    if (mode === 'source') $('cases-viewer-body').innerHTML = STATE.caseSourceHtml || '<div class="live-col-empty">Loading…</div>';
+    else renderCaseHistory();
+  }
+
+  function renderCaseHistory() {
+    var c = activeCase();
+    if (!c) return;
+    var hist = STATE.gitHistory[caseRel(c)];
+    var g = STATE.git;
+    if (hist === undefined) {
+      $('cases-viewer-body').innerHTML = '<div class="diff-note">Loading history…</div>';
+      return;
+    }
+    if (!hist.length) {
+      $('cases-viewer-body').innerHTML = '<div class="diff-note">This file has not been committed yet, so it has no history. Commit it from your terminal to start tracking it.</div>';
+      return;
+    }
+    $('cases-viewer-body').innerHTML = hist
+      .map(function (h) {
+        return (
+          '<div class="git-commit">' +
+          '<a class="sha" href="' + esc(g.webUrl ? g.webUrl + '/commit/' + h.sha : '#') + '" target="_blank" rel="noopener">' + esc(h.short) + '</a>' +
+          '<span class="subj">' + esc(h.subject) + '</span>' +
+          '<span class="meta">' + esc(h.author) + ' · ' + esc(fmtDate(h.date.slice(0, 10))) + '</span>' +
+          '<button type="button" class="git-tab" data-diff-sha="' + esc(h.sha) + '">View changes</button>' +
+          '</div>'
+        );
+      })
+      .join('');
+    $('cases-viewer-body').querySelectorAll('[data-diff-sha]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        showCaseDiff(btn.dataset.diffSha);
+      });
+    });
+  }
+
+  function showCaseDiff(sha) {
+    var c = activeCase();
+    if (!c) return;
+    var caseId = STATE.activeCaseId;
+    STATE.caseMode = 'diff';
+    STATE.caseDiffSha = sha;
+    renderGitStrip();
+    $('cases-viewer-body').innerHTML = '<div class="diff-note">Loading changes…</div>';
+    fetch('/api/git/diff?file=' + encodeURIComponent(c.file) + (sha ? '&commit=' + encodeURIComponent(sha) : ''))
+      .then(function (r) {
+        return r.json().then(function (data) {
+          if (!r.ok) throw new Error(data.error || 'Could not load the changes.');
+          return data;
+        });
+      })
+      .then(function (data) {
+        if (STATE.activeCaseId !== caseId || STATE.caseMode !== 'diff' || STATE.caseDiffSha !== sha) return;
+        var head = sha
+          ? '<div class="diff-note"><button type="button" class="git-tab" id="diff-back">← Back to history</button> &nbsp; Changes made by commit ' + esc(sha.slice(0, 7)) + '</div>'
+          : '';
+        var body;
+        if (data.untracked) body = '<div class="diff-note">This is a new file that has not been committed yet, so there is nothing to compare it with. Commit it from your terminal to start tracking it.</div>';
+        else if (!data.text.trim()) body = '<div class="diff-note">No changes to show.</div>';
+        else {
+          body = data.text
+            .split('\n')
+            .map(function (line) {
+              var cls = '';
+              if (/^(diff --git|index |--- |\+\+\+ |new file|deleted file|similarity|rename )/.test(line)) cls = 'meta';
+              else if (line.charAt(0) === '@') cls = 'hunk';
+              else if (line.charAt(0) === '+') cls = 'add';
+              else if (line.charAt(0) === '-') cls = 'del';
+              return '<div class="diff-line ' + cls + '">' + esc(line || ' ') + '</div>';
+            })
+            .join('') + (data.truncated ? '<div class="diff-note">Diff truncated — it is larger than 300 KB.</div>' : '');
+        }
+        $('cases-viewer-body').innerHTML = head + body;
+        var back = $('diff-back');
+        if (back) back.addEventListener('click', function () { setCaseMode('history'); });
+      })
+      .catch(function (e) {
+        if (STATE.activeCaseId !== caseId) return;
+        $('cases-viewer-body').innerHTML = '<div class="alert-banner">' + esc(e.message) + '</div>';
+      });
+  }
+
+  document.querySelector('[data-view="cases"]').addEventListener('click', loadGit);
+
+  // ---------------------------------------------------------------------
+  // Bug Log — bugs found by the suites: date found, severity, status, and the test case(s)
+  // that exposed each one. Stored server-side in data/bugs.json.
+  // ---------------------------------------------------------------------
+  var SEVERITY_LABEL = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
+  var SEVERITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
+  var BUG_STATUS_LABEL = { open: 'Open', fixed: 'Fixed', wontfix: "Won't fix" };
+  STATE.bugs = [];
+  STATE.bugFilters = { status: '', severity: '', suite: '', q: '' };
+  STATE.bugForm = { editingId: null, testCases: [] };
+
+  function todayLocal() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function fmtDate(s) {
+    if (!s) return '—';
+    return new Date(s + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  // Whole-day "ago" for a YYYY-MM-DD date (fmtWhen would call today's date "15 hr ago").
+  function daysAgo(s) {
+    var days = Math.round((new Date(todayLocal() + 'T00:00:00') - new Date(s + 'T00:00:00')) / 86400000);
+    if (days <= 0) return 'today';
+    return days === 1 ? 'yesterday' : days + ' days ago';
+  }
+  function tcId(title) {
+    var m = String(title || '').match(/^TC\d+[A-Za-z0-9-]*/);
+    return m ? m[0] : truncate(title, 18);
+  }
+  // The API reports absolute paths; the log stores them relative to test-cases/ so entries
+  // stay valid on another machine or inside Docker.
+  function relFile(f) {
+    return String(f || '').replace(/^.*test-cases\//, '');
+  }
+  function sameCase(a, b) {
+    return a.title === b.title && relFile(a.file) === relFile(b.file);
+  }
+
+  function loadBugs() {
+    return fetch('/api/bugs')
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (data) {
+        STATE.bugs = data.bugs || [];
+        renderBugs();
+      })
+      .catch(function () {
+        $('bug-table').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:26px;">Could not load the bug log.</td></tr>';
+      });
+  }
+
+  function renderBugs() {
+    var bugs = STATE.bugs;
+    var f = STATE.bugFilters;
+    var counts = { '': bugs.length, open: 0, fixed: 0, wontfix: 0 };
+    bugs.forEach(function (b) {
+      counts[b.status] = (counts[b.status] || 0) + 1;
+    });
+    document.querySelectorAll('#bug-status-tabs .status-tab').forEach(function (tab) {
+      var s = tab.dataset.status;
+      tab.textContent = (s ? BUG_STATUS_LABEL[s] : 'All') + ' ' + (counts[s] || 0);
+      tab.classList.toggle('on', s === f.status);
+    });
+    $('nav-bug-count').textContent = String(counts.open || 0);
+    $('bugs-sub').textContent = bugs.length
+      ? counts.open + ' open · ' + counts.fixed + ' fixed · ' + bugs.length + ' logged in total'
+      : 'Bugs found while running the suites';
+
+    var suites = {};
+    bugs.forEach(function (b) {
+      b.testCases.forEach(function (tc) {
+        if (tc.suite) suites[tc.suite] = true;
+      });
+    });
+    var suiteSel = $('bug-suite-filter');
+    suiteSel.innerHTML =
+      '<option value="">All suites</option>' +
+      Object.keys(suites)
+        .sort()
+        .map(function (s) {
+          return '<option value="' + esc(s) + '"' + (s === f.suite ? ' selected' : '') + '>' + esc(s) + '</option>';
+        })
+        .join('');
+
+    var q = f.q.trim().toLowerCase();
+    var shown = bugs
+      .filter(function (b) {
+        if (f.status && b.status !== f.status) return false;
+        if (f.severity && b.severity !== f.severity) return false;
+        if (f.suite && !b.testCases.some(function (tc) { return tc.suite === f.suite; })) return false;
+        if (!q) return true;
+        var hay = [b.id, b.title, b.description].concat(b.testCases.map(function (tc) { return tc.title; })).join(' ').toLowerCase();
+        return hay.indexOf(q) !== -1;
+      })
+      .sort(function (a, b) {
+        var open = (a.status === 'open' ? 0 : 1) - (b.status === 'open' ? 0 : 1);
+        if (open) return open;
+        if (SEVERITY_ORDER[a.severity] !== SEVERITY_ORDER[b.severity]) return SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity];
+        return a.foundAt < b.foundAt ? 1 : a.foundAt > b.foundAt ? -1 : 0;
+      });
+
+    if (!shown.length) {
+      $('bug-table').innerHTML =
+        '<tr><td colspan="7" style="text-align:center;color:var(--text-faint);padding:26px;">' +
+        (bugs.length ? 'No bugs match these filters.' : 'No bugs logged yet. Use “Log a bug” to add the first one.') +
+        '</td></tr>';
+      return;
+    }
+
+    $('bug-table').innerHTML = shown
+      .map(function (b) {
+        var cases = b.testCases.length
+          ? b.testCases
+              .map(function (tc) {
+                return '<span class="tc-chip" title="' + esc(tc.title + (tc.suite ? ' — ' + tc.suite : '')) + '">' + esc(tcId(tc.title)) + '</span>';
+              })
+              .join('')
+          : '<span style="color:var(--text-faint);font-size:12px;">Found manually</span>';
+        if (b.runId) cases += '<div style="font-size:11.5px;color:var(--text-faint);">Run ' + esc(shortId(b.runId)) + '</div>';
+        var browsers = b.browsers.length
+          ? b.browsers.map(function (k) { return bchip(k); }).join(' ')
+          : '<span style="color:var(--text-faint);">—</span>';
+        var fixed = b.status === 'fixed' && b.fixedAt ? '<div style="font-size:11.5px;color:var(--text-faint);margin-top:3px;">' + esc(fmtDate(b.fixedAt)) + '</div>' : '';
+        return (
+          '<tr data-bug="' + esc(b.id) + '">' +
+          '<td class="cell-name" style="font-family:var(--font-mono);font-size:12px;white-space:nowrap;">' + esc(b.id) + '</td>' +
+          '<td><div class="bug-title-cell">' + esc(b.title) + '</div>' +
+          (b.description ? '<div class="bug-desc">' + esc(truncate(b.description, 140)) + '</div>' : '') + '</td>' +
+          '<td><span class="badge sev-' + esc(b.severity) + '">' + esc(SEVERITY_LABEL[b.severity]) + '</span></td>' +
+          '<td><span class="badge st-' + esc(b.status) + '">' + esc(BUG_STATUS_LABEL[b.status]) + '</span>' + fixed + '</td>' +
+          '<td style="white-space:nowrap;">' + esc(fmtDate(b.foundAt)) + '<div style="font-size:11.5px;color:var(--text-faint);">' + esc(daysAgo(b.foundAt)) + '</div></td>' +
+          '<td>' + cases + '</td>' +
+          '<td>' + browsers + '</td>' +
+          '</tr>'
+        );
+      })
+      .join('');
+  }
+
+  $('bug-table').addEventListener('click', function (e) {
+    var row = e.target.closest('tr[data-bug]');
+    if (!row) return;
+    var bug = STATE.bugs.filter(function (b) { return b.id === row.dataset.bug; })[0];
+    if (bug) openBugDrawer(bug);
+  });
+  $('bug-status-tabs').addEventListener('click', function (e) {
+    var tab = e.target.closest('.status-tab');
+    if (!tab) return;
+    STATE.bugFilters.status = tab.dataset.status;
+    renderBugs();
+  });
+  $('bug-severity-filter').addEventListener('change', function () {
+    STATE.bugFilters.severity = this.value;
+    renderBugs();
+  });
+  $('bug-suite-filter').addEventListener('change', function () {
+    STATE.bugFilters.suite = this.value;
+    renderBugs();
+  });
+  $('bug-search').addEventListener('input', function () {
+    STATE.bugFilters.q = this.value;
+    renderBugs();
+  });
+
+  // --- Add / edit drawer -------------------------------------------------
+  function renderBugSelected() {
+    var sel = STATE.bugForm.testCases;
+    $('bug-tc-selected').innerHTML = sel.length
+      ? sel
+          .map(function (tc, i) {
+            return '<span class="tc-chip" data-remove="' + i + '" title="' + esc(tc.title) + ' — click to remove">' + esc(tcId(tc.title)) + ' ✕</span>';
+          })
+          .join('')
+      : '<span style="font-size:12px;color:var(--text-faint);">None linked — leave empty if the bug was found by hand.</span>';
+  }
+  function renderBugTestList() {
+    var q = $('bug-tc-search').value.trim().toLowerCase();
+    var all = Object.keys(STATE.testsById).map(function (k) {
+      return STATE.testsById[k];
+    });
+    var matches = all.filter(function (t) {
+      return !q || (t.title + ' ' + t.suite).toLowerCase().indexOf(q) !== -1;
+    });
+    var shown = matches.slice(0, 60);
+    $('bug-tc-list').innerHTML = shown.length
+      ? shown
+          .map(function (t) {
+            var idx = all.indexOf(t);
+            var on = STATE.bugForm.testCases.some(function (tc) { return sameCase(tc, t); });
+            return (
+              '<label><input type="checkbox" data-idx="' + idx + '"' + (on ? ' checked' : '') + '><span>' +
+              esc(t.title) + '<div style="font-size:11.5px;color:var(--text-faint);">' + esc(t.suite || '') + '</div></span></label>'
+            );
+          })
+          .join('') + (matches.length > shown.length ? '<div class="empty">' + (matches.length - shown.length) + ' more — refine the search.</div>' : '')
+      : '<div class="empty">' + (all.length ? 'No test cases match.' : 'Test cases are still loading…') + '</div>';
+    $('bug-tc-list')._all = all;
+  }
+  $('bug-tc-search').addEventListener('input', renderBugTestList);
+  $('bug-tc-list').addEventListener('change', function (e) {
+    var box = e.target;
+    if (!box.matches('input[type=checkbox]')) return;
+    var t = $('bug-tc-list')._all[parseInt(box.dataset.idx, 10)];
+    var ref = { file: relFile(t.file), title: t.title, suite: t.suite };
+    STATE.bugForm.testCases = STATE.bugForm.testCases.filter(function (tc) { return !sameCase(tc, ref); });
+    if (box.checked) STATE.bugForm.testCases.push(ref);
+    renderBugSelected();
+  });
+  $('bug-tc-selected').addEventListener('click', function (e) {
+    var chip = e.target.closest('[data-remove]');
+    if (!chip) return;
+    STATE.bugForm.testCases.splice(parseInt(chip.dataset.remove, 10), 1);
+    renderBugSelected();
+    renderBugTestList();
+  });
+
+  function openBugDrawer(bug) {
+    var isNew = !bug;
+    STATE.bugForm.editingId = isNew ? null : bug.id;
+    STATE.bugForm.testCases = isNew ? [] : bug.testCases.map(function (tc) { return { file: tc.file, title: tc.title, suite: tc.suite }; });
+    $('bug-drawer-title').textContent = isNew ? 'Log a bug' : bug.id;
+    $('bug-drawer-sub').textContent = isNew ? 'Record what was found and which test case found it' : 'Logged ' + fmtDate(bug.createdAt.slice(0, 10)) + ' · last updated ' + fmtWhen(bug.updatedAt);
+    $('bug-title').value = isNew ? '' : bug.title;
+    $('bug-description').value = isNew ? '' : bug.description;
+    $('bug-severity').value = isNew ? 'medium' : bug.severity;
+    $('bug-status').value = isNew ? 'open' : bug.status;
+    $('bug-found').value = isNew ? todayLocal() : bug.foundAt;
+    $('bug-notes').value = isNew ? '' : bug.notes;
+    document.querySelectorAll('#bug-browsers input').forEach(function (cb) {
+      cb.checked = isNew ? true : bug.browsers.indexOf(cb.value) !== -1;
+    });
+    var runSel = $('bug-run');
+    var runIds = STATE.historyRuns.map(function (r) { return r.id; });
+    var options = '<option value="">Not linked to a saved run</option>';
+    if (!isNew && bug.runId && runIds.indexOf(bug.runId) === -1) options += '<option value="' + esc(bug.runId) + '">' + esc(shortId(bug.runId)) + ' (no longer saved)</option>';
+    STATE.historyRuns.forEach(function (r) {
+      options += '<option value="' + esc(r.id) + '">' + esc(shortId(r.id)) + ' · ' + esc(new Date(r.startedAt).toLocaleString()) + '</option>';
+    });
+    runSel.innerHTML = options;
+    runSel.value = isNew ? '' : bug.runId || '';
+    $('bug-tc-search').value = '';
+    $('bug-error').hidden = true;
+    $('bug-delete').hidden = isNew;
+    renderBugSelected();
+    renderBugTestList();
+    $('scrim').classList.add('show');
+    $('bug-drawer').classList.add('show');
+    $('bug-title').focus();
+  }
+  function closeBugDrawer() {
+    $('bug-drawer').classList.remove('show');
+    if (!$('drawer').classList.contains('show') && !$('history-drawer').classList.contains('show')) $('scrim').classList.remove('show');
+  }
+  $('bug-add').addEventListener('click', function () {
+    openBugDrawer(null);
+  });
+  $('bug-drawer-close').addEventListener('click', closeBugDrawer);
+  $('bug-cancel').addEventListener('click', closeBugDrawer);
+  $('scrim').addEventListener('click', closeBugDrawer);
+
+  function showBugError(message) {
+    $('bug-error').textContent = message;
+    $('bug-error').hidden = false;
+    $('bug-error').scrollIntoView({ block: 'nearest' });
+  }
+  $('bug-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var payload = {
+      title: $('bug-title').value,
+      description: $('bug-description').value,
+      severity: $('bug-severity').value,
+      status: $('bug-status').value,
+      foundAt: $('bug-found').value,
+      notes: $('bug-notes').value,
+      runId: $('bug-run').value || null,
+      browsers: Array.prototype.map.call(document.querySelectorAll('#bug-browsers input:checked'), function (cb) { return cb.value; }),
+      testCases: STATE.bugForm.testCases,
+    };
+    if (!payload.title.trim()) return showBugError('Title is required.');
+    if (!payload.foundAt) return showBugError('Date found is required.');
+    var id = STATE.bugForm.editingId;
+    $('bug-save').disabled = true;
+    fetch(id ? '/api/bugs/' + encodeURIComponent(id) : '/api/bugs', {
+      method: id ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(function (r) {
+        return r.json().then(function (data) {
+          if (!r.ok) throw new Error(data.error || 'Could not save the bug.');
+        });
+      })
+      .then(function () {
+        closeBugDrawer();
+        return loadBugs();
+      })
+      .catch(function (err) {
+        showBugError(err.message);
+      })
+      .then(function () {
+        $('bug-save').disabled = false;
+      });
+  });
+  $('bug-delete').addEventListener('click', function () {
+    var id = STATE.bugForm.editingId;
+    if (!id || !window.confirm('Delete ' + id + ' from the bug log? This cannot be undone.')) return;
+    fetch('/api/bugs/' + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('Could not delete the bug.');
+        closeBugDrawer();
+        return loadBugs();
+      })
+      .catch(function (err) {
+        showBugError(err.message);
+      });
+  });
+  document.querySelector('[data-view="bugs"]').addEventListener('click', loadBugs);
 
   // ---------------------------------------------------------------------
   // Init
@@ -1121,7 +1781,10 @@
       return loadTestHistory();
     })
     .then(function () {
-      renderCasesTable('', '');
+      buildCaseTree('');
       resumeIfActive();
+      if ($('bug-drawer').classList.contains('show')) renderBugTestList();
+      loadGit();
+      return loadBugs();
     });
 })();

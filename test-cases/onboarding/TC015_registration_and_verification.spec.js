@@ -21,7 +21,6 @@ import { test } from '../_hive-live.mjs';
  * registration (TC011, TC012). What's not confirmed: where a *successful* submission
  * navigates to, and whether a real verification step exists.
  */
-test.skip('TC015 - Verify user registration and navigation to verification page', async () => {
-  // Not run — see file header. Needs explicit sign-off to create a real account, same basis
-  // as TC005.
+test('TC015 - Verify user registration and navigation to verification page', async () => {
+  test.skip(true, 'Would create a real account in the dev database — needs explicit sign-off, same basis as TC005 — see file header.');
 });

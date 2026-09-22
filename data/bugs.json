@@ -1,0 +1,231 @@
+{
+  "bugs": [
+    {
+      "id": "BUG-001",
+      "title": "Save Changes never saves the profile",
+      "description": "Clicking Save Changes calls the EditUser cloud function. The browser blocks the request with a CORS error and the page then throws a React error. The user sees no success or error message, the form stays in edit mode, and a reload brings back the old values. Display Name and Date of Birth are the only editable fields, so editing a profile does nothing.",
+      "severity": "high",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC024_save_display_name_does_not_persist.spec.js",
+          "title": "TC024 - Verify Save Changes does not persist a new Display Name (bug)",
+          "suite": "Profile"
+        },
+        {
+          "file": "profile/TC025_save_without_edits_stays_in_edit_mode.spec.js",
+          "title": "TC025 - Verify Save Changes with no edits gives no feedback and stays in edit mode (bug)",
+          "suite": "Profile"
+        },
+        {
+          "file": "profile/TC026_save_dob_does_not_persist.spec.js",
+          "title": "TC026 - Verify Save Changes does not persist a new Date of Birth (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "The CORS error is likely a server or environment setting on the cloud function rather than a page bug. Reproduced on Chromium, Firefox and WebKit.",
+      "createdAt": "2026-09-21T09:13:29.547Z",
+      "updatedAt": "2026-09-21T09:13:29.547Z"
+    },
+    {
+      "id": "BUG-002",
+      "title": "No link to the Profile page anywhere in the UI",
+      "description": "/profile works when typed into the address bar, but nothing links to it. The sidebar has no Profile item, and the top-right account menu lists only the name, email and Logout. Clicking the name, email or avatar in that menu does nothing. The Android app opens Profile from the same avatar.",
+      "severity": "medium",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC008_profile_not_reachable_from_ui.spec.js",
+          "title": "TC008 - Verify no link to the Profile page exists in the UI (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "",
+      "createdAt": "2026-09-21T09:13:29.557Z",
+      "updatedAt": "2026-09-21T09:13:29.557Z"
+    },
+    {
+      "id": "BUG-003",
+      "title": "Cancel leaves the typed text in Display Name",
+      "description": "After typing in Display Name and clicking Cancel, the form returns to read-only but the field still shows the typed text instead of the saved value.",
+      "severity": "low",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC016_cancel_keeps_typed_text.spec.js",
+          "title": "TC016 - Verify Cancel leaves the typed text in Display Name (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "Stale screen state only. Nothing is saved and a reload restores the real value.",
+      "createdAt": "2026-09-21T09:13:29.560Z",
+      "updatedAt": "2026-09-21T09:13:29.560Z"
+    },
+    {
+      "id": "BUG-004",
+      "title": "Empty Display Name is accepted with no error",
+      "description": "Clearing Display Name shows no validation message and Save Changes stays enabled.",
+      "severity": "medium",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC017_empty_display_name_not_blocked.spec.js",
+          "title": "TC017 - Verify an empty Display Name shows no error and Save stays enabled (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "",
+      "createdAt": "2026-09-21T09:13:29.561Z",
+      "updatedAt": "2026-09-21T09:13:29.561Z"
+    },
+    {
+      "id": "BUG-005",
+      "title": "Display Name has no maximum length",
+      "description": "A 120-character Display Name is accepted with no limit and no message.",
+      "severity": "low",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC018_display_name_no_max_length.spec.js",
+          "title": "TC018 - Verify Display Name has no maximum length (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "",
+      "createdAt": "2026-09-21T09:13:29.563Z",
+      "updatedAt": "2026-09-21T09:13:29.563Z"
+    },
+    {
+      "id": "BUG-006",
+      "title": "Display Name keeps leading and trailing spaces",
+      "description": "Spaces typed before or after the name are kept as typed instead of being trimmed.",
+      "severity": "low",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC019_display_name_not_trimmed.spec.js",
+          "title": "TC019 - Verify Display Name keeps leading and trailing spaces (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "",
+      "createdAt": "2026-09-21T09:13:29.565Z",
+      "updatedAt": "2026-09-21T09:13:29.565Z"
+    },
+    {
+      "id": "BUG-007",
+      "title": "Future Date of Birth can be selected",
+      "description": "The Date of Birth picker disables no dates. Paging forward to next year and beyond works, and 2027-08-10 was accepted.",
+      "severity": "medium",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC021_future_dob_allowed.spec.js",
+          "title": "TC021 - Verify a future Date of Birth can be selected (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "",
+      "createdAt": "2026-09-21T09:13:29.567Z",
+      "updatedAt": "2026-09-21T09:13:29.567Z"
+    },
+    {
+      "id": "BUG-008",
+      "title": "Enrollment label is misspelled \"Emrolment Number\"",
+      "description": "The label above the Enrollment No. field reads \"Emrolment Number\". The field placeholder spells it correctly.",
+      "severity": "low",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium",
+        "firefox",
+        "webkit"
+      ],
+      "testCases": [
+        {
+          "file": "profile/TC029_enrollment_label_typo.spec.js",
+          "title": "TC029 - Verify the Enrollment label is misspelled \"Emrolment Number\" (bug)",
+          "suite": "Profile"
+        }
+      ],
+      "runId": null,
+      "notes": "",
+      "createdAt": "2026-09-21T09:13:29.569Z",
+      "updatedAt": "2026-09-21T09:13:29.569Z"
+    },
+    {
+      "id": "BUG-009",
+      "title": "Joining Year shows \"Invalid Date\" for the second professor",
+      "description": "On the Profile page of the second professor account (peters@gmail.com) the Joining Year field displays \"Invalid Date\" instead of a year.",
+      "severity": "low",
+      "status": "open",
+      "foundAt": "2026-09-21",
+      "fixedAt": null,
+      "browsers": [
+        "chromium"
+      ],
+      "testCases": [],
+      "runId": null,
+      "notes": "Found while probing the page by hand, so no test case covers it yet.",
+      "createdAt": "2026-09-21T09:13:29.570Z",
+      "updatedAt": "2026-09-21T09:13:29.570Z"
+    }
+  ]
+}

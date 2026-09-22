@@ -16,21 +16,43 @@ import { OpportunityPage } from './opportunity-page.js';
  * for either role, so there is no role restriction to verify. Confirmed the professor's
  * Share dialog is byte-for-byte the same four options (Email, WhatsApp, Facebook, Copy Link)
  * as the student's.
+ *
+ * Split per type (was Jobs-tab only) so Jobs and Internship are tracked as distinct cases.
  */
-test('TC023 - Verify professor-only Buzz sharing (N/A on web)', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+test.describe('TC023 - Professor-only Buzz sharing (N/A on web)', () => {
+  test('TC023-Jobs', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
 
-  const opportunityPage = new OpportunityPage(page);
-  await opportunityPage.goto();
-  await opportunityPage.jobsTab.click();
+    const opportunityPage = new OpportunityPage(page);
+    await opportunityPage.goto();
+    await opportunityPage.jobsTab.click();
 
-  await opportunityPage.openFirstCardMenu();
-  await opportunityPage.clickMenuItem('Share');
+    await opportunityPage.openFirstCardMenu();
+    await opportunityPage.clickMenuItem('Share');
 
-  const dialog = opportunityPage.shareDialog();
-  await expect(dialog).toBeVisible();
-  await expect(dialog.getByText(/buzz/i)).toHaveCount(0);
+    const dialog = opportunityPage.shareDialog();
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText(/buzz/i)).toHaveCount(0);
+  });
+
+  test('TC023-Internship', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+
+    const opportunityPage = new OpportunityPage(page);
+    await opportunityPage.goto();
+    await opportunityPage.internshipTab.click();
+
+    await opportunityPage.openFirstCardMenu();
+    await opportunityPage.clickMenuItem('Share');
+
+    const dialog = opportunityPage.shareDialog();
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText(/buzz/i)).toHaveCount(0);
+  });
 });

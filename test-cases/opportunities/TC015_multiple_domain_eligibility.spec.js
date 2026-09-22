@@ -16,14 +16,29 @@ import { CreateOpportunityPage } from './create-opportunity-page.js';
  * N/A on web (same basis as TC008, re-confirmed): there is no "Eligibility" field on the
  * real create form for either Jobs or Internship, so there is nothing to select multiple
  * domains from.
+ *
+ * Split per type so Jobs and Internship are tracked as distinct test cases.
  */
-test('TC015 - Verify multiple domain selection in Eligibility (N/A on web)', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+test.describe('TC015 - Multiple domain selection in Eligibility (N/A on web)', () => {
+  test('TC015-Jobs', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
 
-  const createPage = new CreateOpportunityPage(page);
-  await createPage.goto('Jobs');
-  await expect(page.getByText(/eligib/i)).toHaveCount(0);
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Jobs');
+    await expect(page.getByText(/eligib/i)).toHaveCount(0);
+  });
+
+  test('TC015-Internship', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
+    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+
+    const createPage = new CreateOpportunityPage(page);
+    await createPage.goto('Internship');
+    await expect(page.getByText(/eligib/i)).toHaveCount(0);
+  });
 });
