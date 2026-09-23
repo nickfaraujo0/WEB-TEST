@@ -6,6 +6,7 @@
 <title>HIVE — Test Automation Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -92,10 +93,6 @@
           <span><span class="d" style="background:var(--skip);"></span><span id="sb-skipped">0</span> skipped</span>
         </div>
       </div>
-      <div class="sidebar-foot">
-        <div class="avatar">JT</div>
-        <div class="who"><div class="n">Jordan Teale</div><div class="r">QA Engineer</div></div>
-      </div>
     </div>
   </aside>
 
@@ -144,19 +141,36 @@
       <div class="content">
         <div class="git-bar" id="cases-git-bar" hidden></div>
         <div class="cases-layout">
-          <div class="panel cases-sidebar" id="cases-sidebar">
-            <div class="cases-sidebar-head">
-              <div class="search" style="flex:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Filter by name or suite…" id="cases-search"></div>
-              <button type="button" class="icon-btn" id="cases-collapse-btn" title="Collapse"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <div class="cases-main-row">
+            <div class="panel cases-sidebar" id="cases-sidebar">
+              <div class="cases-sidebar-head">
+                <div class="search" style="flex:1;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Filter by name or suite…" id="cases-search"></div>
+                <button type="button" class="icon-btn" id="cases-collapse-btn" title="Collapse"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button>
+              </div>
+              <div class="cases-sidebar-body" id="cases-tree"></div>
             </div>
-            <div class="cases-sidebar-body" id="cases-tree"></div>
+            <div class="panel code-viewer" id="cases-viewer">
+              <div class="code-viewer-tab" id="cases-viewer-tab">Pick a test case on the left. Editing happens in your editor — this is a read-only view of what's on disk.</div>
+              <div class="git-strip" id="cases-git-strip" hidden></div>
+              <div class="code-viewer-body" id="cases-viewer-body">
+                <div class="live-col-empty">Select a test case to view its source.</div>
+              </div>
+            </div>
           </div>
-          <div class="panel code-viewer" id="cases-viewer">
-            <div class="code-viewer-tab" id="cases-viewer-tab">Pick a test case on the left. Editing happens in your editor — this is a read-only view of what's on disk.</div>
-            <div class="git-strip" id="cases-git-strip" hidden></div>
-            <div class="code-viewer-body" id="cases-viewer-body">
-              <div class="live-col-empty">Select a test case to view its source.</div>
+          <div class="panel cases-terminal" id="cases-terminal">
+            <div class="terminal-head">
+              <div class="terminal-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 6 5 5-5 5M13 17h6"/></svg>
+                Terminal
+                <span class="terminal-status" id="terminal-status">connecting…</span>
+              </div>
+              <div class="terminal-actions">
+                <span class="terminal-hint">Real shell in this repo — <code>git commit</code> / <code>git push</code> here reach GitHub.</span>
+                <button type="button" class="icon-btn" id="terminal-clear-btn" title="Clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+                <button type="button" class="icon-btn" id="terminal-collapse-btn" title="Collapse"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></button>
+              </div>
             </div>
+            <div class="terminal-body" id="terminal-body"></div>
           </div>
         </div>
       </div>
@@ -319,7 +333,7 @@
                 <div class="progress-wrap">
                   <div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:12.5px;font-weight:700;">
                     <span id="live-progress-label">Running 0 / 24 executions</span>
-                    <span class="mono" id="live-elapsed" style="color:var(--text-faint);">00:00</span>
+                    <span class="mono" style="color:var(--text-faint);"><span id="live-elapsed">00:00</span> elapsed</span>
                   </div>
                   <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%;"></div></div>
                 </div>
@@ -329,6 +343,7 @@
                 <div class="live-stat"><div class="n danger" id="live-fail">0</div><div class="l">Failed</div></div>
                 <div class="live-stat"><div class="n" id="live-running-n">0</div><div class="l">Running</div></div>
                 <div class="live-stat"><div class="n" style="color:var(--text-faint);" id="live-queued">0</div><div class="l">Queued</div></div>
+                <div class="live-stat live-stat-eta"><div class="n" id="live-eta">—</div><div class="l" id="live-eta-sub">Time left</div></div>
               </div>
             </div>
           </div>
@@ -580,6 +595,8 @@
   </div>
 </aside>
 
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

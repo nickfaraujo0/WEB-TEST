@@ -106,6 +106,11 @@
     if (days === 1) return 'yesterday';
     return days + ' days ago';
   }
+  // Absolute local date + time, e.g. "23 Sep 2026, 14:05" — for places where "3 days ago" isn't precise enough.
+  function fmtDateTime(iso) {
+    if (!iso) return '—';
+    return new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
   function shortId(id) {
     return '#' + String(id || '').slice(-6);
   }
@@ -175,7 +180,7 @@
           STATE.suiteOpen[s.name] = false;
           s.cases.forEach(function (c) {
             STATE.testsById[c.id] = { title: c.title, suite: s.name, file: c.file, line: c.line, tags: c.tags || [] };
-            STATE.checked[c.id] = true;
+            STATE.checked[c.id] = false;
             total++;
           });
         });
@@ -456,11 +461,9 @@
     var entry = STATE.testHistory[caseId];
     var last = mostRecentPoint(entry);
     var fileName = c.file.split('/').pop();
-    $('cases-viewer-tab').innerHTML =
-      '<span class="file">' + esc(fileName) + '</span>' +
-      '<span>' + esc(c.suite || '') + '</span>' +
-      (last ? badge(last.status) : '<span style="color:var(--text-faint);">Not run</span>') +
-      '<button type="button" class="hist-link" id="cases-view-history">View history</button>';
+    STATE.caseEditing = false;
+    STATE.caseRawSource = null;
+    renderCaseTab(fileName, c.suite, last);
     $('cases-view-history').addEventListener('click', function () {
       openHistoryDrawer(caseId);
     });
@@ -476,17 +479,98 @@
       })
       .then(function (data) {
         if (STATE.activeCaseId !== caseId) return;
-        var lines = data.content.replace(/\r\n/g, '\n').split('\n');
-        STATE.caseSourceHtml = lines
-          .map(function (line, i) {
-            return '<div class="code-line"><span class="ln">' + (i + 1) + '</span><span class="lc">' + esc(line) + '</span></div>';
-          })
-          .join('');
+        STATE.caseRawSource = data.content;
+        renderCaseSourceHtml(data.content);
         if (STATE.caseMode === 'source') $('cases-viewer-body').innerHTML = STATE.caseSourceHtml;
       })
       .catch(function (e) {
         if (STATE.activeCaseId !== caseId) return;
         $('cases-viewer-body').innerHTML = '<div class="alert-banner">Could not load source: ' + esc(e.message) + '</div>';
+      });
+  }
+
+  function renderCaseSourceHtml(content) {
+    var lines = content.replace(/\r\n/g, '\n').split('\n');
+    STATE.caseSourceHtml = lines
+      .map(function (line, i) {
+        return '<div class="code-line"><span class="ln">' + (i + 1) + '</span><span class="lc">' + esc(line) + '</span></div>';
+      })
+      .join('');
+  }
+
+  function renderCaseTab(fileName, suite, last) {
+    var editing = STATE.caseEditing;
+    $('cases-viewer-tab').innerHTML =
+      '<span class="file">' + esc(fileName) + '</span>' +
+      '<span>' + esc(suite || '') + '</span>' +
+      (last ? badge(last.status) : '<span style="color:var(--text-faint);">Not run</span>') +
+      (editing
+        ? '<button type="button" class="btn sm" id="cases-cancel-edit" style="margin-left:auto;">Cancel</button><button type="button" class="btn sm primary" id="cases-save-edit">Save</button>'
+        : '<button type="button" class="hist-link" id="cases-view-history">View history</button><button type="button" class="hist-link" id="cases-edit-btn">Edit</button>');
+    if (editing) {
+      $('cases-cancel-edit').addEventListener('click', cancelCaseEdit);
+      $('cases-save-edit').addEventListener('click', saveCaseEdit);
+    } else {
+      $('cases-edit-btn').addEventListener('click', startCaseEdit);
+    }
+  }
+
+  function startCaseEdit() {
+    if (STATE.caseRawSource === null) return;
+    STATE.caseMode = 'source';
+    STATE.caseEditing = true;
+    var c = activeCase();
+    renderCaseTab(c.file.split('/').pop(), c.suite, mostRecentPoint(STATE.testHistory[STATE.activeCaseId]));
+    $('cases-viewer-body').innerHTML = '<textarea class="code-edit-area" id="cases-edit-area" spellcheck="false"></textarea>';
+    var area = $('cases-edit-area');
+    area.value = STATE.caseRawSource;
+    area.focus();
+    area.addEventListener('keydown', function (e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var s = area.selectionStart, en = area.selectionEnd;
+        area.value = area.value.slice(0, s) + '  ' + area.value.slice(en);
+        area.selectionStart = area.selectionEnd = s + 2;
+      }
+    });
+  }
+
+  function cancelCaseEdit() {
+    STATE.caseEditing = false;
+    var c = activeCase();
+    renderCaseTab(c.file.split('/').pop(), c.suite, mostRecentPoint(STATE.testHistory[STATE.activeCaseId]));
+    $('cases-viewer-body').innerHTML = STATE.caseSourceHtml;
+  }
+
+  function saveCaseEdit() {
+    var c = activeCase();
+    if (!c) return;
+    var area = $('cases-edit-area');
+    var content = area.value;
+    var btn = $('cases-save-edit');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    fetch('/api/source?file=' + encodeURIComponent(c.file), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: content }),
+    })
+      .then(function (r) {
+        if (!r.ok) return r.json().then(function (d) { throw new Error(d.error || 'Save failed (' + r.status + ')'); });
+        return r.json();
+      })
+      .then(function () {
+        STATE.caseRawSource = content;
+        renderCaseSourceHtml(content);
+        STATE.caseEditing = false;
+        renderCaseTab(c.file.split('/').pop(), c.suite, mostRecentPoint(STATE.testHistory[STATE.activeCaseId]));
+        $('cases-viewer-body').innerHTML = STATE.caseSourceHtml;
+        loadGit();
+      })
+      .catch(function (e) {
+        btn.disabled = false;
+        btn.textContent = 'Save';
+        alert('Could not save: ' + e.message);
       });
   }
 
@@ -537,7 +621,9 @@
         });
       })
       .then(function (data) {
-        startLiveBoard(tests, browsers, data.runId, true);
+        startLiveBoard(tests, browsers, data.runId, true, {
+          workers: STATE.parallel === false ? 1 : STATE.workers,
+        });
       })
       .catch(function (e) {
         alert(e.message);
@@ -620,7 +706,89 @@
     $('live-queued').textContent = Math.max(total - done - running, 0);
     $('live-progress-label').textContent = 'Running ' + done + ' / ' + total + ' executions';
     $('progress-fill').style.width = total ? (done / total) * 100 + '%' : '0%';
+    STATE.liveLastDone = done;
+    STATE.liveLastTotal = total;
+    updateEta(done, total);
     return { pass: pass, fail: fail + skip, done: done, total: total };
+  }
+
+  // Fallback per-execution duration when a case has never run before and there's no other
+  // history to borrow a median from.
+  var ETA_DEFAULT_CASE_MS = 15000;
+
+  // Up-front estimate for the whole run, available the moment it starts: each (case, browser)
+  // execution's last recorded duration from test history (falling back to that case on another
+  // browser, then the median of everything known), summed and divided across the workers that
+  // will actually run in parallel.
+  function estimateRunMs(caseList, browsers, workers) {
+    var known = [];
+    Object.keys(STATE.testHistory).forEach(function (k) {
+      var bp = STATE.testHistory[k].byProject || {};
+      Object.keys(bp).forEach(function (p) {
+        if (bp[p].duration != null) known.push(bp[p].duration);
+      });
+    });
+    known.sort(function (a, b) {
+      return a - b;
+    });
+    var median = known.length ? known[Math.floor(known.length / 2)] : ETA_DEFAULT_CASE_MS;
+
+    var sum = 0;
+    caseList.forEach(function (c) {
+      var bp = (STATE.testHistory[c.file + ':' + c.line] || {}).byProject || {};
+      var anyBrowser = null;
+      Object.keys(bp).forEach(function (p) {
+        if (anyBrowser == null && bp[p].duration != null) anyBrowser = bp[p].duration;
+      });
+      browsers.forEach(function (b) {
+        var d = bp[b] && bp[b].duration != null ? bp[b].duration : anyBrowser;
+        sum += d != null ? d : median;
+      });
+    });
+    var lanes = Math.max(1, Math.min(workers || 1, caseList.length * browsers.length));
+    return sum / lanes;
+  }
+
+  function fmtEta(ms) {
+    var s = Math.max(1, Math.round(ms / 1000));
+    if (s < 60) return s + 's';
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ' + String(s % 60).padStart(2, '0') + 's';
+    return Math.floor(m / 60) + 'h ' + String(m % 60).padStart(2, '0') + 'm';
+  }
+
+  // Blends the history-based estimate with THIS run's own pace (elapsed / executions finished).
+  // History carries the estimate before anything finishes; as executions complete, the live
+  // pace takes over, since it reflects this machine, network and worker count. Weighting is
+  // by how many "rounds" of workers have finished, so one fast early test can't swing it.
+  function updateEta(done, total) {
+    var el = $('live-eta');
+    var sub = $('live-eta-sub');
+    if (!el) return;
+    if (!STATE.elapsedStart || !total) {
+      el.textContent = '—';
+      if (sub) sub.textContent = 'Time left';
+      return;
+    }
+    if (done >= total) {
+      el.textContent = '0s';
+      if (sub) sub.textContent = 'Time left';
+      return;
+    }
+    var elapsedMs = Date.now() - STATE.elapsedStart;
+    var histRemaining = Math.max((STATE.liveEstimateMs || 0) - elapsedMs, 0);
+    var remainingMs = histRemaining;
+    if (done > 0) {
+      var paceRemaining = (elapsedMs / done) * (total - done);
+      var w = Math.min(done / (2 * (STATE.liveWorkers || 1)), 1);
+      remainingMs = w * paceRemaining + (1 - w) * histRemaining;
+    }
+    if (remainingMs < 1000) {
+      el.textContent = 'Almost done';
+    } else {
+      el.textContent = '~' + fmtEta(remainingMs);
+    }
+    if (sub) sub.textContent = done > 0 ? 'Time left' : 'Time left (est.)';
   }
 
   function handleLiveEvent(ev) {
@@ -681,8 +849,11 @@
     if (empty) empty.hidden = true;
   }
 
-  function startLiveBoard(caseList, browsers, runId, isFresh) {
+  function startLiveBoard(caseList, browsers, runId, isFresh, opts) {
+    opts = opts || {};
     STATE.currentRunId = runId;
+    STATE.liveWorkers = Math.max(1, Math.min(opts.workers || 1, caseList.length * browsers.length));
+    STATE.liveEstimateMs = estimateRunMs(caseList, browsers, opts.workers);
     $('run-btn').disabled = true;
     STATE.liveCaseList = caseList;
     STATE.liveBrowsers = browsers;
@@ -705,13 +876,18 @@
     if (isFresh) showView('live');
 
     clearInterval(STATE.elapsedTimer);
-    STATE.elapsedStart = Date.now();
+    // A resumed run (page reload mid-run) keeps its real start time so elapsed and ETA stay right.
+    STATE.elapsedStart = opts.startedAt ? new Date(opts.startedAt).getTime() : Date.now();
+    STATE.liveLastDone = 0;
+    STATE.liveLastTotal = caseList.length * browsers.length;
     $('live-elapsed').textContent = '00:00';
+    updateEta(0, STATE.liveLastTotal);
     STATE.elapsedTimer = setInterval(function () {
       var s = Math.floor((Date.now() - STATE.elapsedStart) / 1000);
       var m = String(Math.floor(s / 60)).padStart(2, '0');
       var ss = String(s % 60).padStart(2, '0');
       $('live-elapsed').textContent = m + ':' + ss;
+      updateEta(STATE.liveLastDone || 0, STATE.liveLastTotal || 0);
     }, 1000);
 
     if (STATE.es) STATE.es.close();
@@ -771,7 +947,10 @@
         // EventSource) while this page-load status check was still in flight — don't start
         // a second one for the same run, or every event would be double-counted.
         if (!status.active || STATE.currentRunId) return;
-        startLiveBoard(status.tests, status.browsers, status.runId, false);
+        startLiveBoard(status.tests, status.browsers, status.runId, false, {
+          workers: status.config && status.config.workers,
+          startedAt: status.startedAt,
+        });
         (status.events || []).forEach(handleLiveEvent);
         Object.keys(status.lastFrame || {}).forEach(function (project) {
           applyFrame(project, status.lastFrame[project]);
@@ -1052,7 +1231,7 @@
           return (
             '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">' +
             bchip(p) + '<span style="display:flex;align-items:center;gap:10px;">' + badge(pt.status) +
-            '<span class="mono" style="font-size:11.5px;color:var(--text-faint);">' + fmtWhen(pt.finishedAt) + '</span></span></div>'
+            '<span class="mono" style="font-size:11.5px;color:var(--text-faint);">' + fmtDateTime(pt.finishedAt) + '</span></span></div>'
           );
         })
         .join('');
@@ -1063,7 +1242,7 @@
         .map(function (p) {
           return (
             '<tr><td class="cell-id" style="padding:6px 0;">' + shortId(p.runId) + '</td><td>' + bchip(p.project) + '</td><td>' +
-            badge(p.status) + '</td><td class="mono">' + fmtDuration(p.duration) + '</td><td class="cell-id">' + fmtWhen(p.finishedAt) + '</td></tr>'
+            badge(p.status) + '</td><td class="mono">' + fmtDuration(p.duration) + '</td><td class="cell-id">' + fmtDateTime(p.finishedAt) + '</td></tr>'
           );
         });
       historyTable.innerHTML = rows.join('');
@@ -1317,7 +1496,7 @@
       var h = hist[0];
       last =
         'Last commit <a href="' + esc(g.webUrl ? g.webUrl + '/commit/' + h.sha : '#') + '" target="_blank" rel="noopener">' + esc(h.short) + '</a> — ' +
-        esc(truncate(h.subject, 70)) + ' · ' + esc(h.author) + ' · ' + esc(fmtWhen(h.date));
+        esc(truncate(h.subject, 70)) + ' · ' + esc(h.author) + ' · ' + esc(fmtDateTime(h.date));
     }
     var mode = STATE.caseMode;
     var onHistory = mode === 'history' || (mode === 'diff' && STATE.caseDiffSha);
@@ -1450,6 +1629,98 @@
   }
 
   document.querySelector('[data-view="cases"]').addEventListener('click', loadGit);
+
+  // ---------------------------------------------------------------------
+  // Embedded terminal (Test Cases tab) — a real shell over WebSocket, bridged to node-pty
+  // server-side (server/terminal.js). Unlike the read-only git panel above, this is NOT
+  // read-only: commands typed here really run against this checkout, so `git add` /
+  // `git commit` / `git push` here really reach GitHub.
+  // ---------------------------------------------------------------------
+  var TERM = { term: null, fit: null, ws: null, reconnectTimer: null };
+
+  function termStatus(text, cls) {
+    var el = $('terminal-status');
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'terminal-status' + (cls ? ' ' + cls : '');
+  }
+
+  function fitTerminal() {
+    if (!TERM.fit || !TERM.term) return;
+    if ($('cases-terminal').classList.contains('collapsed')) return;
+    try {
+      TERM.fit.fit();
+    } catch (e) {
+      return;
+    }
+    if (TERM.ws && TERM.ws.readyState === WebSocket.OPEN) {
+      TERM.ws.send(JSON.stringify({ type: 'resize', cols: TERM.term.cols, rows: TERM.term.rows }));
+    }
+  }
+
+  function connectTerminal() {
+    termStatus('connecting…');
+    var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+    var ws = new WebSocket(proto + location.host + '/ws/terminal');
+    TERM.ws = ws;
+    ws.onopen = function () {
+      termStatus('connected', 'on');
+      setTimeout(fitTerminal, 30);
+    };
+    ws.onmessage = function (ev) {
+      var msg;
+      try {
+        msg = JSON.parse(ev.data);
+      } catch (e) {
+        return;
+      }
+      if (msg.type === 'data') TERM.term.write(msg.data);
+      else if (msg.type === 'error') {
+        termStatus('unavailable', 'err');
+        TERM.term.writeln('\r\n\x1b[31m' + msg.message + '\x1b[0m');
+      }
+    };
+    ws.onclose = function () {
+      termStatus('disconnected', 'err');
+      clearTimeout(TERM.reconnectTimer);
+      TERM.reconnectTimer = setTimeout(connectTerminal, 2000);
+    };
+    ws.onerror = function () {
+      ws.close();
+    };
+  }
+
+  function initTerminal() {
+    if (TERM.term || typeof Terminal === 'undefined') return;
+    TERM.term = new Terminal({
+      fontSize: 12.5,
+      fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
+      cursorBlink: true,
+      theme: { background: '#0c0f13', foreground: '#d8dee9', cursor: '#7ee787' },
+    });
+    TERM.fit = new FitAddon.FitAddon();
+    TERM.term.loadAddon(TERM.fit);
+    TERM.term.open($('terminal-body'));
+    TERM.term.onData(function (data) {
+      if (TERM.ws && TERM.ws.readyState === WebSocket.OPEN) {
+        TERM.ws.send(JSON.stringify({ type: 'input', data: data }));
+      }
+    });
+    connectTerminal();
+    window.addEventListener('resize', fitTerminal);
+  }
+
+  $('terminal-clear-btn').addEventListener('click', function () {
+    if (TERM.term) TERM.term.clear();
+  });
+  $('terminal-collapse-btn').addEventListener('click', function () {
+    var collapsed = $('cases-terminal').classList.toggle('collapsed');
+    if (!collapsed) setTimeout(fitTerminal, 160);
+  });
+  document.querySelector('[data-view="cases"]').addEventListener('click', function () {
+    initTerminal();
+    setTimeout(fitTerminal, 60);
+  });
 
   // ---------------------------------------------------------------------
   // Bug Log — bugs found by the suites: date found, severity, status, and the test case(s)

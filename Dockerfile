@@ -8,6 +8,11 @@ FROM mcr.microsoft.com/playwright:v1.63.0-noble
 
 WORKDIR /app
 
+# node-pty (the Test Cases tab's embedded terminal) only ships prebuilt binaries for macOS/
+# Windows; on Linux it compiles from source via node-gyp, which needs these.
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install dependencies first so this layer is cached across rebuilds that only change code.
 COPY package.json package-lock.json ./
 COPY test-cases/package.json test-cases/package.json

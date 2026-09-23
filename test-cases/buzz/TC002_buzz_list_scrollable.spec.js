@@ -22,7 +22,7 @@ test('TC002 - Verify Buzz list is scrollable', async ({ page }) => {
   expect(await buzzPage.cards.count()).toBeGreaterThan(1);
 
   const lastCard = buzzPage.cards.last();
-  await expect(lastCard).not.toBeInViewport();
+  await expect(lastCard).not.toBeInViewort();
 
   await buzzPage.cards.first().hover();
   await page.mouse.wheel(0, 3000);

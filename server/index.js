@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 const crypto = require('crypto');
 const { spawn } = require('child_process');
 const express = require('express');
@@ -10,6 +11,7 @@ const { getPlaywrightBin, playwrightInstalled } = require('./playwrightBin');
 const testHistory = require('./testHistory');
 const bugStore = require('./bugStore');
 const gitInfo = require('./gitInfo');
+const terminal = require('./terminal');
 const { classifyFailure, skipReason } = require('./classify');
 
 const PORT = process.env.PORT || 4000;
@@ -80,6 +82,7 @@ app.get('/api/status', (req, res) => {
     tests: current.tests,
     browsers: current.browsers,
     config: current.config,
+    startedAt: current.startedAt,
     events: current.events,
     lastFrame: current.lastFrame,
   });
@@ -144,7 +147,7 @@ app.post('/api/run', (req, res) => {
     config: {
       environment: body.environment || 'local',
       mode: body.mode || 'headless',
-      workers,
+      workers: body.parallel === false ? 1 : workers,
       retries: !!body.retries,
     },
     testResults: [],
@@ -476,7 +479,27 @@ app.get('/api/source', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+// Saves edits made in the Test Cases code viewer back to the spec file on disk — same
+// containment check as the read above. This is the only write path onto test-cases/; use
+// the tab's terminal (or your own editor) for anything git.
+app.put('/api/source', (req, res) => {
+  const file = req.query.file;
+  if (!file) return res.status(400).end();
+  const resolved = path.resolve(file);
+  if (!resolved.startsWith(TEST_CASES_DIR + path.sep)) return res.status(403).end();
+  if (!fs.existsSync(resolved)) return res.status(404).end();
+  const content = req.body ? req.body.content : undefined;
+  if (typeof content !== 'string') return res.status(400).json({ error: 'Missing content' });
+  fs.writeFile(resolved, content, 'utf8', (err) => {
+    if (err) return res.status(500).json({ error: 'Could not write file' });
+    res.json({ ok: true });
+  });
+});
+
+const server = http.createServer(app);
+terminal.attach(server);
+
+server.listen(PORT, () => {
   console.log('');
   console.log('  HIVE dashboard running at http://localhost:' + PORT);
   console.log('');
@@ -484,6 +507,10 @@ app.listen(PORT, () => {
     console.log('  ⚠ Playwright is not installed yet. Run:');
     console.log('    npm install');
     console.log('    npx playwright install');
+    console.log('');
+  }
+  if (!terminal.available) {
+    console.log('  ⚠ node-pty failed to load — the Test Cases terminal will be disabled.');
     console.log('');
   }
 });
