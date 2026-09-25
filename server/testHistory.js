@@ -136,4 +136,73 @@ function computeCrossBrowserMismatches(history) {
   return mismatches;
 }
 
-module.exports = { buildHistory, computeBroken, computeCrossBrowserMismatches, computeSkipped };
+// Per-suite rollup across every saved run: lifetime totals plus a per-run timeline (oldest ->
+// newest) so the Reports page can show how each suite's pass rate has moved over time.
+function computeSuiteSummary(limitRuns, timelineLength) {
+  const runs = store.listRuns(limitRuns).slice().reverse(); // oldest -> newest
+  const bySuite = new Map();
+
+  runs.forEach((run) => {
+    const perRun = new Map();
+    (run.tests || []).forEach((t) => {
+      const name = t.suite || 'Other';
+      if (!perRun.has(name)) perRun.set(name, { passed: 0, failed: 0, skipped: 0, duration: 0, cases: new Set() });
+      const pr = perRun.get(name);
+      if (t.status === 'passed') pr.passed++;
+      else if (t.status === 'skipped') pr.skipped++;
+      else if (FAILING_STATUSES.has(t.status)) pr.failed++;
+      pr.duration += t.duration || 0;
+      pr.cases.add(t.file + ':' + t.line);
+    });
+
+    perRun.forEach((pr, name) => {
+      if (!bySuite.has(name)) {
+        bySuite.set(name, { suite: name, runs: 0, executions: 0, passed: 0, failed: 0, skipped: 0, duration: 0, cases: new Set(), firstRunAt: run.startedAt, timeline: [] });
+      }
+      const s = bySuite.get(name);
+      const ran = pr.passed + pr.failed;
+      s.runs++;
+      s.executions += pr.passed + pr.failed + pr.skipped;
+      s.passed += pr.passed;
+      s.failed += pr.failed;
+      s.skipped += pr.skipped;
+      s.duration += pr.duration;
+      pr.cases.forEach((c) => s.cases.add(c));
+      s.timeline.push({
+        runId: run.id,
+        startedAt: run.startedAt,
+        passed: pr.passed,
+        failed: pr.failed,
+        skipped: pr.skipped,
+        passRate: ran ? Math.round((pr.passed / ran) * 100) : null,
+      });
+    });
+  });
+
+  return Array.from(bySuite.values())
+    .map((s) => {
+      const ran = s.passed + s.failed;
+      const rated = s.timeline.filter((p) => p.passRate !== null);
+      const last = rated[rated.length - 1] || null;
+      const prev = rated[rated.length - 2] || null;
+      return {
+        suite: s.suite,
+        runs: s.runs,
+        cases: s.cases.size,
+        executions: s.executions,
+        passed: s.passed,
+        failed: s.failed,
+        skipped: s.skipped,
+        passRate: ran ? Math.round((s.passed / ran) * 100) : null,
+        avgTestMs: s.executions ? Math.round(s.duration / s.executions) : 0,
+        firstRunAt: s.firstRunAt,
+        lastRunAt: s.timeline[s.timeline.length - 1].startedAt,
+        lastPassRate: last ? last.passRate : null,
+        change: last && prev ? last.passRate - prev.passRate : null,
+        timeline: s.timeline.slice(-timelineLength),
+      };
+    })
+    .sort((a, b) => a.suite.localeCompare(b.suite));
+}
+
+module.exports = { buildHistory, computeBroken, computeCrossBrowserMismatches, computeSkipped, computeSuiteSummary };

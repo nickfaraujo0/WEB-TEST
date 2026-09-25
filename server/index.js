@@ -11,7 +11,6 @@ const { getPlaywrightBin, playwrightInstalled } = require('./playwrightBin');
 const testHistory = require('./testHistory');
 const bugStore = require('./bugStore');
 const gitInfo = require('./gitInfo');
-const terminal = require('./terminal');
 const { classifyFailure, skipReason } = require('./classify');
 
 const PORT = process.env.PORT || 4000;
@@ -91,22 +90,36 @@ app.get('/api/status', (req, res) => {
 // ---------------------------------------------------------------------------
 // Kick off a run
 // ---------------------------------------------------------------------------
-app.post('/api/run', (req, res) => {
+// Validates a run request body; returns an error message, or null if it's runnable.
+function validateRunBody(body) {
   if (!playwrightInstalled()) {
-    return res.status(400).json({
-      error: 'Playwright is not installed. Run "npm install" then "npx playwright install" first.',
-    });
+    return 'Playwright is not installed. Run "npm install" then "npx playwright install" first.';
   }
+  const tests = Array.isArray(body.tests) ? body.tests : [];
+  const browsers = Array.isArray(body.browsers) ? body.browsers : [];
+  if (!tests.length || !browsers.length) return 'Select at least one test case and one browser.';
+  return null;
+}
+
+app.post('/api/run', (req, res) => {
+  const body = req.body || {};
+  const invalid = validateRunBody(body);
+  if (invalid) return res.status(400).json({ error: invalid });
   if (current && current.child) {
     return res.status(409).json({ error: 'A run is already in progress.' });
   }
-
-  const body = req.body || {};
-  const tests = Array.isArray(body.tests) ? body.tests : [];
-  const browsers = Array.isArray(body.browsers) ? body.browsers : [];
-  if (!tests.length || !browsers.length) {
-    return res.status(400).json({ error: 'Select at least one test case and one browser.' });
+  try {
+    res.json({ runId: startRun(body) });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
+});
+
+// Spawns Playwright for a (validated) run body and makes it `current`. Returns the runId;
+// throws if the process can't be started.
+function startRun(body) {
+  const tests = body.tests;
+  const browsers = body.browsers;
 
   const runId = 'run-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex');
   const metaByKey = {};
@@ -133,7 +146,7 @@ app.post('/api/run', (req, res) => {
       }),
     });
   } catch (e) {
-    return res.status(500).json({ error: 'Could not start Playwright: ' + e.message });
+    throw new Error('Could not start Playwright: ' + e.message);
   }
 
   current = {
@@ -170,7 +183,75 @@ app.post('/api/run', (req, res) => {
     finalizeRun(runId, code, signal);
   });
 
-  res.json({ runId });
+  return runId;
+}
+
+// ---------------------------------------------------------------------------
+// Run queue — runs requested while another is active. Kept on the server (and saved to
+// data/queue.json) so it survives page reloads and server restarts, advances even with no
+// dashboard tab open, and every viewer sees the same queue.
+// ---------------------------------------------------------------------------
+const QUEUE_FILE = path.join(ROOT, 'data', 'queue.json');
+let runQueue = [];
+try {
+  runQueue = JSON.parse(fs.readFileSync(QUEUE_FILE, 'utf8'));
+  if (!Array.isArray(runQueue)) runQueue = [];
+} catch (e) {
+  runQueue = [];
+}
+
+function saveQueue() {
+  try {
+    fs.mkdirSync(path.dirname(QUEUE_FILE), { recursive: true });
+    fs.writeFileSync(QUEUE_FILE, JSON.stringify(runQueue, null, 2));
+  } catch (e) {
+    console.error('Could not save run queue:', e.message);
+  }
+}
+
+// Starts queued runs in order until one launches. A queued run that can no longer start
+// (e.g. Playwright was uninstalled) is dropped rather than blocking everything behind it.
+function startNextQueued() {
+  while (!current && runQueue.length) {
+    const item = runQueue.shift();
+    saveQueue();
+    try {
+      startRun(item.body);
+    } catch (e) {
+      console.error('Skipping queued run ' + item.id + ': ' + e.message);
+    }
+  }
+}
+
+app.get('/api/queue', (req, res) => {
+  res.json({ queue: runQueue });
+});
+
+app.post('/api/queue', (req, res) => {
+  const body = req.body || {};
+  const invalid = validateRunBody(body);
+  if (invalid) return res.status(400).json({ error: invalid });
+  runQueue.push({
+    id: 'q-' + Date.now() + '-' + crypto.randomBytes(3).toString('hex'),
+    queuedAt: new Date().toISOString(),
+    body,
+  });
+  saveQueue();
+  // Nothing running (e.g. the active run ended while this request was in flight): start now.
+  startNextQueued();
+  res.json({ queue: runQueue, runId: current ? current.id : null });
+});
+
+app.delete('/api/queue/:id', (req, res) => {
+  runQueue = runQueue.filter((item) => item.id !== req.params.id);
+  saveQueue();
+  res.json({ queue: runQueue });
+});
+
+app.delete('/api/queue', (req, res) => {
+  runQueue = [];
+  saveQueue();
+  res.json({ queue: runQueue });
 });
 
 app.post('/api/cancel', (req, res) => {
@@ -236,6 +317,7 @@ function finalizeRun(runId, code, signal) {
     } catch (e) {}
   });
   current = null;
+  startNextQueued();
 }
 
 function buildRunRecord(state, code, signal) {
@@ -316,6 +398,9 @@ function summarize(run) {
     stats: run.stats,
     durationMs: run.durationMs,
     avgTestMs,
+    environment: run.config && run.config.environment,
+    mode: run.config && run.config.mode,
+    suites: [...new Set(run.tests.map((t) => t.suite).filter(Boolean))],
   };
 }
 
@@ -376,8 +461,9 @@ app.get('/api/reports', (req, res) => {
   const broken = testHistory.computeBroken(history).slice(0, 20);
   const crossBrowser = testHistory.computeCrossBrowserMismatches(history).slice(0, 20);
   const skipped = testHistory.computeSkipped(history).slice(0, 20);
+  const suites = testHistory.computeSuiteSummary(200, 20);
 
-  res.json({ trend, flaky, broken, crossBrowser, skipped });
+  res.json({ trend, flaky, broken, crossBrowser, skipped, suites });
 });
 
 // Full per-test history (every saved run each test appeared in), keyed by "file:line" — powers
@@ -481,7 +567,7 @@ app.get('/api/source', (req, res) => {
 
 // Saves edits made in the Test Cases code viewer back to the spec file on disk — same
 // containment check as the read above. This is the only write path onto test-cases/; use
-// the tab's terminal (or your own editor) for anything git.
+// your own terminal or editor for anything git.
 app.put('/api/source', (req, res) => {
   const file = req.query.file;
   if (!file) return res.status(400).end();
@@ -497,7 +583,6 @@ app.put('/api/source', (req, res) => {
 });
 
 const server = http.createServer(app);
-terminal.attach(server);
 
 server.listen(PORT, () => {
   console.log('');
@@ -507,10 +592,6 @@ server.listen(PORT, () => {
     console.log('  ⚠ Playwright is not installed yet. Run:');
     console.log('    npm install');
     console.log('    npx playwright install');
-    console.log('');
-  }
-  if (!terminal.available) {
-    console.log('  ⚠ node-pty failed to load — the Test Cases terminal will be disabled.');
     console.log('');
   }
 });

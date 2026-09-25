@@ -5,6 +5,20 @@ locally as a small Node/Express app — no build step, no framework.
 
 ## Setup
 
+### Test account credentials (do this first)
+
+The suites sign in with real Hive dev accounts. Their emails and passwords are **not** in the
+repo — they go in a git-ignored `.env` file at the repo root:
+
+```bash
+cp .env.example .env
+```
+
+Then fill in the values (ask a teammate for them). Playwright loads `.env` automatically, for
+the CLI, the dashboard and Docker alike. A test that needs an account that isn't set fails
+with a message naming the missing variable.
+
+
 ### Docker (recommended — same environment on every machine)
 
 Playwright browsers need real OS-level libraries (fonts, codecs, GPU/display deps) that
@@ -72,7 +86,7 @@ server's own dependencies (Express, Playwright) never get installed.
   that Playwright captured on failure. Click a failed row to see all of it.
 - **Test Cases** — each row shows when it was last run and its latest status; click a row
   to open its full history (every saved run it appeared in, per browser).
-- **Reports** — pass-rate trend and flaky-test detection over the last 10 runs, plus two
+- **Reports** — flaky-test detection over the last 10 runs, plus two
   reports built from your full saved history (`server/testHistory.js`): **Currently
   failing**, showing how many consecutive runs (and how long) each broken test has stayed
   broken, per browser; and **Browser mismatches**, tests whose latest result differs

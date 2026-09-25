@@ -1,7 +1,6 @@
 // @ts-check
 import { test, expect } from '../_hive-live.mjs';
-import { LoginPage } from '../login/login-page.js';
-import { credential } from '../login/credentials.js';
+import { loginAsProfessor, loginAsStudent } from './session.js';
 import { BuzzPage } from './buzz-page.js';
 
 /**
@@ -16,20 +15,14 @@ import { BuzzPage } from './buzz-page.js';
  */
 test.describe('TC006 - Verify only a Professor sees the Create Buzz option', () => {
   test('professor account sees the Create Buzz button', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+    await loginAsProfessor(page);
 
     const buzzPage = new BuzzPage(page);
     await expect(buzzPage.createBuzzButton).toBeVisible();
   });
 
   test('student account does not see the Create Buzz button', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    await loginPage.goto();
-    await loginPage.login(credential('HIVE_STUDENT_EMAIL'), credential('HIVE_STUDENT_PASSWORD'));
-    await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+    await loginAsStudent(page);
 
     const buzzPage = new BuzzPage(page);
     // Not asserting on `allTab` here: confirmed live it never leaves a loading state for a

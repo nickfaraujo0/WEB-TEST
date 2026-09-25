@@ -13,5 +13,10 @@ services:
       # Edit or add specs on the host and they show up immediately — no image rebuild needed,
       # `playwright test --list` runs fresh every time the dashboard asks for the test tree.
       - ./test-cases:/app/test-cases
+    # Test account credentials (git-ignored; copy .env.example to .env). Optional so the
+    # dashboard still starts without it — tests needing an account then say what's missing.
+    env_file:
+      - path: .env
+        required: false
     environment:
       - BASE_URL=${BASE_URL:-https://hive-dev.thegritcity.com}

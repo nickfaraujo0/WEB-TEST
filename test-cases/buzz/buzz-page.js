@@ -1,6 +1,7 @@
 // @ts-check
 
-export const BUZZ_URL = 'https://hive-dev.thegritcity.com/Buzz';
+// Relative, so it follows the environment picked on the dashboard (Playwright's baseURL).
+export const BUZZ_URL = '/Buzz';
 
 /**
  * Page object for the Buzz feed and its "Create Buzz" composer wizard.

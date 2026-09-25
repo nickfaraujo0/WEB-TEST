@@ -1,7 +1,6 @@
 // @ts-check
 import { test, expect } from '../_hive-live.mjs';
-import { LoginPage } from '../login/login-page.js';
-import { credential } from '../login/credentials.js';
+import { loginAsProfessor } from './session.js';
 import { BuzzPage } from './buzz-page.js';
 
 /**
@@ -12,21 +11,21 @@ import { BuzzPage } from './buzz-page.js';
  * Expected: later posts, not visible on load, scroll into view.
  */
 test('TC002 - Verify Buzz list is scrollable', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+  await loginAsProfessor(page);
 
   const buzzPage = new BuzzPage(page);
   await expect(buzzPage.cards.first()).toBeVisible();
   expect(await buzzPage.cards.count()).toBeGreaterThan(1);
 
-  const lastCard = buzzPage.cards.last();
-  await expect(lastCard).not.toBeInViewort();
+  // Pin the card that is last on first load by index: infinite scroll appends more cards as the
+  // feed scrolls, so `.last()` would re-resolve to a newer card still below the fold.
+  const initialLast = buzzPage.cards.nth((await buzzPage.cards.count()) - 1);
+  await expect(initialLast).not.toBeInViewport();
 
   await buzzPage.cards.first().hover();
-  await page.mouse.wheel(0, 3000);
-  await page.waitForTimeout(500);
-
-  await expect(lastCard).toBeInViewport();
+  // Keep wheeling until the pinned card scrolls into view (web-first retry, no fixed sleep).
+  await expect(async () => {
+    await page.mouse.wheel(0, 1500);
+    await expect(initialLast).toBeInViewport({ timeout: 1000 });
+  }).toPass({ timeout: 15000 });
 });

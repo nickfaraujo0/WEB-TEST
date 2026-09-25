@@ -1,7 +1,6 @@
 // @ts-check
 import { test, expect } from '../_hive-live.mjs';
-import { LoginPage } from '../login/login-page.js';
-import { credential } from '../login/credentials.js';
+import { loginAsProfessor, loginAsStudent } from './session.js';
 import { BuzzPage } from './buzz-page.js';
 
 /**
@@ -18,10 +17,7 @@ import { BuzzPage } from './buzz-page.js';
 test('TC012 - Verify a Student has no Edit/Delete options on a Buzz', async ({ page, browser }) => {
   const marker = `Buzz-TC012 student-visibility-probe ${Date.now()}`;
 
-  const professorPage = new LoginPage(page);
-  await professorPage.goto();
-  await professorPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+  await loginAsProfessor(page);
 
   const professorBuzz = new BuzzPage(page);
   await professorBuzz.openCreateBuzz();
@@ -31,10 +27,7 @@ test('TC012 - Verify a Student has no Edit/Delete options on a Buzz', async ({ p
   // A separate browser context: the Professor's session must not be disturbed by signing out.
   const studentContext = await browser.newContext();
   const studentPage = await studentContext.newPage();
-  const studentLogin = new LoginPage(studentPage);
-  await studentLogin.goto();
-  await studentLogin.login(credential('HIVE_STUDENT_EMAIL'), credential('HIVE_STUDENT_PASSWORD'));
-  await expect(studentPage).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+  await loginAsStudent(studentPage);
 
   const studentBuzz = new BuzzPage(studentPage);
   const card = studentBuzz.cardByText(marker);

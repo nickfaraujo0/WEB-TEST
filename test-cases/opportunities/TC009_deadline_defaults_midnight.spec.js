@@ -3,6 +3,7 @@ import { test, expect } from '../_hive-live.mjs';
 import { LoginPage } from '../login/login-page.js';
 import { credential } from '../login/credentials.js';
 import { CreateOpportunityPage, PreviewOpportunityPage } from './create-opportunity-page.js';
+import { cleanupOpportunityByTitle } from './opportunities-helpers.js';
 
 /**
  * Hive Test Cases.xlsx, sheet "create & display jobsinternship", TC009 — Verify if the
@@ -22,7 +23,12 @@ import { CreateOpportunityPage, PreviewOpportunityPage } from './create-opportun
  * gap, not a wording difference like the login/onboarding suites' cases.
  *
  * Cost note: like any real create-flow E2E test, running this creates one new "QA Test"
- * listing in the dev database each time (one per type below).
+ * listing in the dev database each time (one per type below). Confirmed live via network
+ * capture that clicking "Preview" alone already fires the CreateEvent endpoint — the record
+ * exists the moment Preview is reached, before any Publish click — so this test completes the
+ * publish itself (rather than stopping at Preview) and then unpublishes its own listing via
+ * `cleanupOpportunityByTitle`, the same best-effort cleanup TC010 uses, so no half-created
+ * draft or published QA clutter is left behind either way.
  *
  * Split per type so Jobs and Internship are tracked as distinct test cases.
  */
@@ -36,7 +42,8 @@ test.describe('TC009 - Deadline never displays a time (does not default to 11:59
     const createPage = new CreateOpportunityPage(page);
     await createPage.goto('Jobs');
 
-    await createPage.titleInput.fill('QA Test - TC009-Jobs automated (safe to delete)');
+    const title = `QA Test - TC009-Jobs automated ${Date.now()} (safe to delete)`;
+    await createPage.titleInput.fill(title);
     await createPage.fillDescription('QA automated test listing for TC009-Jobs. Safe to delete.');
     await createPage.selectOrganization('City', 'Grit City');
 
@@ -48,10 +55,18 @@ test.describe('TC009 - Deadline never displays a time (does not default to 11:59
     await createPage.previewButton.click();
 
     const previewPage = new PreviewOpportunityPage(page);
-    await expect(previewPage.deadlineText).toBeVisible({ timeout: 15000 });
-    const deadlineText = await previewPage.deadlineText.textContent();
-    expect(deadlineText).not.toMatch(/\d{1,2}\s*[:.]\s*\d{2}\s*(am|pm)/i);
-    expect(deadlineText).not.toContain('11:59');
+    try {
+      await expect(previewPage.deadlineText).toBeVisible({ timeout: 15000 });
+      const deadlineText = await previewPage.deadlineText.textContent();
+      expect(deadlineText).not.toMatch(/\d{1,2}\s*[:.]\s*\d{2}\s*(am|pm)/i);
+      expect(deadlineText).not.toContain('11:59');
+    } finally {
+      // Preview already created the real backend record (see header comment) — complete the
+      // publish so it ends up in a known, unpublishable state rather than an orphaned draft.
+      // cleanupOpportunityByTitle navigates to the listing page itself, so no extra nav here.
+      await previewPage.publishButton.click().catch(() => {});
+      await cleanupOpportunityByTitle(page, 'Jobs', title);
+    }
   });
 
   test('TC009-Internship', async ({ page }) => {
@@ -63,7 +78,8 @@ test.describe('TC009 - Deadline never displays a time (does not default to 11:59
     const createPage = new CreateOpportunityPage(page);
     await createPage.goto('Internship');
 
-    await createPage.titleInput.fill('QA Test - TC009-Internship automated (safe to delete)');
+    const title = `QA Test - TC009-Internship automated ${Date.now()} (safe to delete)`;
+    await createPage.titleInput.fill(title);
     await createPage.fillDescription('QA automated test listing for TC009-Internship. Safe to delete.');
     await createPage.selectOrganization('City', 'Grit City');
 
@@ -75,9 +91,17 @@ test.describe('TC009 - Deadline never displays a time (does not default to 11:59
     await createPage.previewButton.click();
 
     const previewPage = new PreviewOpportunityPage(page);
-    await expect(previewPage.deadlineText).toBeVisible({ timeout: 15000 });
-    const deadlineText = await previewPage.deadlineText.textContent();
-    expect(deadlineText).not.toMatch(/\d{1,2}\s*[:.]\s*\d{2}\s*(am|pm)/i);
-    expect(deadlineText).not.toContain('11:59');
+    try {
+      await expect(previewPage.deadlineText).toBeVisible({ timeout: 15000 });
+      const deadlineText = await previewPage.deadlineText.textContent();
+      expect(deadlineText).not.toMatch(/\d{1,2}\s*[:.]\s*\d{2}\s*(am|pm)/i);
+      expect(deadlineText).not.toContain('11:59');
+    } finally {
+      // Preview already created the real backend record (see header comment) — complete the
+      // publish so it ends up in a known, unpublishable state rather than an orphaned draft.
+      // cleanupOpportunityByTitle navigates to the listing page itself, so no extra nav here.
+      await previewPage.publishButton.click().catch(() => {});
+      await cleanupOpportunityByTitle(page, 'Internship', title);
+    }
   });
 });

@@ -1,6 +1,15 @@
 // @ts-check
 const { defineConfig, devices } = require('@playwright/test');
 
+// Test account credentials live in the git-ignored .env at the repo root (see .env.example).
+// Loaded here so every way of running the suites picks them up — the CLI, the dashboard, and
+// Docker. Variables already set in the real environment win over the file.
+try {
+  process.loadEnvFile(require('path').join(__dirname, '.env'));
+} catch (e) {
+  // No .env (e.g. CI passing real env vars) — credentials.js reports anything missing.
+}
+
 module.exports = defineConfig({
   testDir: './test-cases',
   fullyParallel: true,

@@ -7,12 +7,10 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node server/index.js",
-    "postinstall": "node -e \"try{require('fs').chmodSync('node_modules/node-pty/prebuilds/'+process.platform+'-'+process.arch+'/spawn-helper',0o755)}catch(e){}\" && node -e \"console.log('Next: run npx playwright install, then npm start.')\""
+    "postinstall": "node -e \"console.log('Next: run npx playwright install, then npm start.')\""
   },
   "dependencies": {
     "@playwright/test": "1.63.0",
-    "express": "^4.19.2",
-    "node-pty": "^1.1.0",
-    "ws": "^8.21.3"
+    "express": "^4.19.2"
   }
 }

@@ -4,8 +4,11 @@
     {
       "name": "hive",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["server/index.js"],
-      "port": 4000
+      "runtimeArgs": [
+        "server/index.js"
+      ],
+      "port": 4000,
+      "autoPort": true
     }
   ]
 }

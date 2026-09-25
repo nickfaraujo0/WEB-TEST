@@ -1,7 +1,6 @@
 // @ts-check
 import { test, expect } from '../_hive-live.mjs';
-import { LoginPage } from '../login/login-page.js';
-import { credential } from '../login/credentials.js';
+import { loginAsProfessor } from './session.js';
 import { BuzzPage } from './buzz-page.js';
 
 /**
@@ -12,10 +11,7 @@ import { BuzzPage } from './buzz-page.js';
  * Expected: each post renders as its own visually distinct card.
  */
 test('TC003 - Verify Buzz cards are visually separated', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_VALID_EMAIL'), credential('HIVE_VALID_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+  await loginAsProfessor(page);
 
   const buzzPage = new BuzzPage(page);
   await expect(buzzPage.cards.nth(1)).toBeVisible();

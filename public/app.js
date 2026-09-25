@@ -154,6 +154,8 @@
     resultsRun: null,
     resultsFilters: { status: '', browser: '', suite: '', q: '' },
     currentRunId: null,
+    runQueue: [], // [{id, queuedAt, body}] mirrored from the server's /api/queue
+    queueConfirmTimer: null,
     liveCaseList: [],
     liveBrowsers: [],
     liveColState: {},
@@ -582,9 +584,14 @@
   });
 
   // ---------------------------------------------------------------------
-  // Run a test: POST /api/run, then drive the live 3-column board via SSE
+  // Run a test: POST /api/run, then drive the live 3-column board via SSE.
+  // If a run is already active, the same button queues the current
+  // selection instead — it starts automatically once the active run (and
+  // anything queued ahead of it) finishes. Only one Playwright process ever
+  // runs at a time: the server itself still rejects overlapping runs, and
+  // queueing client-side avoids ever hitting that 409 in normal use.
   // ---------------------------------------------------------------------
-  $('run-btn').addEventListener('click', function () {
+  function buildRunBody() {
     var tests = Object.keys(STATE.checked)
       .filter(function (k) {
         return STATE.checked[k];
@@ -596,9 +603,9 @@
     var browsers = Object.keys(STATE.browsersOn).filter(function (k) {
       return STATE.browsersOn[k];
     });
-    if (!tests.length || !browsers.length) return;
+    if (!tests.length || !browsers.length) return null;
 
-    var body = {
+    return {
       tests: tests,
       browsers: browsers,
       workers: STATE.workers,
@@ -608,20 +615,187 @@
       environment: STATE.env,
       baseUrl: ENV_URLS[STATE.env] || '',
     };
+  }
 
-    fetch('/api/run', {
+  function launchRun(body) {
+    return fetch('/api/run', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
-    })
-      .then(function (r) {
-        return r.json().then(function (data) {
-          if (!r.ok) throw new Error(data.error || 'Could not start the run.');
-          return data;
-        });
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (!r.ok) throw new Error(data.error || 'Could not start the run.');
+        return data;
+      });
+    });
+  }
+
+  function updateRunButtonLabel() {
+    $('run-btn-label').textContent = STATE.currentRunId ? 'Queue this run' : 'Run tests';
+  }
+
+  function queueDescription(body) {
+    return body.tests.length + ' cases · ' + body.browsers.length + ' browsers';
+  }
+
+  function queuedRunMs(body) {
+    return estimateRunMs(body.tests, body.browsers, body.parallel === false ? 1 : body.workers);
+  }
+
+  // Per-suite case counts for a queued run, in first-seen order: "Login 3 · Buzz 5".
+  function queueSuiteSummary(body) {
+    var order = [];
+    var counts = {};
+    body.tests.forEach(function (t) {
+      var name = t.suite || 'Other';
+      if (!(name in counts)) {
+        counts[name] = 0;
+        order.push(name);
+      }
+      counts[name]++;
+    });
+    return order.map(function (name) {
+      return '<span class="qr-suite">' + esc(name) + ' <b>' + counts[name] + '</b></span>';
+    }).join('');
+  }
+
+  // "Starts in" for each queued run = what's left of the active run + the estimated
+  // duration of every run queued ahead of it. Refreshed every second by updateEta().
+  function updateQueueStartTimes() {
+    var spans = document.querySelectorAll('#queue-list [data-qr-start]');
+    if (!spans.length) return;
+    var wait = STATE.currentRunId ? remainingMs(STATE.liveLastDone || 0, STATE.liveLastTotal || 0) : 0;
+    spans.forEach(function (span, i) {
+      span.textContent = wait < 1000 ? 'Starts next' : 'Starts in ~' + fmtEta(wait);
+      if (STATE.runQueue[i]) wait += queuedRunMs(STATE.runQueue[i].body);
+    });
+  }
+
+  function renderQueuePanel() {
+    var n = STATE.runQueue.length;
+
+    // Persistent indicator on the Test Runs page — the only page-local feedback that a
+    // "Queue this run" click actually did something, since that page never navigates away.
+    $('rp-queue-note').hidden = n === 0;
+    if (n > 0) {
+      $('rp-queue-note-text').textContent = n + ' run' + (n === 1 ? '' : 's') + ' queued — view in Live Run →';
+    }
+
+    $('queue-panel').hidden = n === 0;
+    if (n === 0) return;
+    $('queue-sub').textContent = n + ' run' + (n === 1 ? '' : 's') + ' will start automatically, one after another';
+    $('queue-list').innerHTML = STATE.runQueue
+      .map(function (item, i) {
+        var body = item.body;
+        var workers = body.parallel === false ? 1 : body.workers;
+        var executions = body.tests.length * body.browsers.length;
+        var meta = [
+          esc(body.environment || 'local'),
+          body.mode === 'headed' ? 'Headed' : 'Headless',
+          workers + ' worker' + (workers === 1 ? '' : 's'),
+          body.retries ? 'Retries on' : 'No retries',
+        ].join(' · ');
+        var caseList = body.tests.map(function (t) {
+          return '<li><span class="qr-case-suite">' + esc(t.suite || '') + '</span>' + esc(t.title) + '</li>';
+        }).join('');
+        return (
+          '<div class="queue-row">' +
+          '<span class="qr-pos">' + (i + 1) + '</span>' +
+          '<div class="qr-main">' +
+          '<div class="qr-top">' +
+          '<span class="qr-desc">' + body.tests.length + ' case' + (body.tests.length === 1 ? '' : 's') + ' · ' + executions + ' executions</span>' +
+          '<span class="qr-browsers">' + body.browsers.map(bchip).join('') + '</span>' +
+          '</div>' +
+          '<div class="qr-suites">' + queueSuiteSummary(body) + '</div>' +
+          '<div class="qr-meta">' + meta + '</div>' +
+          '<details class="qr-cases"><summary>Show test cases</summary><ol>' + caseList + '</ol></details>' +
+          '</div>' +
+          '<div class="qr-timing">' +
+          '<span class="qr-start" data-qr-start></span>' +
+          '<span class="qr-dur">~' + fmtEta(queuedRunMs(body)) + ' run</span>' +
+          '</div>' +
+          '<button class="qr-remove" data-remove-queued="' + esc(item.id) + '" title="Remove from queue">&times;</button></div>'
+        );
       })
+      .join('');
+    updateQueueStartTimes();
+  }
+
+  // The queue lives on the server (so it survives reloads and runs with no tab open);
+  // every call here returns the server's current queue, which replaces the local copy.
+  function queueRequest(method, url, body) {
+    return fetch(url, {
+      method: method,
+      headers: body ? { 'content-type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    }).then(function (r) {
+      return r.json().then(function (data) {
+        if (!r.ok) throw new Error(data.error || 'Queue request failed.');
+        STATE.runQueue = data.queue || [];
+        renderQueuePanel();
+        return data;
+      });
+    });
+  }
+
+  function loadQueue() {
+    return queueRequest('GET', '/api/queue').catch(function () {});
+  }
+
+  $('queue-list').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-remove-queued]');
+    if (!btn) return;
+    queueRequest('DELETE', '/api/queue/' + encodeURIComponent(btn.getAttribute('data-remove-queued'))).catch(function (err) {
+      alert(err.message);
+    });
+  });
+
+  $('queue-clear-btn').addEventListener('click', function () {
+    queueRequest('DELETE', '/api/queue').catch(function (err) {
+      alert(err.message);
+    });
+  });
+
+  /**
+   * Called once a run finishes. The server starts the next queued run by itself; this just
+   * attaches the live board to it. Returns true if a queued run is expected to follow.
+   */
+  function followNextQueuedRun() {
+    if (!STATE.runQueue.length) return false;
+    var tries = 0;
+    (function attach() {
+      tries++;
+      resumeIfActive().then(function (attached) {
+        if (attached) return loadQueue();
+        if (tries < 10) return setTimeout(attach, 500);
+        // Nothing picked up (e.g. every queued run failed to start): settle back to idle.
+        loadQueue();
+        updateRunButtonLabel();
+        updateSummary();
+      });
+    })();
+    return true;
+  }
+
+  $('run-btn').addEventListener('click', function () {
+    var body = buildRunBody();
+    if (!body) return;
+
+    if (STATE.currentRunId) {
+      queueRequest('POST', '/api/queue', body).catch(function (err) {
+        alert(err.message);
+      });
+      // Momentary confirmation on the button itself, since it's the thing the user just
+      // clicked and is still looking at — the persistent rp-queue-note covers the rest.
+      $('run-btn-label').textContent = 'Added to queue ✓';
+      clearTimeout(STATE.queueConfirmTimer);
+      STATE.queueConfirmTimer = setTimeout(updateRunButtonLabel, 1400);
+      return;
+    }
+
+    launchRun(body)
       .then(function (data) {
-        startLiveBoard(tests, browsers, data.runId, true, {
+        startLiveBoard(body.tests, body.browsers, data.runId, true, {
           workers: STATE.parallel === false ? 1 : STATE.workers,
         });
       })
@@ -761,35 +935,32 @@
   // History carries the estimate before anything finishes; as executions complete, the live
   // pace takes over, since it reflects this machine, network and worker count. Weighting is
   // by how many "rounds" of workers have finished, so one fast early test can't swing it.
+  function remainingMs(done, total) {
+    if (!STATE.elapsedStart || !total || done >= total) return 0;
+    var elapsedMs = Date.now() - STATE.elapsedStart;
+    var histRemaining = Math.max((STATE.liveEstimateMs || 0) - elapsedMs, 0);
+    if (done <= 0) return histRemaining;
+    var paceRemaining = (elapsedMs / done) * (total - done);
+    var w = Math.min(done / (2 * (STATE.liveWorkers || 1)), 1);
+    return w * paceRemaining + (1 - w) * histRemaining;
+  }
+
   function updateEta(done, total) {
     var el = $('live-eta');
     var sub = $('live-eta-sub');
     if (!el) return;
+    if (sub) sub.textContent = done > 0 || !total ? 'Time left' : 'Time left (est.)';
     if (!STATE.elapsedStart || !total) {
       el.textContent = '—';
-      if (sub) sub.textContent = 'Time left';
-      return;
-    }
-    if (done >= total) {
+    } else if (done >= total) {
       el.textContent = '0s';
-      if (sub) sub.textContent = 'Time left';
-      return;
-    }
-    var elapsedMs = Date.now() - STATE.elapsedStart;
-    var histRemaining = Math.max((STATE.liveEstimateMs || 0) - elapsedMs, 0);
-    var remainingMs = histRemaining;
-    if (done > 0) {
-      var paceRemaining = (elapsedMs / done) * (total - done);
-      var w = Math.min(done / (2 * (STATE.liveWorkers || 1)), 1);
-      remainingMs = w * paceRemaining + (1 - w) * histRemaining;
-    }
-    if (remainingMs < 1000) {
-      el.textContent = 'Almost done';
     } else {
-      el.textContent = '~' + fmtEta(remainingMs);
+      var ms = remainingMs(done, total);
+      el.textContent = ms < 1000 ? 'Almost done' : '~' + fmtEta(ms);
     }
-    if (sub) sub.textContent = done > 0 ? 'Time left' : 'Time left (est.)';
+    updateQueueStartTimes();
   }
+
 
   function handleLiveEvent(ev) {
     if (ev.type === 'test-begin') {
@@ -854,7 +1025,8 @@
     STATE.currentRunId = runId;
     STATE.liveWorkers = Math.max(1, Math.min(opts.workers || 1, caseList.length * browsers.length));
     STATE.liveEstimateMs = estimateRunMs(caseList, browsers, opts.workers);
-    $('run-btn').disabled = true;
+    updateRunButtonLabel();
+    renderQueuePanel();
     STATE.liveCaseList = caseList;
     STATE.liveBrowsers = browsers;
     STATE.liveColState = {};
@@ -888,6 +1060,8 @@
       var ss = String(s % 60).padStart(2, '0');
       $('live-elapsed').textContent = m + ':' + ss;
       updateEta(STATE.liveLastDone || 0, STATE.liveLastTotal || 0);
+      // Pick up queue changes made from other tabs/viewers.
+      if (s % 5 === 0) loadQueue();
     }, 1000);
 
     if (STATE.es) STATE.es.close();
@@ -908,20 +1082,33 @@
     $('live-nav-dot').hidden = true;
     $('cancel-btn').hidden = true;
 
+    // A queued run takes over immediately once this one finishes, so its own
+    // "complete" pause screen is skipped entirely — the finished run's result
+    // is still recorded and fully visible in Test Runs/Results either way.
+    var continuesToQueuedRun = STATE.runQueue.length > 0;
+
     fetch('/api/results/' + encodeURIComponent(STATE.currentRunId))
       .then(function (r) {
         return r.json();
       })
       .then(function (run) {
         STATE.latestRun = run;
-        $('live-complete-panel').hidden = false;
-        $('complete-title').textContent = (run.status === 'cancelled' ? 'Run ' : 'Run ') + shortId(run.id) + (run.status === 'cancelled' ? ' cancelled' : ' complete');
-        $('complete-sub').textContent = 'Finished in ' + fmtDuration(run.durationMs) + ' · ' + run.browsers.map(function (b) {
-          return BROWSER_META[b] ? BROWSER_META[b].label : b;
-        }).join(', ');
-        $('complete-total').textContent = run.executions;
-        $('complete-pass').textContent = run.stats.passed;
-        $('complete-fail').textContent = run.stats.failed;
+        if (!continuesToQueuedRun) {
+          $('live-complete-panel').hidden = false;
+          $('complete-title').textContent = (run.status === 'cancelled' ? 'Run ' : 'Run ') + shortId(run.id) + (run.status === 'cancelled' ? ' cancelled' : ' complete');
+          $('complete-sub').textContent = 'Finished in ' + fmtDuration(run.durationMs) + ' · ' + run.browsers.map(function (b) {
+            return BROWSER_META[b] ? BROWSER_META[b].label : b;
+          }).join(', ');
+          $('complete-total').textContent = run.executions;
+          $('complete-pass').textContent = run.stats.passed;
+          $('complete-fail').textContent = run.stats.failed;
+          $('complete-skip').textContent = run.stats.skipped || 0;
+          // The board is done: drop back to the idle state, with this summary on top.
+          $('live-active').hidden = true;
+          $('live-idle').hidden = false;
+          $('live-title').textContent = 'Live Run';
+          $('live-sub').textContent = 'No run in progress';
+        }
 
         loadHistory();
         loadTestHistory().then(function () {
@@ -932,13 +1119,17 @@
       .catch(function () {})
       .then(function () {
         STATE.currentRunId = null;
-        updateSummary();
+        if (!followNextQueuedRun()) {
+          updateRunButtonLabel();
+          updateSummary();
+        }
       });
   }
 
   // Resume a run already in progress (e.g. after a page reload).
+  // Resolves true if it attached the live board to an active run.
   function resumeIfActive() {
-    fetch('/api/status')
+    return fetch('/api/status')
       .then(function (r) {
         return r.json();
       })
@@ -946,7 +1137,7 @@
         // A fresh run-btn click may have already started its own live board (and its own
         // EventSource) while this page-load status check was still in flight — don't start
         // a second one for the same run, or every event would be double-counted.
-        if (!status.active || STATE.currentRunId) return;
+        if (!status.active || STATE.currentRunId) return false;
         startLiveBoard(status.tests, status.browsers, status.runId, false, {
           workers: status.config && status.config.workers,
           startedAt: status.startedAt,
@@ -955,8 +1146,11 @@
         Object.keys(status.lastFrame || {}).forEach(function (project) {
           applyFrame(project, status.lastFrame[project]);
         });
+        return true;
       })
-      .catch(function () {});
+      .catch(function () {
+        return false;
+      });
   }
 
   // ---------------------------------------------------------------------
@@ -977,6 +1171,32 @@
       });
   }
 
+  // For every test case that has ever run, its single most recent result (across whichever
+  // browser last ran it — same "one point per case" convention as the Test Cases table's own
+  // "last status" column) bucketed the same way the server buckets a run's own stats (passed /
+  // skipped / everything else counts as failed, including timedOut and interrupted). This is
+  // the CURRENT known health of the whole suite, not any one run's numbers — a run that only
+  // touched 13 of 247 cases no longer makes the other 234 look like they never happened.
+  function computeOverallStats() {
+    var passed = 0,
+      failed = 0,
+      skipped = 0,
+      durationSum = 0,
+      durationCount = 0;
+    Object.keys(STATE.testHistory).forEach(function (key) {
+      var pt = mostRecentPoint(STATE.testHistory[key]);
+      if (!pt) return;
+      if (pt.status === 'passed') passed++;
+      else if (pt.status === 'skipped') skipped++;
+      else failed++; // failed, timedOut, interrupted
+      if (pt.duration != null) {
+        durationSum += pt.duration;
+        durationCount++;
+      }
+    });
+    return { passed: passed, failed: failed, skipped: skipped, avgMs: durationCount ? durationSum / durationCount : 0 };
+  }
+
   function renderOverview() {
     var totalCases = 0;
     STATE.suites.forEach(function (s) {
@@ -985,28 +1205,40 @@
     $('kpi-cases').textContent = totalCases;
     $('kpi-cases-sub').textContent = STATE.suites.length + ' suite' + (STATE.suites.length === 1 ? '' : 's');
 
-    var latest = STATE.historyRuns[0];
-    if (latest) {
-      $('kpi-passed').textContent = latest.stats.passed;
-      $('kpi-failed').textContent = latest.stats.failed;
-      $('kpi-skipped').textContent = latest.stats.skipped;
-      var total = latest.stats.passed + latest.stats.failed;
-      $('kpi-passrate').textContent = total ? Math.round((latest.stats.passed / total) * 1000) / 10 + '%' : '—';
-      $('kpi-avgtime').textContent = latest.avgTestMs ? fmtDuration(latest.avgTestMs) : '—';
-      $('kpi-latest').textContent = shortId(latest.id);
-      $('kpi-latest-sub').textContent = fmtWhen(latest.finishedAt);
-
-      var ratio = latest.stats.passed + '/' + (latest.stats.passed + latest.stats.failed + latest.stats.skipped);
-      $('sb-ratio').textContent = ratio;
-      var denom = latest.stats.passed + latest.stats.failed + latest.stats.skipped;
-      $('sb-fill').style.width = (denom ? (latest.stats.passed / denom) * 100 : 0) + '%';
-      $('sb-failed').textContent = latest.stats.failed;
-      $('sb-skipped').textContent = latest.stats.skipped;
+    // "Latest run" stays a pointer to the most recent run event itself (id + when) — separate
+    // from the health numbers below, which now summarize the whole suite, not just that one run.
+    var latestRun = STATE.historyRuns[0];
+    if (latestRun) {
+      $('kpi-latest').textContent = shortId(latestRun.id);
+      $('kpi-latest-sub').textContent = fmtWhen(latestRun.finishedAt);
     } else {
-      ['kpi-passed', 'kpi-failed', 'kpi-skipped', 'kpi-passrate', 'kpi-avgtime', 'kpi-latest'].forEach(function (id) {
+      $('kpi-latest').textContent = '—';
+      $('kpi-latest-sub').textContent = 'No runs yet';
+    }
+
+    var overall = computeOverallStats();
+    var ranCount = overall.passed + overall.failed + overall.skipped;
+    if (ranCount) {
+      $('kpi-passed').textContent = overall.passed;
+      $('kpi-failed').textContent = overall.failed;
+      $('kpi-skipped').textContent = overall.skipped;
+      var total = overall.passed + overall.failed;
+      $('kpi-passrate').textContent = total ? Math.round((overall.passed / total) * 1000) / 10 + '%' : '—';
+      $('kpi-avgtime').textContent = overall.avgMs ? fmtDuration(overall.avgMs) : '—';
+
+      var ratio = overall.passed + '/' + ranCount;
+      $('sb-ratio').textContent = ratio;
+      $('sb-fill').style.width = (ranCount ? (overall.passed / ranCount) * 100 : 0) + '%';
+      $('sb-failed').textContent = overall.failed;
+      $('sb-skipped').textContent = overall.skipped;
+    } else {
+      ['kpi-passed', 'kpi-failed', 'kpi-skipped', 'kpi-passrate', 'kpi-avgtime'].forEach(function (id) {
         $(id).textContent = '—';
       });
-      $('kpi-latest-sub').textContent = 'No runs yet';
+      $('sb-ratio').textContent = '0 / 0';
+      $('sb-fill').style.width = '0%';
+      $('sb-failed').textContent = '0';
+      $('sb-skipped').textContent = '0';
     }
 
     $('runs-table').innerHTML =
@@ -1035,9 +1267,51 @@
         return '<option value="' + esc(r.id) + '">' + shortId(r.id) + ' — ' + fmtWhen(r.finishedAt) + (i === 0 ? ' (latest)' : '') + '</option>';
       })
       .join('') || '<option>No runs yet</option>';
+    renderRecentRuns();
   }
   $('results-run-select').addEventListener('change', function (e) {
     loadResultsRun(e.target.value);
+  });
+
+  // Side column on the Results page: the last 10 runs, newest first, with pass/fail counts.
+  function renderRecentRuns() {
+    var activeId = STATE.resultsRun ? STATE.resultsRun.id : null;
+    $('recent-runs-list').innerHTML =
+      STATE.historyRuns
+        .slice(0, 10)
+        .map(function (r) {
+          var ran = r.stats.passed + r.stats.failed;
+          var rate = ran ? Math.round((r.stats.passed / ran) * 100) : 0;
+          var st = r.status === 'passed' ? 'passed' : r.status === 'cancelled' ? 'skipped' : 'failed';
+          var suites = r.suites || [];
+          var suitesText = suites.length > 3 ? suites.slice(0, 3).join(', ') + ' +' + (suites.length - 3) : suites.join(', ');
+          var env = [r.environment, r.mode].filter(Boolean).join(' · ');
+          return (
+            '<button type="button" class="recent-run' + (r.id === activeId ? ' on' : '') + '" data-run="' + esc(r.id) + '">' +
+            '<div class="rr-top"><div><div class="rr-when">' + fmtDateTime(r.startedAt || r.finishedAt) + '</div>' +
+            '<div class="cell-id">' + shortId(r.id) + ' · ' + fmtWhen(r.finishedAt) + '</div></div>' + badge(st) + '</div>' +
+            '<div class="rr-bar' + (ran ? '' : ' none') + '"><span style="width:' + rate + '%"></span></div>' +
+            '<div class="rr-meta"><span style="color:var(--success);">' + r.stats.passed + ' passed</span>' +
+            '<span style="color:' + (r.stats.failed ? 'var(--danger)' : 'var(--text-faint)') + ';">' + r.stats.failed + ' failed</span>' +
+            '<span>' + (r.stats.skipped || 0) + ' skipped</span>' +
+            '<span class="rr-rate">' + (ran ? rate + '%' : '—') + '</span></div>' +
+            '<dl class="rr-details">' +
+            '<dt>Duration</dt><dd class="mono">' + fmtDuration(r.durationMs) + '</dd>' +
+            '<dt>Tests</dt><dd>' + r.totalCases + (r.totalCases === 1 ? ' case' : ' cases') + (r.executions !== r.totalCases ? ' · ' + r.executions + ' executions' : '') + '</dd>' +
+            (env ? '<dt>Env</dt><dd>' + esc(env) + '</dd>' : '') +
+            (suitesText ? '<dt>Suites</dt><dd title="' + esc(suites.join(', ')) + '">' + esc(suitesText) + '</dd>' : '') +
+            '</dl>' +
+            '<div class="rr-browsers">' + (r.browsers || []).map(bchip).join('') + '</div>' +
+            '</button>'
+          );
+        })
+        .join('') || '<div class="recent-empty">No runs yet.</div>';
+  }
+  $('recent-runs-list').addEventListener('click', function (e) {
+    var btn = e.target.closest('.recent-run');
+    if (!btn) return;
+    $('results-run-select').value = btn.dataset.run;
+    loadResultsRun(btn.dataset.run);
   });
 
   var resultsReqId = 0;
@@ -1053,6 +1327,7 @@
         STATE.latestRun = STATE.latestRun || run;
         $('results-run-sub').textContent = shortId(run.id) + ' · ' + run.config.environment + ' · ' + fmtWhen(run.finishedAt);
         renderResults();
+        renderRecentRuns();
       })
       .catch(function () {});
   }
@@ -1208,6 +1483,10 @@
       })
       .then(function (data) {
         STATE.testHistory = data.tests || {};
+        // renderOverview()'s suite-wide stats read from testHistory, which loads separately
+        // from (and, on initial page load, after) loadHistory() — refresh it once this lands
+        // so Overview doesn't render its "no runs" fallback for a page that actually has runs.
+        renderOverview();
       })
       .catch(function () {});
   }
@@ -1271,7 +1550,7 @@
       })
       .then(function (data) {
         if (myId !== reportsReqId) return; // a newer request already landed — drop this stale one
-        renderTrend(data.trend || []);
+        renderSuiteSummary(data.suites || []);
         renderFlaky(data.flaky || []);
         renderBroken(data.broken || []);
         renderMismatch(data.crossBrowser || []);
@@ -1279,55 +1558,57 @@
       })
       .catch(function () {});
   }
-  function renderTrend(trend) {
-    var svg = $('trend-svg');
-    var empty = $('trend-empty');
-    var labels = $('trend-labels');
-    if (trend.length < 2) {
-      // SVGElement.hidden doesn't reliably reflect to/from the "hidden" attribute in every
-      // browser, and a stale attribute would win over inline style via [hidden]{!important} —
-      // so this element is shown/hidden via the attribute + style together, not .hidden.
-      svg.setAttribute('hidden', '');
-      svg.style.display = 'none';
-      empty.hidden = false;
-      labels.innerHTML = '';
-      return;
-    }
-    empty.hidden = true;
-    svg.removeAttribute('hidden');
-    svg.style.display = '';
-    svg.setAttribute('viewBox', '0 0 640 180');
-
-    var minY = Math.min(70, Math.min.apply(null, trend.map(function (t) { return t.passRate; })) - 5);
-    var maxY = 100;
-    var x0 = 30, x1 = 620, y0 = 150, y1 = 20;
-    function xAt(i) { return x0 + (trend.length === 1 ? 0 : (i / (trend.length - 1)) * (x1 - x0)); }
-    function yAt(v) { return y0 - ((v - minY) / (maxY - minY)) * (y0 - y1); }
-
-    var points = trend.map(function (t, i) { return xAt(i) + ',' + yAt(t.passRate); }).join(' ');
-    var dots = trend
-      .map(function (t, i) {
-        var last = i === trend.length - 1;
-        return '<circle cx="' + xAt(i) + '" cy="' + yAt(t.passRate) + '" r="' + (last ? 4.5 : 3.5) + '"' + (last ? ' stroke="var(--surface)" stroke-width="2"' : '') + '/>';
-      })
-      .join('');
-    var gridLines = [100, 90, 80, 70]
-      .filter(function (v) { return v >= minY; })
-      .map(function (v) {
-        return '<line x1="' + x0 + '" y1="' + yAt(v) + '" x2="' + x1 + '" y2="' + yAt(v) + '" stroke="var(--border)" stroke-width="1"/>' +
-          '<text x="0" y="' + (yAt(v) + 4) + '" font-size="10" fill="var(--text-faint)" font-family="var(--font-mono)">' + v + '%</text>';
-      })
-      .join('');
-    var lastPoint = trend[trend.length - 1];
-
-    svg.innerHTML =
-      gridLines +
-      '<polyline points="' + points + '" fill="none" stroke="var(--accent)" stroke-width="2.5"/>' +
-      '<g fill="var(--accent)">' + dots + '</g>' +
-      '<text x="' + xAt(trend.length - 1) + '" y="' + (yAt(lastPoint.passRate) - 12) + '" font-size="11" font-weight="700" fill="var(--accent)" font-family="var(--font-display)" text-anchor="middle">' + lastPoint.passRate + '%</text>';
-
-    labels.innerHTML = trend.map(function (t) { return '<span>#' + esc(t.shortId) + '</span>'; }).join('');
+  function rateColor(rate) {
+    if (rate == null) return 'var(--text-faint)';
+    if (rate >= 90) return 'var(--success)';
+    if (rate >= 70) return 'var(--warning)';
+    return 'var(--danger)';
   }
+  function renderSuiteSummary(suites) {
+    $('suite-summary-table').innerHTML =
+      suites
+        .map(function (s) {
+          var bars = s.timeline
+            .map(function (p) {
+              var h = p.passRate == null ? 3 : Math.max(3, Math.round((p.passRate / 100) * 28));
+              var tip =
+                fmtDateTime(p.startedAt) + ' · ' + shortId(p.runId) + '\n' +
+                (p.passRate == null ? 'All skipped' : p.passRate + '% pass rate') + '\n' +
+                p.passed + ' passed, ' + p.failed + ' failed, ' + p.skipped + ' skipped';
+              return '<button type="button" class="st-bar" data-run="' + esc(p.runId) + '" title="' + esc(tip) + '" aria-label="' + esc(tip) + '">' +
+                '<span style="height:' + h + 'px;background:' + rateColor(p.passRate) + ';"></span></button>';
+            })
+            .join('');
+          var change = '';
+          if (s.change != null && s.change !== 0) {
+            change = '<span class="st-change ' + (s.change > 0 ? 'up' : 'down') + '">' + (s.change > 0 ? '▲ ' : '▼ ') + Math.abs(s.change) + (Math.abs(s.change) === 1 ? ' pt' : ' pts') + '</span>';
+          } else if (s.change === 0) {
+            change = '<span class="st-change">no change</span>';
+          }
+          return (
+            '<tr><td class="cell-name">' + esc(s.suite) + '<div class="cell-sub">since ' + esc(fmtDateTime(s.firstRunAt).split(',')[0]) + '</div></td>' +
+            '<td class="mono">' + s.runs + '</td>' +
+            '<td class="mono">' + s.cases + '<div class="cell-sub">' + s.executions + ' executions</div></td>' +
+            '<td class="st-results"><span style="color:var(--success);">' + s.passed + ' passed</span>' +
+            '<span style="color:' + (s.failed ? 'var(--danger)' : 'var(--text-faint)') + ';">' + s.failed + ' failed</span>' +
+            '<span style="color:var(--text-faint);">' + s.skipped + ' skipped</span></td>' +
+            '<td><div class="st-rate"><b style="color:' + rateColor(s.passRate) + ';">' + (s.passRate == null ? '—' : s.passRate + '%') + '</b>' +
+            '<div class="st-rate-bar"><span style="width:' + (s.passRate || 0) + '%;background:' + rateColor(s.passRate) + ';"></span></div></div></td>' +
+            '<td><div class="st-bars">' + bars + '</div></td>' +
+            '<td class="mono">' + fmtDuration(s.avgTestMs) + '</td>' +
+            '<td style="white-space:nowrap;"><div>' + esc(fmtDateTime(s.lastRunAt)) + '</div><div class="cell-sub">' +
+            (s.lastPassRate == null ? 'all skipped' : s.lastPassRate + '% pass') + (change ? ' · ' + change : '') + '</div></td></tr>'
+          );
+        })
+        .join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-faint);padding:26px;">No runs yet.</td></tr>';
+  }
+  $('suite-summary-table').addEventListener('click', function (e) {
+    var bar = e.target.closest('.st-bar');
+    if (!bar) return;
+    showView('results');
+    $('results-run-select').value = bar.dataset.run;
+    loadResultsRun(bar.dataset.run);
+  });
   function renderFlaky(flaky) {
     $('flaky-table').innerHTML =
       flaky
@@ -1629,98 +1910,6 @@
   }
 
   document.querySelector('[data-view="cases"]').addEventListener('click', loadGit);
-
-  // ---------------------------------------------------------------------
-  // Embedded terminal (Test Cases tab) — a real shell over WebSocket, bridged to node-pty
-  // server-side (server/terminal.js). Unlike the read-only git panel above, this is NOT
-  // read-only: commands typed here really run against this checkout, so `git add` /
-  // `git commit` / `git push` here really reach GitHub.
-  // ---------------------------------------------------------------------
-  var TERM = { term: null, fit: null, ws: null, reconnectTimer: null };
-
-  function termStatus(text, cls) {
-    var el = $('terminal-status');
-    if (!el) return;
-    el.textContent = text;
-    el.className = 'terminal-status' + (cls ? ' ' + cls : '');
-  }
-
-  function fitTerminal() {
-    if (!TERM.fit || !TERM.term) return;
-    if ($('cases-terminal').classList.contains('collapsed')) return;
-    try {
-      TERM.fit.fit();
-    } catch (e) {
-      return;
-    }
-    if (TERM.ws && TERM.ws.readyState === WebSocket.OPEN) {
-      TERM.ws.send(JSON.stringify({ type: 'resize', cols: TERM.term.cols, rows: TERM.term.rows }));
-    }
-  }
-
-  function connectTerminal() {
-    termStatus('connecting…');
-    var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
-    var ws = new WebSocket(proto + location.host + '/ws/terminal');
-    TERM.ws = ws;
-    ws.onopen = function () {
-      termStatus('connected', 'on');
-      setTimeout(fitTerminal, 30);
-    };
-    ws.onmessage = function (ev) {
-      var msg;
-      try {
-        msg = JSON.parse(ev.data);
-      } catch (e) {
-        return;
-      }
-      if (msg.type === 'data') TERM.term.write(msg.data);
-      else if (msg.type === 'error') {
-        termStatus('unavailable', 'err');
-        TERM.term.writeln('\r\n\x1b[31m' + msg.message + '\x1b[0m');
-      }
-    };
-    ws.onclose = function () {
-      termStatus('disconnected', 'err');
-      clearTimeout(TERM.reconnectTimer);
-      TERM.reconnectTimer = setTimeout(connectTerminal, 2000);
-    };
-    ws.onerror = function () {
-      ws.close();
-    };
-  }
-
-  function initTerminal() {
-    if (TERM.term || typeof Terminal === 'undefined') return;
-    TERM.term = new Terminal({
-      fontSize: 12.5,
-      fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
-      cursorBlink: true,
-      theme: { background: '#0c0f13', foreground: '#d8dee9', cursor: '#7ee787' },
-    });
-    TERM.fit = new FitAddon.FitAddon();
-    TERM.term.loadAddon(TERM.fit);
-    TERM.term.open($('terminal-body'));
-    TERM.term.onData(function (data) {
-      if (TERM.ws && TERM.ws.readyState === WebSocket.OPEN) {
-        TERM.ws.send(JSON.stringify({ type: 'input', data: data }));
-      }
-    });
-    connectTerminal();
-    window.addEventListener('resize', fitTerminal);
-  }
-
-  $('terminal-clear-btn').addEventListener('click', function () {
-    if (TERM.term) TERM.term.clear();
-  });
-  $('terminal-collapse-btn').addEventListener('click', function () {
-    var collapsed = $('cases-terminal').classList.toggle('collapsed');
-    if (!collapsed) setTimeout(fitTerminal, 160);
-  });
-  document.querySelector('[data-view="cases"]').addEventListener('click', function () {
-    initTerminal();
-    setTimeout(fitTerminal, 60);
-  });
 
   // ---------------------------------------------------------------------
   // Bug Log — bugs found by the suites: date found, severity, status, and the test case(s)
@@ -2054,6 +2243,7 @@
     .then(function () {
       buildCaseTree('');
       resumeIfActive();
+      loadQueue();
       if ($('bug-drawer').classList.contains('show')) renderBugTestList();
       loadGit();
       return loadBugs();

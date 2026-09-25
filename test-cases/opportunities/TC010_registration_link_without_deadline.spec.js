@@ -4,6 +4,7 @@ import { LoginPage } from '../login/login-page.js';
 import { credential } from '../login/credentials.js';
 import { CreateOpportunityPage, PreviewOpportunityPage } from './create-opportunity-page.js';
 import { OpportunityPage } from './opportunity-page.js';
+import { cleanupOpportunityByTitle } from './opportunities-helpers.js';
 
 /**
  * Hive Test Cases.xlsx, sheet "create & display jobsinternship", TC010 — Verify if the
@@ -53,15 +54,21 @@ test.describe('TC010 - Registration link works without a deadline', () => {
 
     await expect(page).toHaveURL(/\/opportunity\//i, { timeout: 15000 });
 
-    const opportunityPage = new OpportunityPage(page);
-    await opportunityPage.jobsTab.click();
+    try {
+      const opportunityPage = new OpportunityPage(page);
+      await opportunityPage.jobsTab.click();
 
-    // A freshly published listing appears as the first card in its tab's feed (confirmed
-    // live) — the title heading and the first "Register" link on the page belong to it.
-    await expect(page.getByText(title)).toBeVisible({ timeout: 15000 });
-    const registerLink = page.getByRole('link', { name: 'Register' }).first();
-    await expect(registerLink).toBeVisible();
-    await expect(registerLink).toHaveAttribute('href', /google\.com/i);
+      // A freshly published listing appears as the first card in its tab's feed (confirmed
+      // live) — the title heading and the first "Register" link on the page belong to it.
+      await expect(page.getByText(title)).toBeVisible({ timeout: 15000 });
+      const registerLink = page.getByRole('link', { name: 'Register' }).first();
+      await expect(registerLink).toBeVisible();
+      await expect(registerLink).toHaveAttribute('href', /google\.com/i);
+    } finally {
+      // This test publishes a real listing every run — unpublish it afterward so QA clutter
+      // doesn't accumulate in the live Jobs feed. Best-effort: see opportunities-helpers.js.
+      await cleanupOpportunityByTitle(page, 'Jobs', title);
+    }
   });
 
   test('TC010-Internship', async ({ page }) => {
@@ -92,12 +99,18 @@ test.describe('TC010 - Registration link works without a deadline', () => {
 
     await expect(page).toHaveURL(/\/opportunity\//i, { timeout: 15000 });
 
-    const opportunityPage = new OpportunityPage(page);
-    await opportunityPage.internshipTab.click();
+    try {
+      const opportunityPage = new OpportunityPage(page);
+      await opportunityPage.internshipTab.click();
 
-    await expect(page.getByText(title)).toBeVisible({ timeout: 15000 });
-    const registerLink = page.getByRole('link', { name: 'Register' }).first();
-    await expect(registerLink).toBeVisible();
-    await expect(registerLink).toHaveAttribute('href', /google\.com/i);
+      await expect(page.getByText(title)).toBeVisible({ timeout: 15000 });
+      const registerLink = page.getByRole('link', { name: 'Register' }).first();
+      await expect(registerLink).toBeVisible();
+      await expect(registerLink).toHaveAttribute('href', /google\.com/i);
+    } finally {
+      // This test publishes a real listing every run — unpublish it afterward so QA clutter
+      // doesn't accumulate in the live Internship feed. Best-effort: see opportunities-helpers.js.
+      await cleanupOpportunityByTitle(page, 'Internship', title);
+    }
   });
 });

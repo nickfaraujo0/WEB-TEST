@@ -1,26 +1,49 @@
 // @ts-check
-import { test } from '../_hive-live.mjs';
+import { test, expect } from '../_hive-live.mjs';
+import { loginAsProfessor, loginAsProfessor2 } from './session.js';
+import { BuzzPage } from './buzz-feed-page.js';
+import { CreateBuzzPage } from './create-buzz-page.js';
 
 /**
- * Hive Test Cases.xlsx, sheet "Buzz", TC011 — Verify a Professor cannot Edit/Delete another
- * Professor's Buzz.
+ * Hive Test Cases.xlsx, sheet "Buzz", TC011 — Verify a Professor cannot Edit/Delete another Professor's Buzz.
  * Precondition (spreadsheet): a Buzz authored by a *different* Professor account.
  *
- * SKIPPED — not a failure. This needs two distinct, confirmed-faculty accounts: one to author
- * the post, one to sign in as and verify the "..." menu is absent from it. Only one faculty
- * account is available to this suite (tests/web/login/credentials.js:
- * HIVE_VALID_EMAIL/HIVE_VALID_PASSWORD) — HIVE_STUDENT_EMAIL is a student, which is TC012's
- * case, not this one.
- *
- * Mirrors the same skip already recorded on the Appium side:
- * DroidSwarmQAgent-Knowledge/tests/appium/Hive/Buzz/summary.md ("Second account needed" —
- * TC011, TC012, TC028, TC029, TC032). Unlike TC012, this one has no second account to
- * unblock it with.
- *
- * To implement for real: a confirmed second faculty account, then this becomes: sign in as
- * Professor A, publish a marker post; sign in as Professor B, locate that post, assert its
- * "..." trigger has count 0.
+ * Previously skipped for lack of a second faculty account; HIVE_PROFESSOR2 (credentials.js) now
+ * provides one. Professor A (HIVE_VALID_EMAIL) publishes a marker post; Professor B signs in in a
+ * separate context and must see the post but no "..." (Edit/Delete) menu on it. The positive
+ * control — A does see the menu on the same card — proves the menu locator works, so an absent
+ * menu for B means "not allowed", not "wrong selector". A deletes the post afterwards.
  */
-test('TC011 - Verify a Professor cannot edit/delete another Professor\'s Buzz', async () => {
-  test.skip(true, 'No second faculty account available to test with — see file header.');
+test("TC011 - Verify a Professor cannot edit/delete another Professor's Buzz", async ({ browser }) => {
+  test.setTimeout(150000);
+  const marker = `QA Test TC011 - other professor ${Date.now()} (safe to delete)`;
+
+  const authorContext = await browser.newContext();
+  const author = await authorContext.newPage();
+  await loginAsProfessor(author);
+  const authorBuzz = new BuzzPage(author);
+  await authorBuzz.createBuzzButton.click();
+  const create = new CreateBuzzPage(author);
+  await create.fillText(marker);
+  await create.publishWithDefaults();
+  await expect(authorBuzz.cardByText(marker)).toBeVisible({ timeout: 15000 });
+
+  try {
+    // Positive control: the author has the menu on this card.
+    await expect(authorBuzz.cardByText(marker).locator('.ant-dropdown-trigger.aspect-square:visible')).toHaveCount(1);
+
+    const otherContext = await browser.newContext();
+    const other = await otherContext.newPage();
+    await loginAsProfessor2(other);
+    const otherBuzz = new BuzzPage(other);
+    await otherBuzz.loadUntilPresent(otherBuzz.cardByText(marker));
+    const card = otherBuzz.cardByText(marker).first();
+    await expect(card).toBeVisible();
+    await expect(otherBuzz.createBuzzButton).toBeVisible(); // really signed in as a Professor
+    await expect(card.locator('.ant-dropdown-trigger.aspect-square:visible')).toHaveCount(0);
+    await otherContext.close();
+  } finally {
+    await authorBuzz.cleanupPost(marker);
+    await authorContext.close();
+  }
 });

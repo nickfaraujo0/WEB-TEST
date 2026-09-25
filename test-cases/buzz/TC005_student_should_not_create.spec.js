@@ -1,7 +1,6 @@
 // @ts-check
 import { test, expect } from '../_hive-live.mjs';
-import { LoginPage } from '../login/login-page.js';
-import { credential } from '../login/credentials.js';
+import { loginAsStudent } from './session.js';
 import { BuzzPage } from './buzz-page.js';
 
 /**
@@ -16,10 +15,7 @@ import { BuzzPage } from './buzz-page.js';
  * wizard itself, rather than trying (and failing) to open it.
  */
 test('TC005 - Verify a Student cannot create a Buzz', async ({ page }) => {
-  const loginPage = new LoginPage(page);
-  await loginPage.goto();
-  await loginPage.login(credential('HIVE_STUDENT_EMAIL'), credential('HIVE_STUDENT_PASSWORD'));
-  await expect(page).toHaveURL(/\/Buzz/i, { timeout: 15000 });
+  await loginAsStudent(page);
 
   const buzzPage = new BuzzPage(page);
   // Not asserting on `allTab` here: confirmed live that its "All"/board tab bar never leaves

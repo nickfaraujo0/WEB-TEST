@@ -1,19 +1,17 @@
 // @ts-check
 
 /**
- * Test accounts for the Hive web login suite (https://hive-dev.thegritcity.com).
+ * Test accounts for the Hive web suites (https://hive-dev.thegritcity.com).
  *
- * `nolan@wafer.ee` is the same throwaway dev-build faculty account the DroidSwarm Appium
- * suite signs in with (tests/appium/credentials.mjs in the DroidSwarmQAgent-Knowledge repo) —
- * confirmed live against the web login on 2026-09-11.
+ * Real account emails and passwords are NOT in this file — they come from environment
+ * variables, normally set in the repo-root `.env` (git-ignored; `playwright.config.js` loads it).
+ * Copy `.env.example` to `.env` and fill it in. The main faculty account is the same
+ * throwaway dev-build account the DroidSwarm Appium suite signs in with.
  *
- * The environment always wins: set these as real env vars to override the fallback below
- * without editing this file.
+ * Only values that are deliberately fake (a wrong password, an unregistered or malformed
+ * email) live here as defaults, and the environment still wins over them.
  */
-const FALLBACKS = Object.freeze({
-  HIVE_VALID_EMAIL: 'nolan@wafer.ee',
-  HIVE_VALID_PASSWORD: 'nolan123',
-
+const NON_SECRET_DEFAULTS = Object.freeze({
   // Deliberately wrong, for TC002 (Invalid Password).
   HIVE_INVALID_PASSWORD: 'WrongPassword@999',
 
@@ -22,29 +20,36 @@ const FALLBACKS = Object.freeze({
 
   // Malformed (no '@'), for TC007 (Invalid Email Format).
   HIVE_MALFORMED_EMAIL: 'nolanwaferee',
-
-  // A second, enrolled student — the counterpart to nolan@wafer.ee (a Professor) needed for
-  // role-based tests in the Opportunities suite (e.g. only professors can create listings).
-  // Same throwaway-account source as HIVE_VALID_EMAIL: tests/appium/credentials.mjs.
-  HIVE_STUDENT_EMAIL: 'student0003@test.com',
-  HIVE_STUDENT_PASSWORD: 'Stud@123',
-
-  // A second Professor, distinct from nolan@wafer.ee — for tests that need "another
-  // professor" (e.g. one professor cannot edit/delete another's posts).
-  HIVE_PROFESSOR2_EMAIL: 'peters@gmail.com',
-  HIVE_PROFESSOR2_PASSWORD: 'peters123',
 });
 
-/** One credential, by name. Throws for a name nobody defined. */
+/** Account credentials that must come from the environment / `.env`. */
+const FROM_ENV_ONLY = new Set([
+  'HIVE_VALID_EMAIL',
+  'HIVE_VALID_PASSWORD',
+  'HIVE_STUDENT_EMAIL',
+  'HIVE_STUDENT_PASSWORD',
+  'HIVE_PROFESSOR2_EMAIL',
+  'HIVE_PROFESSOR2_PASSWORD',
+  'HIVE_DEACTIVATED_EMAIL',
+  'HIVE_DEACTIVATED_PASSWORD',
+]);
+
+/** One credential, by name. Throws for a name nobody defined or a missing account variable. */
 export function credential(name) {
   const fromEnv = process.env[name];
   if (fromEnv !== undefined && fromEnv !== '') {
     return fromEnv;
   }
 
-  const fallback = FALLBACKS[name];
+  if (FROM_ENV_ONLY.has(name)) {
+    throw new Error(
+      `${name} is not set. Copy .env.example to .env in the repo root and fill in the Hive test accounts.`
+    );
+  }
+
+  const fallback = NON_SECRET_DEFAULTS[name];
   if (fallback === undefined) {
-    throw new Error(`No credential named ${name}. Add it to tests/web/login/credentials.js.`);
+    throw new Error(`No credential named ${name}. Add it to test-cases/login/credentials.js or .env.example.`);
   }
 
   return fallback;

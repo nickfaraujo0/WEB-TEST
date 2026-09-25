@@ -6,7 +6,6 @@
 <title>HIVE — Test Automation Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -109,11 +108,11 @@
       <div class="content view">
         <div class="kpi-row">
           <div class="kpi"><div class="lbl">Test cases</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h11v16H9z"/><path d="M4 4h2v16H4z"/></svg><div class="val" id="kpi-cases">—</div><div class="sub" id="kpi-cases-sub">—</div></div>
-          <div class="kpi"><div class="lbl">Passed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 12 2.5 2.5L16 9"/></svg><div class="val success" id="kpi-passed">—</div><div class="sub">last run</div></div>
-          <div class="kpi"><div class="lbl">Failed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m9 9 6 6M15 9l-6 6"/></svg><div class="val danger" id="kpi-failed">—</div><div class="sub">last run</div></div>
-          <div class="kpi"><div class="lbl">Skipped</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9v6h-6"/></svg><div class="val skip" id="kpi-skipped">—</div><div class="sub">last run</div></div>
-          <div class="kpi"><div class="lbl">Pass rate</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M11 19V5M18 19v-6"/></svg><div class="val accent" id="kpi-passrate">—</div><div class="sub" id="kpi-passrate-sub">last run</div></div>
-          <div class="kpi"><div class="lbl">Avg exec time</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><div class="val" id="kpi-avgtime">—</div><div class="sub">per execution</div></div>
+          <div class="kpi"><div class="lbl">Passed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 12 2.5 2.5L16 9"/></svg><div class="val success" id="kpi-passed">—</div><div class="sub">across suite</div></div>
+          <div class="kpi"><div class="lbl">Failed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m9 9 6 6M15 9l-6 6"/></svg><div class="val danger" id="kpi-failed">—</div><div class="sub">across suite</div></div>
+          <div class="kpi"><div class="lbl">Skipped</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9v6h-6"/></svg><div class="val skip" id="kpi-skipped">—</div><div class="sub">across suite</div></div>
+          <div class="kpi"><div class="lbl">Pass rate</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M11 19V5M18 19v-6"/></svg><div class="val accent" id="kpi-passrate">—</div><div class="sub" id="kpi-passrate-sub">across suite</div></div>
+          <div class="kpi"><div class="lbl">Avg exec time</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><div class="val" id="kpi-avgtime">—</div><div class="sub">per execution, across suite</div></div>
           <div class="kpi"><div class="lbl">Latest run</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M10 8.5 16 12l-6 3.5v-7Z" fill="currentColor" stroke="none"/></svg><div class="val" id="kpi-latest">—</div><div class="sub" id="kpi-latest-sub">—</div></div>
         </div>
 
@@ -156,21 +155,6 @@
                 <div class="live-col-empty">Select a test case to view its source.</div>
               </div>
             </div>
-          </div>
-          <div class="panel cases-terminal" id="cases-terminal">
-            <div class="terminal-head">
-              <div class="terminal-title">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 6 5 5-5 5M13 17h6"/></svg>
-                Terminal
-                <span class="terminal-status" id="terminal-status">connecting…</span>
-              </div>
-              <div class="terminal-actions">
-                <span class="terminal-hint">Real shell in this repo — <code>git commit</code> / <code>git push</code> here reach GitHub.</span>
-                <button type="button" class="icon-btn" id="terminal-clear-btn" title="Clear"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
-                <button type="button" class="icon-btn" id="terminal-collapse-btn" title="Collapse"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></button>
-              </div>
-            </div>
-            <div class="terminal-body" id="terminal-body"></div>
           </div>
         </div>
       </div>
@@ -295,9 +279,13 @@
             <div class="rp-actions">
               <button class="btn primary" id="run-btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 4l14 8-14 8V4z"/></svg>
-                Run tests
+                <span id="run-btn-label">Run tests</span>
               </button>
               <button class="link-btn">Save as preset</button>
+            </div>
+            <div class="rp-queue-note" id="rp-queue-note" hidden data-view="live">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+              <span id="rp-queue-note-text"></span>
             </div>
           </div>
         </div>
@@ -313,7 +301,21 @@
       </div>
       <div class="content">
 
-        <!-- idle state: no run started yet -->
+        <!-- summary of the run that just finished, shown above the idle state -->
+        <div class="panel" id="live-complete-panel" style="margin-bottom:16px;" hidden>
+          <div class="panel-head">
+            <div><h2 id="complete-title">Run complete</h2><div class="sub" id="complete-sub"></div></div>
+            <button class="btn primary sm" data-view="results">View full results →</button>
+          </div>
+          <div class="kpi-row" style="grid-template-columns:repeat(4,1fr); padding:18px;">
+            <div class="kpi"><div class="lbl">Executions</div><div class="val" id="complete-total">24</div></div>
+            <div class="kpi"><div class="lbl">Passed</div><div class="val success" id="complete-pass">21</div></div>
+            <div class="kpi"><div class="lbl">Failed</div><div class="val danger" id="complete-fail">2</div></div>
+            <div class="kpi"><div class="lbl">Skipped</div><div class="val skip" id="complete-skip">0</div></div>
+          </div>
+        </div>
+
+        <!-- idle state: nothing running -->
         <div id="live-idle">
           <div class="panel">
             <div style="padding:60px 20px; text-align:center;">
@@ -327,6 +329,14 @@
 
         <!-- active/complete run -->
         <div id="live-active" hidden>
+          <div class="panel" id="queue-panel" style="margin-bottom:16px;" hidden>
+            <div class="panel-head">
+              <div><h2 style="font-size:14px;">Up next</h2><div class="sub" id="queue-sub"></div></div>
+              <button class="link-btn" id="queue-clear-btn">Clear queue</button>
+            </div>
+            <div id="queue-list"></div>
+          </div>
+
           <div class="panel">
             <div style="padding:18px;">
               <div class="live-head">
@@ -349,19 +359,6 @@
           </div>
 
           <div class="live-cols" id="live-cols" style="margin-top:16px;"></div>
-
-          <div class="panel" id="live-complete-panel" style="margin-top:16px;" hidden>
-            <div class="panel-head">
-              <div><h2 id="complete-title">Run complete</h2><div class="sub" id="complete-sub"></div></div>
-              <button class="btn primary sm" data-view="results">View full results →</button>
-            </div>
-            <div class="kpi-row" style="grid-template-columns:repeat(4,1fr); padding:18px;">
-              <div class="kpi"><div class="lbl">Executions</div><div class="val" id="complete-total">24</div></div>
-              <div class="kpi"><div class="lbl">Passed</div><div class="val success" id="complete-pass">21</div></div>
-              <div class="kpi"><div class="lbl">Failed</div><div class="val danger" id="complete-fail">2</div></div>
-              <div class="kpi"><div class="lbl">Skipped</div><div class="val skip">0</div></div>
-            </div>
-          </div>
         </div>
 
       </div>
@@ -376,7 +373,8 @@
         </select>
       </div>
       <div class="content">
-        <div class="panel">
+        <div class="results-grid">
+        <div class="panel results-main">
           <div class="filter-bar">
             <div class="status-tabs" id="status-tabs">
               <button class="status-tab on" data-status="">All 0</button>
@@ -395,18 +393,26 @@
             </table>
           </div>
         </div>
+        <div class="panel recent-runs">
+          <div class="panel-head"><div><h2>Recent runs</h2><div class="sub">Click a run to view its results</div></div></div>
+          <div id="recent-runs-list"><div class="recent-empty">No runs yet.</div></div>
+        </div>
+        </div>
       </div>
     </section>
 
     <!-- REPORTS -->
     <section class="view" id="view-reports" hidden>
-      <div class="topbar"><div><h1>Reports</h1><div class="sub">Trends across the last 10 runs</div></div></div>
+      <div class="topbar"><div><h1>Reports</h1><div class="sub">Test health across recent runs</div></div></div>
       <div class="content">
-        <div class="panel" style="padding:20px;" id="trend-panel">
-          <h2 style="font-size:14.5px;margin:0 0 16px;">Pass rate trend</h2>
-          <div id="trend-empty" style="text-align:center; color:var(--text-faint); font-size:12.5px; padding:30px 0;">Run the suite a few times to see a trend here.</div>
-          <svg viewBox="0 0 640 180" width="100%" style="overflow:visible;" id="trend-svg" hidden></svg>
-          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10.5px;color:var(--text-faint);font-family:var(--font-mono);" id="trend-labels"></div>
+        <div class="panel">
+          <div class="panel-head"><div><h2>Suite summary</h2><div class="sub">Each suite across all saved runs. Each bar is one run, sized by its pass rate. Click a bar to open that run.</div></div></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Suite</th><th>Runs</th><th>Cases</th><th>Results</th><th>Pass rate</th><th>Over time</th><th>Avg test</th><th>Last run</th></tr></thead>
+              <tbody id="suite-summary-table"><tr><td colspan="8" style="text-align:center;color:var(--text-faint);padding:26px;">No runs yet.</td></tr></tbody>
+            </table>
+          </div>
         </div>
         <div class="panel">
           <div class="panel-head"><h2>Flaky tests</h2><div class="sub">Tests with both passes and failures across recent runs</div></div>
@@ -454,7 +460,8 @@
         <button class="btn primary" id="bug-add">+ Log a bug</button>
       </div>
       <div class="content">
-        <div class="panel">
+        <div class="results-grid">
+        <div class="panel results-main">
           <div class="filter-bar">
             <div class="status-tabs" id="bug-status-tabs">
               <button class="status-tab on" data-status="">All 0</button>
@@ -595,8 +602,6 @@
   </div>
 </aside>
 
-<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
