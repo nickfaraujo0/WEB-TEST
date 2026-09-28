@@ -118,7 +118,7 @@
   // ---------------------------------------------------------------------
   // Nav / view switching
   // ---------------------------------------------------------------------
-  var VIEWS = ['overview', 'cases', 'runs', 'live', 'results', 'reports', 'bugs', 'settings'];
+  var VIEWS = ['overview', 'cases', 'runs', 'live', 'results', 'reports', 'bugs', 'sheet', 'settings'];
   function showView(v) {
     VIEWS.forEach(function (name) {
       $('view-' + name).hidden = name !== v;
@@ -156,6 +156,8 @@
     currentRunId: null,
     runQueue: [], // [{id, queuedAt, body}] mirrored from the server's /api/queue
     queueConfirmTimer: null,
+    reports: null,
+    suiteCardOpen: {}, // suite name -> bool, which Reports cards are expanded
     liveCaseList: [],
     liveBrowsers: [],
     liveColState: {},
@@ -417,7 +419,7 @@
           return !q || c.title.toLowerCase().indexOf(q) >= 0 || s.name.toLowerCase().indexOf(q) >= 0;
         });
         if (!visible.length) return '';
-        var isOpen = q ? true : STATE.caseTreeOpen[s.name] !== false; // default open
+        var isOpen = q ? true : STATE.caseTreeOpen[s.name] === true; // default collapsed; a search always expands its matches
         var items = visible
           .map(function (c) {
             return (
@@ -1363,7 +1365,8 @@
     $('results-table').innerHTML =
       rows
         .map(function (t) {
-          var clickable = t.status !== 'passed';
+          // Passed tests open too once they have a screenshot/video to show.
+          var clickable = t.status !== 'passed' || (t.attachments && t.attachments.length > 0);
           var retriedTag = t.attempts > 1 ? '<div class="cell-sub">retried ' + (t.attempts - 1) + 'x</div>' : '';
           var reasonTag = '';
           if (t.status === 'skipped') {
@@ -1421,6 +1424,8 @@
     }
     var headingEl = $('d-error-heading');
     if (headingEl) headingEl.firstChild.textContent = test.status === 'skipped' ? 'Skip reason' : 'Error';
+    // A passed test has no error to show — only its screenshot/video below.
+    $('d-error-section').hidden = test.status === 'passed' && !test.error;
 
     if (test.status === 'skipped') {
       $('d-error').textContent = test.reason || 'This test was skipped (no reason given).';
@@ -1452,6 +1457,9 @@
           var url = '/api/attachment/' + encodeURIComponent(STATE.resultsRun.id) + '/' + testIndex + '/' + i;
           if ((a.contentType || '').indexOf('image/') === 0) {
             return '<div class="shot" style="margin-bottom:10px;"><img src="' + url + '" alt="' + esc(a.name) + '" style="display:block;width:100%;"></div>';
+          }
+          if ((a.contentType || '').indexOf('video/') === 0) {
+            return '<div class="shot" style="margin-bottom:10px;"><video src="' + url + '" controls preload="metadata" style="display:block;width:100%;"></video></div>';
           }
           return '<div style="margin-bottom:6px;"><a href="' + url + '" target="_blank" rel="noopener" style="color:var(--accent);font-size:12.5px;font-weight:600;">' + esc(a.name) + '</a></div>';
         })
@@ -1541,6 +1549,29 @@
   // ---------------------------------------------------------------------
   // Reports page
   // ---------------------------------------------------------------------
+  // Suite summary is collapsible as a whole (remembers open/closed across reloads).
+  (function () {
+    var toggle = $('suite-summary-toggle');
+    var grid = $('suite-summary-table');
+    var open = true;
+    try {
+      open = localStorage.getItem('hiveSuiteSummaryOpen') !== '0';
+    } catch (e) {}
+    function apply() {
+      grid.hidden = !open;
+      toggle.setAttribute('aria-expanded', open);
+      toggle.classList.toggle('collapsed', !open);
+    }
+    apply();
+    toggle.addEventListener('click', function () {
+      open = !open;
+      apply();
+      try {
+        localStorage.setItem('hiveSuiteSummaryOpen', open ? '1' : '0');
+      } catch (e) {}
+    });
+  })();
+
   var reportsReqId = 0;
   function loadReports() {
     var myId = ++reportsReqId;
@@ -1550,6 +1581,7 @@
       })
       .then(function (data) {
         if (myId !== reportsReqId) return; // a newer request already landed — drop this stale one
+        STATE.reports = data;
         renderSuiteSummary(data.suites || []);
         renderFlaky(data.flaky || []);
         renderBroken(data.broken || []);
@@ -1564,45 +1596,154 @@
     if (rate >= 70) return 'var(--warning)';
     return 'var(--danger)';
   }
+  function suiteStatus(rate) {
+    if (rate == null) return { label: 'No data', cls: '' };
+    if (rate >= 90) return { label: 'Healthy', cls: 'good' };
+    if (rate >= 70) return { label: 'Watch', cls: 'warn' };
+    return { label: 'Needs attention', cls: 'bad' };
+  }
+  // The part of a suite card hidden until it's expanded: results, sparkline, footer stats,
+  // per-browser breakdown, and what's currently failing/flaky in that suite (the last two
+  // filtered client-side from the same /api/reports payload).
+  function renderSuiteBody(s) {
+    var bars = s.timeline
+      .map(function (p) {
+        var h = p.passRate == null ? 4 : Math.max(4, Math.round((p.passRate / 100) * 36));
+        var tip =
+          fmtDateTime(p.startedAt) + ' · ' + shortId(p.runId) + '\n' +
+          (p.passRate == null ? 'All skipped' : p.passRate + '% pass rate') + '\n' +
+          p.passed + ' passed, ' + p.failed + ' failed, ' + p.skipped + ' skipped';
+        return '<button type="button" class="st-bar" data-run="' + esc(p.runId) + '" title="' + esc(tip) + '" aria-label="' + esc(tip) + '">' +
+          '<span style="height:' + h + 'px;background:' + rateColor(p.passRate) + ';"></span></button>';
+      })
+      .join('');
+    var change = '';
+    if (s.change != null && s.change !== 0) {
+      change = '<span class="st-change ' + (s.change > 0 ? 'up' : 'down') + '">' + (s.change > 0 ? '▲ ' : '▼ ') + Math.abs(s.change) + (Math.abs(s.change) === 1 ? ' pt' : ' pts') + ' since last run</span>';
+    } else if (s.change === 0) {
+      change = '<span class="st-change">no change since last run</span>';
+    }
+    var total = s.passed + s.failed + s.skipped;
+    var pctOf = function (n) { return total ? (n / total) * 100 : 0; };
+
+    var byProject = (s.byProject || [])
+      .map(function (p) {
+        var color = rateColor(p.passRate);
+        return (
+          '<div class="suite-proj-row">' +
+            bchip(p.project) +
+            '<div class="stat-track suite-proj-bar"><span class="stat-fill" style="width:' + (p.passRate || 0) + '%;background:' + color + ';"></span></div>' +
+            '<span class="suite-proj-rate mono" style="color:' + color + ';">' + (p.passRate == null ? '—' : p.passRate + '%') + '</span>' +
+            '<span class="cell-sub">' + p.passed + 'p · ' + p.failed + 'f · ' + p.skipped + 's</span>' +
+          '</div>'
+        );
+      })
+      .join('') || '<div class="cell-sub">No per-browser data yet.</div>';
+
+    var reports = STATE.reports || {};
+    var broken = (reports.broken || []).filter(function (b) { return (b.suite || 'Other') === s.suite; });
+    var flaky = (reports.flaky || []).filter(function (f) { return (f.suite || 'Other') === s.suite; });
+
+    function issueList(items, kind) {
+      if (!items.length) return '<div class="cell-sub">None right now.</div>';
+      var shown = items.slice(0, 5);
+      var rows = shown
+        .map(function (t) {
+          var tag = kind === 'broken'
+            ? '<span class="badge fail" style="margin-left:6px;">' + (t.category ? esc(t.category) : 'Failing') + '</span>'
+            : '<span class="badge fail" style="margin-left:6px;">' + t.flakeRate + '% flaky</span>';
+          return '<div class="suite-issue-row"><span class="cell-name" style="font-weight:600;">' + esc(t.title) + '</span>' + bchip(t.project) + tag + '</div>';
+        })
+        .join('');
+      var more = items.length > shown.length ? '<div class="cell-sub">+' + (items.length - shown.length) + ' more</div>' : '';
+      return rows + more;
+    }
+
+    return (
+      '<div class="suite-segbar">' +
+        (s.passed ? '<span style="width:' + pctOf(s.passed) + '%;background:var(--success);"></span>' : '') +
+        (s.failed ? '<span style="width:' + pctOf(s.failed) + '%;background:var(--danger);"></span>' : '') +
+        (s.skipped ? '<span style="width:' + pctOf(s.skipped) + '%;background:var(--text-faint);"></span>' : '') +
+      '</div>' +
+      '<div class="suite-legend">' +
+        '<span><i style="background:var(--success);"></i>' + s.passed + ' passed</span>' +
+        '<span' + (s.failed ? ' style="color:var(--danger);"' : '') + '><i style="background:' + (s.failed ? 'var(--danger)' : 'var(--text-faint)') + ';"></i>' + s.failed + ' failed</span>' +
+        '<span><i style="background:var(--text-faint);"></i>' + s.skipped + ' skipped</span>' +
+        '<span class="suite-legend-sub">' + s.executions + ' executions</span>' +
+      '</div>' +
+
+      '<div class="suite-sparkline">' +
+        '<div class="suite-sparkline-label">Over time</div>' +
+        '<div class="st-bars">' + bars + '</div>' +
+      '</div>' +
+
+      '<div class="suite-foot">' +
+        '<div><div class="suite-foot-label">Avg test</div><div class="suite-foot-val mono">' + fmtDuration(s.avgTestMs) + '</div></div>' +
+        '<div><div class="suite-foot-label">Last run</div><div class="suite-foot-val">' + esc(fmtDateTime(s.lastRunAt)) + '</div></div>' +
+        '<div><div class="suite-foot-label">Trend</div><div class="suite-foot-val">' + (change || (s.lastPassRate == null ? 'all skipped' : s.lastPassRate + '% pass')) + '</div></div>' +
+      '</div>' +
+
+      '<div class="suite-detail-section">' +
+        '<div class="suite-sparkline-label">By browser</div>' +
+        byProject +
+      '</div>' +
+      '<div class="suite-detail-section">' +
+        '<div class="suite-sparkline-label">Currently failing (' + broken.length + ')</div>' +
+        issueList(broken, 'broken') +
+      '</div>' +
+      '<div class="suite-detail-section">' +
+        '<div class="suite-sparkline-label">Flaky (' + flaky.length + ')</div>' +
+        issueList(flaky, 'flaky') +
+      '</div>' +
+      '<button type="button" class="btn sm suite-view-cases" data-suite="' + esc(s.suite) + '">View ' + s.suite + ' in Test Cases →</button>'
+    );
+  }
   function renderSuiteSummary(suites) {
     $('suite-summary-table').innerHTML =
       suites
         .map(function (s) {
-          var bars = s.timeline
-            .map(function (p) {
-              var h = p.passRate == null ? 3 : Math.max(3, Math.round((p.passRate / 100) * 28));
-              var tip =
-                fmtDateTime(p.startedAt) + ' · ' + shortId(p.runId) + '\n' +
-                (p.passRate == null ? 'All skipped' : p.passRate + '% pass rate') + '\n' +
-                p.passed + ' passed, ' + p.failed + ' failed, ' + p.skipped + ' skipped';
-              return '<button type="button" class="st-bar" data-run="' + esc(p.runId) + '" title="' + esc(tip) + '" aria-label="' + esc(tip) + '">' +
-                '<span style="height:' + h + 'px;background:' + rateColor(p.passRate) + ';"></span></button>';
-            })
-            .join('');
-          var change = '';
-          if (s.change != null && s.change !== 0) {
-            change = '<span class="st-change ' + (s.change > 0 ? 'up' : 'down') + '">' + (s.change > 0 ? '▲ ' : '▼ ') + Math.abs(s.change) + (Math.abs(s.change) === 1 ? ' pt' : ' pts') + '</span>';
-          } else if (s.change === 0) {
-            change = '<span class="st-change">no change</span>';
-          }
+          var rate = s.passRate;
+          var color = rateColor(rate);
+          var status = suiteStatus(rate);
+          var open = !!STATE.suiteCardOpen[s.suite];
+
           return (
-            '<tr><td class="cell-name">' + esc(s.suite) + '<div class="cell-sub">since ' + esc(fmtDateTime(s.firstRunAt).split(',')[0]) + '</div></td>' +
-            '<td class="mono">' + s.runs + '</td>' +
-            '<td class="mono">' + s.cases + '<div class="cell-sub">' + s.executions + ' executions</div></td>' +
-            '<td class="st-results"><span style="color:var(--success);">' + s.passed + ' passed</span>' +
-            '<span style="color:' + (s.failed ? 'var(--danger)' : 'var(--text-faint)') + ';">' + s.failed + ' failed</span>' +
-            '<span style="color:var(--text-faint);">' + s.skipped + ' skipped</span></td>' +
-            '<td><div class="st-rate"><b style="color:' + rateColor(s.passRate) + ';">' + (s.passRate == null ? '—' : s.passRate + '%') + '</b>' +
-            '<div class="st-rate-bar"><span style="width:' + (s.passRate || 0) + '%;background:' + rateColor(s.passRate) + ';"></span></div></div></td>' +
-            '<td><div class="st-bars">' + bars + '</div></td>' +
-            '<td class="mono">' + fmtDuration(s.avgTestMs) + '</td>' +
-            '<td style="white-space:nowrap;"><div>' + esc(fmtDateTime(s.lastRunAt)) + '</div><div class="cell-sub">' +
-            (s.lastPassRate == null ? 'all skipped' : s.lastPassRate + '% pass') + (change ? ' · ' + change : '') + '</div></td></tr>'
+            '<div class="suite-card ' + status.cls + (open ? ' open' : '') + '">' +
+              '<button type="button" class="suite-card-head suite-card-toggle" data-suite="' + esc(s.suite) + '" aria-expanded="' + open + '">' +
+                '<div class="suite-name-block">' +
+                  '<div class="suite-name">' + esc(s.suite) + (status.cls ? '<span class="suite-status ' + status.cls + '">' + status.label + '</span>' : '') + '</div>' +
+                  '<div class="cell-sub">since ' + esc(fmtDateTime(s.firstRunAt).split(',')[0]) + ' · ' + s.runs + ' run' + (s.runs === 1 ? '' : 's') + ' · ' + s.cases + ' cases</div>' +
+                '</div>' +
+                '<div class="suite-ring" style="--rate:' + (rate || 0) + ';--rc:' + color + ';" role="img" aria-label="' + (rate == null ? 'No pass rate yet' : rate + '% pass rate') + '">' +
+                  '<b style="color:' + color + ';">' + (rate == null ? '—' : rate + '%') + '</b>' +
+                '</div>' +
+                '<svg class="suite-card-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg>' +
+              '</button>' +
+              '<div class="suite-card-body"' + (open ? '' : ' hidden') + '>' + renderSuiteBody(s) + '</div>' +
+            '</div>'
           );
         })
-        .join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-faint);padding:26px;">No runs yet.</td></tr>';
+        .join('') || '<div class="suite-empty">No runs yet.</div>';
   }
   $('suite-summary-table').addEventListener('click', function (e) {
+    var toggle = e.target.closest('.suite-card-toggle');
+    if (toggle) {
+      var suite = toggle.dataset.suite;
+      var willOpen = !STATE.suiteCardOpen[suite];
+      STATE.suiteCardOpen[suite] = willOpen;
+      var card = toggle.closest('.suite-card');
+      card.classList.toggle('open', willOpen);
+      toggle.setAttribute('aria-expanded', willOpen);
+      card.querySelector('.suite-card-body').hidden = !willOpen;
+      return;
+    }
+    var viewCases = e.target.closest('.suite-view-cases');
+    if (viewCases) {
+      showView('cases');
+      $('cases-search').value = viewCases.dataset.suite;
+      buildCaseTree(viewCases.dataset.suite);
+      return;
+    }
     var bar = e.target.closest('.st-bar');
     if (!bar) return;
     showView('results');
@@ -2229,6 +2370,290 @@
       });
   });
   document.querySelector('[data-view="bugs"]').addEventListener('click', loadBugs);
+
+  // ---------------------------------------------------------------------
+  // Google Sheet page — edit tabs in place; the server does all the talking to Google
+  // ---------------------------------------------------------------------
+  var SHEET = { status: null, tab: null, header: [], rows: [], loaded: false };
+
+  function sheetMsg(text, isError) {
+    var el = $('sheet-msg');
+    el.textContent = text || '';
+    el.style.color = isError ? 'var(--fail, #d64545)' : 'var(--text-dim)';
+  }
+  function sheetJson(url, opts) {
+    return fetch(url, opts).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (data) {
+        if (!r.ok) {
+          var err = new Error(data.error || 'Request failed (' + r.status + ')');
+          err.status = r.status;
+          err.data = data;
+          throw err;
+        }
+        return data;
+      });
+    });
+  }
+
+  function loadSheetPage() {
+    return sheetJson('/api/sheet/status')
+      .then(function (st) {
+        SHEET.status = st;
+        var ready = st.configured && !st.error;
+        $('sheet-setup').hidden = ready;
+        $('sheet-panel').hidden = !ready;
+        $('sheet-sync-creds').disabled = !ready;
+        $('sheet-refresh').disabled = !ready;
+        if (!ready) {
+          var steps = [];
+          if (!st.hasKey) steps.push('Create a Google Cloud <b>service account</b>, enable the <b>Google Sheets API</b>, and save its JSON key as <code>' + esc(st.keyFile || 'server/google-key.json') + '</code> (git-ignored).');
+          if (!st.hasSheetId) steps.push('Add <code>GOOGLE_SHEET_ID=&lt;id from the sheet URL&gt;</code> to the repo-root <code>.env</code>.');
+          if (st.serviceAccountEmail) steps.push('Share the sheet with <code>' + esc(st.serviceAccountEmail) + '</code> as <b>Editor</b>.');
+          else steps.push('Share the sheet with the service account’s <code>client_email</code> as <b>Editor</b>.');
+          steps.push('Restart the dashboard server, then reopen this page.');
+          $('sheet-setup-body').innerHTML =
+            (st.error ? '<div style="color:var(--fail,#d64545);margin-bottom:8px;">' + esc(st.error) + '</div>' : '') +
+            '<ol style="margin:0;padding-left:18px;">' + steps.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol>';
+          return;
+        }
+        var tabs = st.tabs || [];
+        if (!SHEET.tab || tabs.indexOf(SHEET.tab) === -1) SHEET.tab = tabs.indexOf(st.credentialsTab) !== -1 ? st.credentialsTab : tabs[0];
+        renderSheetTabs(tabs);
+        return SHEET.tab ? loadSheetTab() : null;
+      })
+      .catch(function (err) {
+        $('sheet-setup').hidden = false;
+        $('sheet-panel').hidden = true;
+        $('sheet-setup-body').textContent = err.message;
+      });
+  }
+
+  function renderSheetTabs(tabs) {
+    var strip = $('sheet-tabs');
+    strip.innerHTML = tabs
+      .map(function (t) {
+        return '<button class="status-tab' + (t === SHEET.tab ? ' on' : '') + '" data-tab="' + esc(t) + '">' + esc(t) + '</button>';
+      })
+      .join('');
+    var active = strip.querySelector('.status-tab.on');
+    if (active) active.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+  // Lets a plain vertical mouse wheel scroll the tab strip sideways (trackpads already do this natively).
+  $('sheet-tabs').addEventListener(
+    'wheel',
+    function (e) {
+      if (!e.deltaY || e.deltaX) return;
+      var el = e.currentTarget;
+      if (el.scrollWidth <= el.clientWidth) return;
+      el.scrollLeft += e.deltaY;
+      e.preventDefault();
+    },
+    { passive: false }
+  );
+
+  function loadSheetTab() {
+    sheetMsg('Loading…');
+    return sheetJson('/api/sheet/tab/' + encodeURIComponent(SHEET.tab))
+      .then(function (data) {
+        SHEET.header = data.header;
+        SHEET.rows = data.rows;
+        renderSheetTable();
+        sheetMsg(data.rows.length + ' row' + (data.rows.length === 1 ? '' : 's') + ' · edits save when you leave a cell');
+      })
+      .catch(function (err) {
+        sheetMsg(err.message, true);
+      });
+  }
+
+  function isSecretCol(i) {
+    return /pass/i.test(SHEET.header[i] || '');
+  }
+
+  // Column widths in px that add up to the table's width, so the whole sheet fits the page and
+  // long cells wrap instead of scrolling sideways. Every column first gets enough room for its
+  // longest word (capped, so one giant token like a URL can't hog the row) — that's what stops
+  // words breaking letter by letter — then the rest is shared out by how much text each
+  // column holds, so a long "Steps" column gets more than a short "ID" one.
+  var SHEET_CHAR_PX = 7.4; // ~12.5px Inter
+  var SHEET_CELL_PAD_PX = 26; // textarea padding + border + td padding
+
+  function sheetColumnWidths(availablePx) {
+    function longestWord(text) {
+      return String(text || '').split(/\s+/).reduce(function (m, w) { return Math.max(m, w.length); }, 0);
+    }
+    var cols = SHEET.header.map(function (h, ci) {
+      var total = String(h || '').length;
+      var longest = String(h || '').length;
+      // Headings render uppercase and letter-spaced, so a heading word needs ~1.4x the room.
+      var word = Math.ceil(longestWord(h) * 1.4);
+      SHEET.rows.forEach(function (row) {
+        var text = String(row[ci] == null ? '' : row[ci]);
+        total += text.length;
+        if (text.length > longest) longest = text.length;
+        word = Math.max(word, longestWord(text));
+      });
+      var avg = total / (SHEET.rows.length + 1);
+      return {
+        minPx: Math.min(word, 16) * SHEET_CHAR_PX + SHEET_CELL_PAD_PX,
+        weight: Math.max(Math.min((avg + longest) / 2, 60), 1),
+      };
+    });
+    var minSum = cols.reduce(function (a, c) { return a + c.minPx; }, 0);
+    // Fitting the page wins: on a narrow screen shrink every column in proportion (long
+    // single words then wrap mid-word) rather than scroll the sheet sideways.
+    if (minSum >= availablePx) {
+      // Short columns (IDs, statuses) keep their width; only the wide ones give way.
+      var SHORT_PX = 90;
+      var fixed = cols.reduce(function (a, c) { return a + (c.minPx <= SHORT_PX ? c.minPx : 0); }, 0);
+      var flexMin = minSum - fixed;
+      var room = Math.max(availablePx - fixed, 0);
+      return cols.map(function (c) {
+        if (c.minPx <= SHORT_PX || !flexMin) return c.minPx;
+        return (c.minPx / flexMin) * room;
+      });
+    }
+    var spare = availablePx - minSum;
+    var weightSum = cols.reduce(function (a, c) { return a + c.weight; }, 0) || 1;
+    return cols.map(function (c) { return c.minPx + (spare * c.weight) / weightSum; });
+  }
+
+  function applySheetColumnWidths() {
+    var table = $('sheet-head').closest('table');
+    if (!table || !SHEET.header.length) return;
+    var available = table.parentElement.clientWidth;
+    if (!available) return;
+    var widths = sheetColumnWidths(available);
+    var colgroup = table.querySelector('colgroup') || table.insertBefore(document.createElement('colgroup'), table.firstChild);
+    colgroup.innerHTML = widths.map(function (w) { return '<col style="width:' + Math.floor(w) + 'px">'; }).join('');
+    table.style.width = available + 'px';
+  }
+
+  // Textareas grow to fit their wrapped content, so every cell shows its full text.
+  function fitSheetCell(el) {
+    if (el.tagName !== 'TEXTAREA') return;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+  function fitAllSheetCells() {
+    document.querySelectorAll('#sheet-body textarea.sheet-cell').forEach(fitSheetCell);
+  }
+
+  function renderSheetTable() {
+    var show = $('sheet-show-secrets').checked;
+    applySheetColumnWidths();
+    $('sheet-head').innerHTML = '<tr>' + SHEET.header.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr>';
+    $('sheet-body').innerHTML = SHEET.rows.length
+      ? SHEET.rows
+          .map(function (row, ri) {
+            return (
+              '<tr>' +
+              SHEET.header
+                .map(function (_, ci) {
+                  var v = row[ci] == null ? '' : row[ci];
+                  var attrs = ' class="sheet-cell" data-r="' + ri + '" data-c="' + ci + '" autocomplete="off"';
+                  // Hidden passwords stay a masked single-line input; everything else is a
+                  // wrapping textarea so multi-line cells (e.g. numbered steps) show in full.
+                  if (isSecretCol(ci) && !show) return '<td><input type="password"' + attrs + ' value="' + esc(v) + '"></td>';
+                  return '<td><textarea rows="1"' + attrs + ' spellcheck="false">' + esc(v) + '</textarea></td>';
+                })
+                .join('') +
+              '</tr>'
+            );
+          })
+          .join('')
+      : '<tr><td colspan="' + (SHEET.header.length || 1) + '" style="text-align:center;color:var(--text-faint);padding:26px;">This tab is empty.</td></tr>';
+    fitAllSheetCells();
+  }
+
+  $('sheet-body').addEventListener('input', function (e) {
+    if (e.target.classList.contains('sheet-cell')) fitSheetCell(e.target);
+  });
+  // A resize changes the space available — recompute column widths, then the row heights.
+  var sheetResizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(sheetResizeTimer);
+    sheetResizeTimer = setTimeout(function () {
+      applySheetColumnWidths();
+      fitAllSheetCells();
+    }, 120);
+  });
+
+  $('sheet-tabs').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-tab]');
+    if (!b) return;
+    SHEET.tab = b.dataset.tab;
+    renderSheetTabs(SHEET.status.tabs);
+    loadSheetTab();
+  });
+  $('sheet-show-secrets').addEventListener('change', renderSheetTable);
+  $('sheet-refresh').addEventListener('click', loadSheetPage);
+
+  // Save a cell when it loses focus and its value actually changed.
+  $('sheet-body').addEventListener('change', function (e) {
+    var input = e.target.closest('.sheet-cell');
+    if (!input) return;
+    var ri = Number(input.dataset.r);
+    var ci = Number(input.dataset.c);
+    var before = SHEET.rows[ri][ci] == null ? '' : SHEET.rows[ri][ci];
+    input.classList.remove('saved', 'failed');
+    input.classList.add('saving');
+    sheetJson('/api/sheet/tab/' + encodeURIComponent(SHEET.tab) + '/cell', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ row: ri + 2, col: ci + 1, value: input.value, expected: before }),
+    })
+      .then(function () {
+        SHEET.rows[ri][ci] = input.value;
+        input.classList.remove('saving');
+        input.classList.add('saved');
+        sheetMsg('Saved ✓');
+      })
+      .catch(function (err) {
+        input.classList.remove('saving');
+        input.classList.add('failed');
+        if (err.status === 409) {
+          sheetMsg('Not saved — someone changed this cell in the sheet. Reverted to the sheet’s value; edit again if you still want yours.', true);
+          SHEET.rows[ri][ci] = err.data.current;
+          input.value = err.data.current;
+        } else {
+          sheetMsg('Not saved: ' + err.message, true);
+        }
+      });
+  });
+
+  $('sheet-add-row').addEventListener('click', function () {
+    if (!SHEET.header.length) return;
+    sheetJson('/api/sheet/tab/' + encodeURIComponent(SHEET.tab) + '/rows', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: SHEET.header.map(function () { return ''; }) }),
+    })
+      .then(loadSheetTab)
+      .catch(function (err) {
+        sheetMsg('Could not add a row: ' + err.message, true);
+      });
+  });
+
+  $('sheet-sync-creds').addEventListener('click', function () {
+    var btn = $('sheet-sync-creds');
+    btn.disabled = true;
+    sheetMsg('Syncing credentials…');
+    sheetJson('/api/sheet/credentials/sync', { method: 'POST' })
+      .then(function (r) {
+        SHEET.tab = r.tab;
+        return loadSheetPage().then(function () {
+          sheetMsg('Synced ' + r.total + ' accounts (' + r.added + ' new, ' + r.updated + ' updated). Type and Comments you edited were kept.');
+        });
+      })
+      .catch(function (err) {
+        sheetMsg('Sync failed: ' + err.message, true);
+      })
+      .then(function () {
+        btn.disabled = false;
+      });
+  });
+
+  document.querySelector('[data-view="sheet"]').addEventListener('click', loadSheetPage);
 
   // ---------------------------------------------------------------------
   // Init

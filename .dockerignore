@@ -9,3 +9,4 @@ playwright-report
 npm-debug.log*
 .auth
 .env
+artifacts/

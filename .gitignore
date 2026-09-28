@@ -6,4 +6,6 @@ playwright-report/
 *.log
 data/queue.json
 .auth/
+server/google-key.json
 .env
+artifacts/

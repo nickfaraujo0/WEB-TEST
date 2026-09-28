@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="sheet.css">
 </head>
 <body>
 <div class="app">
@@ -71,6 +72,10 @@
       <div class="navgroup">
         <div class="glabel">Configure</div>
         <nav class="navlist">
+          <button class="navitem" data-view="sheet">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 9h16M4 15h16M10 3v18"/></svg>
+            Google Sheet
+          </button>
           <button class="navitem" data-view="settings">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V20a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H4a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H10a1.7 1.7 0 0 0 1-1.55V4a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V10c.1.03.2.07.3.1a1.7 1.7 0 0 0 1.7 1V11a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z" stroke-width="1.2"/></svg>
             Settings
@@ -406,16 +411,14 @@
       <div class="topbar"><div><h1>Reports</h1><div class="sub">Test health across recent runs</div></div></div>
       <div class="content">
         <div class="panel">
-          <div class="panel-head"><div><h2>Suite summary</h2><div class="sub">Each suite across all saved runs. Each bar is one run, sized by its pass rate. Click a bar to open that run.</div></div></div>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Suite</th><th>Runs</th><th>Cases</th><th>Results</th><th>Pass rate</th><th>Over time</th><th>Avg test</th><th>Last run</th></tr></thead>
-              <tbody id="suite-summary-table"><tr><td colspan="8" style="text-align:center;color:var(--text-faint);padding:26px;">No runs yet.</td></tr></tbody>
-            </table>
-          </div>
+          <button type="button" class="panel-head collapsible" id="suite-summary-toggle" aria-expanded="true" aria-controls="suite-summary-table">
+            <div><h2>Suite summary</h2><div class="sub">Each suite (Buzz, Login, Courses…) across all saved runs. Each bar is one run, sized by its pass rate. Click a bar to open that run.</div></div>
+            <svg class="panel-head-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="suite-grid" id="suite-summary-table"><div class="suite-empty">No runs yet.</div></div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h2>Flaky tests</h2><div class="sub">Tests with both passes and failures across recent runs</div></div>
+          <div class="panel-head"><div><h2>Flaky tests</h2><div class="sub">Unreliable tests: passed in some of the last 10 runs and failed in others on the same browser. Often timing or test-data issues, not a real app bug.</div></div></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Test</th><th>Suite</th><th>Browser</th><th>Flake rate</th><th>Last seen</th></tr></thead>
@@ -424,7 +427,7 @@
           </div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h2>Currently failing</h2><div class="sub">How long each broken test has been failing, per browser</div></div>
+          <div class="panel-head"><div><h2>Currently failing</h2><div class="sub">Broken tests: failed in their latest run on that browser, and how long they've been failing. Either an app bug or a test that needs fixing.</div></div></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Test</th><th>Suite</th><th>Browser</th><th>Reason</th><th>Failing for</th><th>Since</th></tr></thead>
@@ -433,7 +436,7 @@
           </div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h2>Browser mismatches</h2><div class="sub">Tests whose latest result differs across browsers — hover a status for the error/reason</div></div>
+          <div class="panel-head"><div><h2>Browser mismatches</h2><div class="sub">Browser-specific tests: pass on one browser but fail or skip on another in their latest run. Hover a status for the error or reason.</div></div></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Test</th><th>Suite</th><th>Chromium</th><th>Firefox</th><th>WebKit</th></tr></thead>
@@ -442,7 +445,7 @@
           </div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h2>Currently skipped</h2><div class="sub">Skipped tests and why — coverage gaps that need a look</div></div>
+          <div class="panel-head"><div><h2>Currently skipped</h2><div class="sub">Tests that didn't run: skipped on purpose (e.g. Chromium-only, or would send real emails or create accounts), with the reason. These are coverage gaps.</div></div></div>
           <div class="table-wrap">
             <table>
               <thead><tr><th>Test</th><th>Suite</th><th>Browsers</th><th>Reason</th><th>Last run</th></tr></thead>
@@ -460,8 +463,7 @@
         <button class="btn primary" id="bug-add">+ Log a bug</button>
       </div>
       <div class="content">
-        <div class="results-grid">
-        <div class="panel results-main">
+        <div class="panel">
           <div class="filter-bar">
             <div class="status-tabs" id="bug-status-tabs">
               <button class="status-tab on" data-status="">All 0</button>
@@ -479,6 +481,39 @@
               <tbody id="bug-table"><tr><td colspan="7" style="text-align:center;color:var(--text-faint);padding:26px;">No bugs logged yet.</td></tr></tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GOOGLE SHEET -->
+    <section class="view" id="view-sheet" hidden>
+      <div class="topbar">
+        <div><h1>Google Sheet</h1><div class="sub" id="sheet-sub">Edit the team sheet without leaving the dashboard</div></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn" id="sheet-refresh">Refresh</button>
+          <button class="btn primary" id="sheet-sync-creds">Sync credentials from code</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="panel" id="sheet-setup" hidden>
+          <div class="panel-head"><h2>Connect your sheet</h2></div>
+          <div style="padding:14px 18px;line-height:1.7;" id="sheet-setup-body"></div>
+        </div>
+        <div class="panel" id="sheet-panel" hidden>
+          <div class="filter-bar">
+            <div class="status-tabs" id="sheet-tabs"></div>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-dim);margin-left:auto;">
+              <input type="checkbox" id="sheet-show-secrets"> Show passwords
+            </label>
+            <button class="btn sm" id="sheet-add-row">+ Add row</button>
+          </div>
+          <div class="table-wrap">
+            <table class="sheet-table">
+              <thead id="sheet-head"></thead>
+              <tbody id="sheet-body"></tbody>
+            </table>
+          </div>
+          <div id="sheet-msg" style="padding:8px 18px;font-size:12.5px;color:var(--text-dim);min-height:20px;"></div>
         </div>
       </div>
     </section>

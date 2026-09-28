@@ -31,8 +31,10 @@ module.exports = defineConfig({
   use: {
     baseURL: process.env.BASE_URL || 'https://hive-dev.thegritcity.com',
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    // Every test keeps a final screenshot and a video, pass or fail. The dashboard archives
+    // them per run into artifacts/<runId>/ (server/store.js) so later runs don't wipe them.
+    screenshot: 'on',
+    video: 'on',
     navigationTimeout: 45000,
     actionTimeout: 20000,
   },

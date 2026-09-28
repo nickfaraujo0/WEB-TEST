@@ -146,18 +146,25 @@ function computeSuiteSummary(limitRuns, timelineLength) {
     const perRun = new Map();
     (run.tests || []).forEach((t) => {
       const name = t.suite || 'Other';
-      if (!perRun.has(name)) perRun.set(name, { passed: 0, failed: 0, skipped: 0, duration: 0, cases: new Set() });
+      if (!perRun.has(name)) perRun.set(name, { passed: 0, failed: 0, skipped: 0, duration: 0, cases: new Set(), byProject: new Map() });
       const pr = perRun.get(name);
       if (t.status === 'passed') pr.passed++;
       else if (t.status === 'skipped') pr.skipped++;
       else if (FAILING_STATUSES.has(t.status)) pr.failed++;
       pr.duration += t.duration || 0;
       pr.cases.add(t.file + ':' + t.line);
+
+      const proj = t.project || 'unknown';
+      if (!pr.byProject.has(proj)) pr.byProject.set(proj, { passed: 0, failed: 0, skipped: 0 });
+      const pp = pr.byProject.get(proj);
+      if (t.status === 'passed') pp.passed++;
+      else if (t.status === 'skipped') pp.skipped++;
+      else if (FAILING_STATUSES.has(t.status)) pp.failed++;
     });
 
     perRun.forEach((pr, name) => {
       if (!bySuite.has(name)) {
-        bySuite.set(name, { suite: name, runs: 0, executions: 0, passed: 0, failed: 0, skipped: 0, duration: 0, cases: new Set(), firstRunAt: run.startedAt, timeline: [] });
+        bySuite.set(name, { suite: name, runs: 0, executions: 0, passed: 0, failed: 0, skipped: 0, duration: 0, cases: new Set(), byProject: new Map(), firstRunAt: run.startedAt, timeline: [] });
       }
       const s = bySuite.get(name);
       const ran = pr.passed + pr.failed;
@@ -168,6 +175,13 @@ function computeSuiteSummary(limitRuns, timelineLength) {
       s.skipped += pr.skipped;
       s.duration += pr.duration;
       pr.cases.forEach((c) => s.cases.add(c));
+      pr.byProject.forEach((pp, proj) => {
+        if (!s.byProject.has(proj)) s.byProject.set(proj, { passed: 0, failed: 0, skipped: 0 });
+        const acc = s.byProject.get(proj);
+        acc.passed += pp.passed;
+        acc.failed += pp.failed;
+        acc.skipped += pp.skipped;
+      });
       s.timeline.push({
         runId: run.id,
         startedAt: run.startedAt,
@@ -185,6 +199,12 @@ function computeSuiteSummary(limitRuns, timelineLength) {
       const rated = s.timeline.filter((p) => p.passRate !== null);
       const last = rated[rated.length - 1] || null;
       const prev = rated[rated.length - 2] || null;
+      const byProject = Array.from(s.byProject.entries())
+        .map(([project, pp]) => {
+          const pran = pp.passed + pp.failed;
+          return { project, passed: pp.passed, failed: pp.failed, skipped: pp.skipped, passRate: pran ? Math.round((pp.passed / pran) * 100) : null };
+        })
+        .sort((a, b) => a.project.localeCompare(b.project));
       return {
         suite: s.suite,
         runs: s.runs,
@@ -200,6 +220,7 @@ function computeSuiteSummary(limitRuns, timelineLength) {
         lastPassRate: last ? last.passRate : null,
         change: last && prev ? last.passRate - prev.passRate : null,
         timeline: s.timeline.slice(-timelineLength),
+        byProject,
       };
     })
     .sort((a, b) => a.suite.localeCompare(b.suite));

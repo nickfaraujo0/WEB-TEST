@@ -34,6 +34,22 @@ const FROM_ENV_ONLY = new Set([
   'HIVE_DEACTIVATED_PASSWORD',
 ]);
 
+/**
+ * Every named credential and its current value ('' when an account variable isn't set).
+ * Used by the dashboard's Credentials sheet sync (server/credentialsSheet.js).
+ */
+export function allCredentials() {
+  const out = {};
+  for (const name of [...Object.keys(NON_SECRET_DEFAULTS), ...FROM_ENV_ONLY]) {
+    try {
+      out[name] = credential(name);
+    } catch (e) {
+      out[name] = '';
+    }
+  }
+  return out;
+}
+
 /** One credential, by name. Throws for a name nobody defined or a missing account variable. */
 export function credential(name) {
   const fromEnv = process.env[name];

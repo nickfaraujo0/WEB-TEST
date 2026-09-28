@@ -308,6 +308,7 @@ app.post('/internal/frame', (req, res) => {
 function finalizeRun(runId, code, signal) {
   if (!current || current.id !== runId) return;
   const run = buildRunRecord(current, code, signal);
+  store.archiveArtifacts(run);
   store.saveRun(run);
 
   broadcast({ type: 'run-end', status: run.status, runId, summary: summarize(run) });
@@ -532,8 +533,89 @@ app.delete('/api/bugs/:id', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// Attachments (screenshots / traces / videos) — served from Playwright's own
-// test-results output directory only, never arbitrary paths.
+// Google Sheet — read/edit tabs from the dashboard, and sync the Credentials tab from
+// test-cases/login/credentials.js. The sheet holds real account passwords, so these routes
+// only answer local requests unless SHEET_ALLOW_REMOTE=1 (e.g. when running in Docker).
+// ---------------------------------------------------------------------------
+const googleSheets = require('./googleSheets');
+const credentialsSheet = require('./credentialsSheet');
+
+function isLoopback(req) {
+  const a = req.socket.remoteAddress || '';
+  return a === '127.0.0.1' || a === '::1' || a === '::ffff:127.0.0.1';
+}
+
+app.use('/api/sheet', (req, res, next) => {
+  if (process.env.SHEET_ALLOW_REMOTE === '1' || isLoopback(req)) return next();
+  res.status(403).json({ error: 'The sheet API only answers local requests (set SHEET_ALLOW_REMOTE=1 to allow others).' });
+});
+
+function sendSheetError(res, err) {
+  res.status(err.status && err.status >= 400 && err.status < 600 ? err.status : 500).json({ error: err.message || 'Google Sheets request failed' });
+}
+
+app.get('/api/sheet/status', async (req, res) => {
+  const cfg = googleSheets.config();
+  if (!cfg.configured) return res.json(cfg);
+  try {
+    res.json(Object.assign({}, cfg, { tabs: await googleSheets.listTabs(), credentialsTab: credentialsSheet.TAB }));
+  } catch (err) {
+    res.json(Object.assign({}, cfg, { error: err.message }));
+  }
+});
+
+app.get('/api/sheet/tab/:name', async (req, res) => {
+  try {
+    const rows = await googleSheets.readTab(req.params.name);
+    res.json({ tab: req.params.name, header: rows[0] || [], rows: rows.slice(1) }); // rows[i] is sheet row i + 2
+  } catch (err) {
+    sendSheetError(res, err);
+  }
+});
+
+// Edit one cell. `expected` is the value the page last saw — if the sheet has changed since,
+// answer 409 with the current value instead of silently overwriting someone else's edit.
+app.patch('/api/sheet/tab/:name/cell', async (req, res) => {
+  const { row, col, value, expected } = req.body || {};
+  if (!Number.isInteger(row) || row < 2 || !Number.isInteger(col) || col < 1 || typeof value !== 'string') {
+    return res.status(400).json({ error: 'row (>=2), col (>=1) and a string value are required' });
+  }
+  try {
+    if (typeof expected === 'string') {
+      const current = await googleSheets.readCell(req.params.name, row, col);
+      if (current !== expected) return res.status(409).json({ error: 'This cell changed in the sheet since you loaded it.', current });
+    }
+    await googleSheets.writeCell(req.params.name, row, col, value);
+    res.json({ ok: true });
+  } catch (err) {
+    sendSheetError(res, err);
+  }
+});
+
+app.post('/api/sheet/tab/:name/rows', async (req, res) => {
+  const values = req.body && req.body.values;
+  if (!Array.isArray(values) || !values.every((v) => typeof v === 'string')) {
+    return res.status(400).json({ error: 'values must be an array of strings' });
+  }
+  try {
+    await googleSheets.appendRow(req.params.name, values);
+    res.status(201).json({ ok: true });
+  } catch (err) {
+    sendSheetError(res, err);
+  }
+});
+
+app.post('/api/sheet/credentials/sync', async (req, res) => {
+  try {
+    res.json(await credentialsSheet.sync());
+  } catch (err) {
+    sendSheetError(res, err);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Attachments (screenshots / traces / videos) — served from Playwright's test-results
+// output directory or the per-run artifacts/ archive only, never arbitrary paths.
 // ---------------------------------------------------------------------------
 app.get('/api/attachment/:runId/:testIndex/:attIndex', (req, res) => {
   const run = store.loadRun(req.params.runId);
@@ -544,7 +626,8 @@ app.get('/api/attachment/:runId/:testIndex/:attIndex', (req, res) => {
   if (!att || !att.path) return res.status(404).end();
 
   const resolved = path.resolve(att.path);
-  if (!resolved.startsWith(TEST_RESULTS_DIR + path.sep) && resolved !== TEST_RESULTS_DIR) {
+  const allowed = [TEST_RESULTS_DIR, store.ARTIFACTS_DIR].some((dir) => resolved.startsWith(dir + path.sep));
+  if (!allowed) {
     return res.status(403).end();
   }
   if (!fs.existsSync(resolved)) return res.status(404).end();

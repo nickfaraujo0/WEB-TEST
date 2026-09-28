@@ -1,0 +1,36 @@
+/* Google Sheet page */
+
+/* Fit the page: fixed layout, with px column widths the page computes from each column's
+   content to add up to the available width (see sheetColumnWidths in app.js). */
+#sheet-panel .table-wrap { overflow-x: hidden; }
+.sheet-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.sheet-table th { white-space: normal; overflow-wrap: break-word; vertical-align: bottom; }
+.sheet-table td { padding: 2px 4px; vertical-align: top; }
+
+/* Tab strip: one row, horizontally scrollable instead of wrapping onto multiple lines. */
+#sheet-tabs {
+  flex: 1 1 100%; /* own row, full width, so it doesn't fight the other filter-bar controls for space */
+  flex-wrap: nowrap;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  padding-bottom: 6px; /* room for the scrollbar so it doesn't sit under the tab labels */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+}
+#sheet-tabs::-webkit-scrollbar { height: 8px; }
+#sheet-tabs::-webkit-scrollbar-track { background: transparent; }
+#sheet-tabs::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 20px; }
+/* Bigger, easier-to-hit tab buttons (larger than the dashboard's default .status-tab). */
+#sheet-tabs .status-tab { flex: none; white-space: nowrap; padding: 9px 16px; font-size: 13.5px; line-height: 1.3; border-radius: 10px; }
+
+.sheet-cell { display: block; width: 100%; min-width: 0; box-sizing: border-box; padding: 7px 8px; font: inherit; font-size: 12.5px; line-height: 1.45; color: inherit; background: transparent; border: 1px solid transparent; border-radius: 6px; }
+textarea.sheet-cell { resize: none; overflow: hidden; white-space: pre-wrap; overflow-wrap: break-word; }
+.sheet-cell:hover { border-color: var(--border, rgba(128,128,128,.3)); }
+.sheet-cell:focus { outline: none; border-color: var(--accent, #6b5cff); background: var(--surface, transparent); }
+.sheet-cell.saving { opacity: .6; }
+.sheet-cell.saved { border-color: rgba(46,160,90,.55); }
+.sheet-cell.failed { border-color: #d64545; }

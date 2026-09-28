@@ -36,31 +36,6 @@
       "updatedAt": "2026-09-21T09:13:29.547Z"
     },
     {
-      "id": "BUG-002",
-      "title": "No link to the Profile page anywhere in the UI",
-      "description": "/profile works when typed into the address bar, but nothing links to it. The sidebar has no Profile item, and the top-right account menu lists only the name, email and Logout. Clicking the name, email or avatar in that menu does nothing. The Android app opens Profile from the same avatar.",
-      "severity": "medium",
-      "status": "open",
-      "foundAt": "2026-09-21",
-      "fixedAt": null,
-      "browsers": [
-        "chromium",
-        "firefox",
-        "webkit"
-      ],
-      "testCases": [
-        {
-          "file": "profile/TC008_profile_not_reachable_from_ui.spec.js",
-          "title": "TC008 - Verify no link to the Profile page exists in the UI (bug)",
-          "suite": "Profile"
-        }
-      ],
-      "runId": null,
-      "notes": "",
-      "createdAt": "2026-09-21T09:13:29.557Z",
-      "updatedAt": "2026-09-21T09:13:29.557Z"
-    },
-    {
       "id": "BUG-003",
       "title": "Cancel leaves the typed text in Display Name",
       "description": "After typing in Display Name and clicking Cancel, the form returns to read-only but the field still shows the typed text instead of the saved value.",

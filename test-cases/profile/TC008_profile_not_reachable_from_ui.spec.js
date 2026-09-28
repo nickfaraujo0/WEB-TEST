@@ -9,7 +9,7 @@ import { loginAs, AccountMenu } from './profile-helpers.js';
  * (which the Android app uses to open Profile) lists only the name, email and Logout —
  * clicking the name, email or avatar inside it does nothing.
  */
-test('TC008 - Verify no link to the Profile page exists in the UI (bug)', async ({ page }) => {
+test('TC008 - Verify no link to the Profile page exists in the UI (gap)', async ({ page }) => {
   await loginAs(page);
 
   await expect(page.locator('a[href*="profile" i]')).toHaveCount(0);
