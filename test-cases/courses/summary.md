@@ -297,6 +297,47 @@ correctness one.
   rather than silently mutating data, but they will fail until the real conflict is cleared by
   hand. Worth a follow-up: pick a deliberately far-future, conflict-free slot instead of "now".
 
+## 2026-09-29 — new cases TC102–TC115, and app changes found while writing them
+
+Source: the master Google Sheet's "Courses – Schedule & Sessions (Web)" tab, which gained these
+rows from the original Courses tab's Schedule rows that had no web test yet. Every locator was
+confirmed live first, on throwaway sessions in Mechanics of Solids / Div A.
+
+**App changes that affect existing tests (not yet fixed in those tests):**
+- **TC017 is out of date.** New Session no longer pre-selects the "All" batch — creating with
+  defaults now shows "Select your batch to continue." (The "Corrections" note below saying
+  Batches: All is preselected was true on 2026-09-22.) `withDisposableSession` now picks "All"
+  and retries when that message appears, so it works either way.
+- **TC034 is out of date — the bug looks fixed.** Save Changes on Edit Session now succeeds:
+  "Buzz! Session Details updated successfully." with "Back to Schedule" / "Close" (seen with a
+  Location edit, and TC107–TC109 save Date / Duration / Location successfully). TC034 still
+  asserts the old "Buzzt!" 409 failure and should be rewritten; bug 1 above should be re-checked
+  with the Unit / Course Outcomes / Participants combinations it was originally reported with.
+
+**What the new cases found:**
+- Attendance Records (`/Courses/edit-attendance`): Present/Absent totals, one row per student,
+  and "Update Attendance". Clicking a student's status pill toggles Present ↔ Absent (no option
+  menu); the totals change only after "Update Attendance", and the change survives a reload
+  (TC102–TC104).
+- The success pop-up ("Attendance updated successfully!") has only a close (×) — **no "Done"**
+  as on mobile. Closing it stays on Attendance; Back returns to Edit Session (TC105, N/A on web).
+- Edit Session: Duration is a number box (hours); "Delete Session Records" exists at the bottom
+  with a Delete / Cancel confirm (TC106, TC111); Date, Duration and Location edits save (TC107–TC109);
+  several Teaching/Learning Methods can be ticked at once (TC110).
+- New Session: defaults to the month currently in view, not always today (TC112); any date can be
+  typed/picked (TC113); **no Faculty field** at creation — a gap vs. mobile, Faculty can only be
+  set later in Edit Session (TC114).
+- The session list scrolls inside the page, not the window (TC115).
+
+**Helper changes (`courses-helpers.js`):** `withDisposableSession` picks the "All" batch when
+required; its cleanup returns to the schedule page before deleting if a test ended elsewhere (a
+failure on the Attendance page once left a session behind — found and deleted by hand the same
+day); and it now takes a cross-process lock (`_lock.mjs`), shared with TC113, so session-creating
+tests never create at the same time slot in parallel. New: `openEditSession`, `saveEditSession`,
+`pickerDate`, `cardDate`, `otherDayThisMonth`.
+
+**Run:** all 14 pass on Chromium with `--workers=1`.
+
 ## Section index
 
 | Section | TCs | Notes |
@@ -309,6 +350,10 @@ correctness one.
 | Delete Session | TC039–040 | Confirm copy, real delete round-trip |
 | Edit Schedule wizard | TC041–048 | Step 1 timetable grid + Add Time Slot, step 2 CSV/manual choice, step 3 preview generation, exit confirmation, Create Schedule reachability (not exercised — semester-wide) |
 | Role differences | TC049–051 | Student has no Divisions/Add/Edit controls, status badge instead of actions, no "..." menu |
+| Attendance Records | TC102–105 | Update Attendance button, saving a status, success pop-up, no "Done" on web |
+| Edit Session (more fields) | TC106–111 | Scrolling, Date / Duration / Location edits saved, multiple Teaching Methods, Delete Session Records confirm |
+| New Session (more) | TC112–114 | Defaults to the month in view, any date, no Faculty field (gap) |
+| Session list | TC115 | Scrolls to the month's last session and Load Next Month |
 
 ## Explicitly not exercised
 

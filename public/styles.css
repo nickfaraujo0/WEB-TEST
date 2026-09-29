@@ -440,10 +440,6 @@
   @media (prefers-reduced-motion: reduce){ .suite-card-chevron{transition:none;} }
   .suite-name-block{min-width:0;}
   .suite-name{font-size:15px; font-weight:800; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
-  .suite-status{font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:2px 7px; border-radius:20px; background:var(--surface-3); color:var(--text-faint);}
-  .suite-status.good{background:var(--success-soft); color:var(--success);}
-  .suite-status.warn{background:var(--warning-soft); color:var(--warning);}
-  .suite-status.bad{background:var(--danger-soft); color:var(--danger);}
   .suite-ring{flex:none; width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:relative; background:conic-gradient(var(--rc) calc(var(--rate) * 3.6deg), var(--surface-3) 0);}
   .suite-ring::before{content:''; position:absolute; inset:5px; border-radius:50%; background:var(--surface);}
   .suite-ring b{position:relative; font-size:13px; font-weight:800;}

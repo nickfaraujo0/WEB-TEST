@@ -1711,7 +1711,7 @@
             '<div class="suite-card ' + status.cls + (open ? ' open' : '') + '">' +
               '<button type="button" class="suite-card-head suite-card-toggle" data-suite="' + esc(s.suite) + '" aria-expanded="' + open + '">' +
                 '<div class="suite-name-block">' +
-                  '<div class="suite-name">' + esc(s.suite) + (status.cls ? '<span class="suite-status ' + status.cls + '">' + status.label + '</span>' : '') + '</div>' +
+                  '<div class="suite-name">' + esc(s.suite) + '</div>' +
                   '<div class="cell-sub">since ' + esc(fmtDateTime(s.firstRunAt).split(',')[0]) + ' · ' + s.runs + ' run' + (s.runs === 1 ? '' : 's') + ' · ' + s.cases + ' cases</div>' +
                 '</div>' +
                 '<div class="suite-ring" style="--rate:' + (rate || 0) + ';--rc:' + color + ';" role="img" aria-label="' + (rate == null ? 'No pass rate yet' : rate + '% pass rate') + '">' +

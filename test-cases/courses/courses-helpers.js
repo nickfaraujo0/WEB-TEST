@@ -3,6 +3,7 @@ import { expect } from '../_hive-live.mjs';
 import { LoginPage } from '../login/login-page.js';
 import { credential } from '../login/credentials.js';
 import { CoursesPage } from './courses-page.js';
+import { withLock } from '../_lock.mjs';
 
 /** Log in with the named credentials (default: the professor account) and land on Buzz. */
 export async function loginAs(page, emailKey = 'HIVE_VALID_EMAIL', passwordKey = 'HIVE_VALID_PASSWORD') {
@@ -68,8 +69,29 @@ export async function exitWizard(courses) {
  * scheduling collision fails the test loudly rather than risking real data.
  */
 export async function withDisposableSession(page, courses, run) {
+  // Every throwaway session is created at "now" in the same division, so two running at once
+  // (parallel workers, or the same test in Chromium and Firefox) would hit "Conflict Detected".
+  // Take turns; everything else still runs in parallel.
+  return withSessionLock(() => createAndRun(page, courses, run));
+}
+
+/** Serialises tests that create sessions (see withDisposableSession). */
+export function withSessionLock(fn) {
+  return withLock('courses-session', fn);
+}
+
+async function createAndRun(page, courses, run) {
   await courses.addSessionButton.click();
   await courses.createSessionButton().click();
+
+  // Confirmed live 2026-09-29: New Session no longer pre-selects the "All" batch, so creating
+  // with defaults is refused with "Select your batch to continue." Pick "All" and retry. Kept
+  // conditional so the helper still works if the app goes back to pre-selecting it.
+  const batchError = courses.newSessionDialog().getByText('Select your batch to continue.');
+  if (await batchError.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await courses.batchPill('All').click();
+    await courses.createSessionButton().click();
+  }
 
   const conflictDialog = page.getByRole('dialog').filter({ hasText: 'Conflict Detected' });
   const closed = await courses
@@ -110,9 +132,18 @@ export async function withDisposableSession(page, courses, run) {
   // The attribute-selector form has no such restriction.
   const card = id ? page.locator(`[id="${id}"]`) : freshCard;
 
+  // Remembered so cleanup can come back here if `run` ends on another page (e.g. Edit Session or
+  // Attendance) — confirmed live 2026-09-29: a failure on the Attendance page left the session
+  // behind because the delete below looked for the card on the wrong page.
+  const scheduleUrl = page.url();
+
   try {
     await run(card);
   } finally {
+    if (!(await card.isVisible().catch(() => false))) {
+      await page.goto(scheduleUrl, { waitUntil: 'domcontentloaded' }).catch(() => {});
+      await card.waitFor({ state: 'visible', timeout: 30000 }).catch(() => {});
+    }
     // Confirmed live twice now (a "Buzzt!" error dialog left open after page.goBack(), and a
     // Delete-confirm dialog whose close animation outran its own "hidden" state): a dialog
     // `run` opened or dismissed can still leave an antd `.ant-modal-wrap` intercepting pointer
@@ -125,4 +156,39 @@ export async function withDisposableSession(page, courses, run) {
     await courses.deleteConfirmButton().click();
     await expect(card).toBeHidden({ timeout: 15000 }).catch(() => {});
   }
+}
+
+/** Opens `card`'s Edit Session page (/Courses/editLog) via its "..." menu. */
+export async function openEditSession(courses, card) {
+  await courses.cardMenuTrigger(card).click();
+  await courses.menuItem('Edit Session').click();
+  await expect(courses.sessionDetailsHeading()).toBeVisible({ timeout: 15000 });
+}
+
+/** Clicks Save Changes on Edit Session and waits for the success dialog, then closes it. */
+export async function saveEditSession(courses) {
+  await courses.saveChangesButton().click();
+  const ok = courses.saveSuccessDialog();
+  await expect(ok).toBeVisible({ timeout: 15000 });
+  await ok.getByRole('button', { name: 'Close', exact: true }).click();
+  await expect(ok).toBeHidden();
+}
+
+/** "D MMMM YYYY" as the Hive date pickers display it, e.g. "29 September 2026". */
+export function pickerDate(d) {
+  return `${d.getDate()} ${d.toLocaleString('en-GB', { month: 'long' })} ${d.getFullYear()}`;
+}
+
+/** Card header date as shown on session cards, e.g. "Tue, 29 Sep". */
+export function cardDate(d) {
+  // en-US, not en-GB: en-GB abbreviates September as "Sept", the app shows "Sep".
+  return `${d.toLocaleString('en-US', { weekday: 'short' })}, ${d.getDate()} ${d.toLocaleString('en-US', { month: 'short' })}`;
+}
+
+/** Another day in the current month (so the session stays in the loaded list): yesterday when
+ * possible — covers "past" — otherwise tomorrow. */
+export function otherDayThisMonth(today = new Date()) {
+  const d = new Date(today);
+  d.setDate(today.getDate() > 1 ? today.getDate() - 1 : today.getDate() + 1);
+  return d;
 }

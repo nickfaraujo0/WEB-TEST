@@ -67,6 +67,9 @@ export class CoursesPage {
   }
 
   async openCourse(name) {
+    // The course list can take well over the 20s action timeout to appear on hive-dev (its
+    // ~7.6MB bundle) — confirmed by a real run 2026-09-29 — so wait for the card explicitly.
+    await this.courseCard(name).waitFor({ state: 'visible', timeout: 60000 });
     await this.courseCard(name).click();
   }
 
@@ -368,5 +371,80 @@ export class CoursesPage {
 
   createScheduleButton() {
     return this.page.getByRole('button', { name: 'Create Schedule' });
+  }
+
+  // ---- New Session: date/time (confirmed live 2026-09-29) ----
+
+  /** Real antd date picker input; accepts typed "D MMMM YYYY" + Enter (confirmed live). With a
+   * later month in view, it defaults to the same day-of-month in that month, not today. */
+  newSessionDateInput() {
+    return this.newSessionDialog().getByPlaceholder('Select date');
+  }
+
+  newSessionTimeInput() {
+    return this.newSessionDialog().getByPlaceholder('Select time');
+  }
+
+  /** The month/year picker above the session list ("Sep, 2026"); its panel lists Jan–Dec. */
+  async pickMonth(shortMonth) {
+    await this.monthLabel.click();
+    await this.page.locator('.ant-picker-dropdown:visible .ant-picker-cell-in-view').filter({ hasText: new RegExp(`^${shortMonth}$`) }).click();
+  }
+
+  // ---- Edit Session page: more fields (confirmed live 2026-09-29, /Courses/editLog) ----
+
+  /** The page has exactly one date and one time picker (Schedule Date / Session Start Time). */
+  editDateInput() {
+    return this.page.getByPlaceholder('Select date');
+  }
+
+  /** Duration is an antd InputNumber (hours), not a text box like New Session's "1h". */
+  durationInput() {
+    return this.page.locator('.ant-input-number-input');
+  }
+
+  /** "Buzz! Session Details updated successfully." with "Back to Schedule" / "Close" — Save
+   * Changes succeeds as of 2026-09-29 (it used to fail with a "Buzzt!" conflict, see TC034). */
+  saveSuccessDialog() {
+    return this.page.locator('.ant-modal').filter({ hasText: 'Session Details updated successfully.' });
+  }
+
+  /** Confirm shown by "Delete Session Records": its buttons are Delete and Cancel. */
+  deleteRecordsConfirmDialog() {
+    return this.page.locator('.ant-modal').filter({ has: this.page.getByRole('button', { name: 'Delete', exact: true }) });
+  }
+
+  // ---- Attendance Records page (confirmed live 2026-09-29, /Courses/edit-attendance) ----
+
+  updateAttendanceButton() {
+    return this.page.getByRole('button', { name: 'Update Attendance' });
+  }
+
+  /** One student's row: a bordered rounded box holding roll no., name and the status control. */
+  attendanceRow(studentName) {
+    return this.page.locator('div.rounded-button.border').filter({ hasText: studentName });
+  }
+
+  /** The row's status pill ("Present"/"Absent"). Clicking it toggles the status directly — there
+   * is no option menu (confirmed live). Unsaved until "Update Attendance". */
+  attendanceStatus(studentName) {
+    return this.attendanceRow(studentName).locator('.ant-dropdown-trigger').first();
+  }
+
+  /** The Present / Absent total box at the top of the page (label, then the number). They
+   * reflect the saved attendance: they update after "Update Attendance", not on each toggle. */
+  attendanceCount(label) {
+    // Scoped to the total boxes (`mt-4 animate-comein`), not the student rows, whose status
+    // pills also say Present/Absent — a looser match read a row's "Present" (real run 2026-09-29).
+    return this.page
+      .locator('div.mt-4.animate-comein')
+      .filter({ has: this.page.getByText(label, { exact: true }) })
+      .locator('p')
+      .nth(1);
+  }
+
+  /** Success pop-up after "Update Attendance": a check icon + text and only a close (×). */
+  attendanceSuccessPopup() {
+    return this.page.locator('.ant-modal').filter({ hasText: 'Attendance updated successfully!' });
   }
 }
