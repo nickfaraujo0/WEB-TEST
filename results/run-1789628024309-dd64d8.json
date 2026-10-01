@@ -1,0 +1,25 @@
+{
+  "id": "run-1789628024309-dd64d8",
+  "startedAt": "2026-09-17T06:53:44.315Z",
+  "finishedAt": "2026-09-17T06:53:57.604Z",
+  "status": "cancelled",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 2,
+  "executions": 0,
+  "expectedExecutions": 2,
+  "stats": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "durationMs": 13289,
+  "tests": []
+}

@@ -1,0 +1,8 @@
+# HTTPS reverse proxy for the shared HIVE dashboard. Caddy fetches a certificate
+# automatically when HIVE_DOMAIN is a real hostname pointing at this server.
+{$HIVE_DOMAIN:localhost} {
+	# Run streaming (SSE) must not be buffered.
+	reverse_proxy hive:4000 {
+		flush_interval -1
+	}
+}

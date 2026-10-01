@@ -1,0 +1,41 @@
+{
+  "id": "run-1789665459929-1942e8",
+  "startedAt": "2026-09-17T17:17:39.930Z",
+  "finishedAt": "2026-09-17T17:17:45.737Z",
+  "status": "passed",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 1,
+    "retries": false
+  },
+  "totalCases": 1,
+  "executions": 1,
+  "expectedExecutions": 1,
+  "stats": {
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "durationMs": 5807,
+  "tests": [
+    {
+      "title": "TC013 - Enter Key Submits The Login Form",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC013_enter_key_submits_form.spec.js",
+      "line": 20,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 4189,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

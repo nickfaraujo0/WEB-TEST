@@ -1,0 +1,76 @@
+{
+  "id": "run-1789728607345-7402ad",
+  "startedAt": "2026-09-18T10:50:07.350Z",
+  "finishedAt": "2026-09-18T10:52:32.440Z",
+  "status": "cancelled",
+  "browsers": [
+    "chromium",
+    "firefox",
+    "webkit"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 47,
+  "executions": 2,
+  "expectedExecutions": 141,
+  "stats": {
+    "passed": 0,
+    "failed": 2,
+    "skipped": 0
+  },
+  "durationMs": 145090,
+  "tests": [
+    {
+      "title": "TC001 - Verify navigation to opportunities",
+      "suite": "Opportunities",
+      "file": "/Users/nick/Documents/web test/test-cases/opportunities/TC001_navigation_to_opportunities.spec.js",
+      "line": 17,
+      "project": "chromium",
+      "status": "timedOut",
+      "duration": 121496,
+      "attempts": 1,
+      "error": {
+        "message": "Test timeout of 60000ms exceeded.",
+        "stack": "Test timeout of 60000ms exceeded."
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/opportunities-TC001_naviga-497b7-navigation-to-opportunities-chromium/error-context.md",
+          "contentType": "text/markdown"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC003 - Verify Create Opportunity menu appears",
+      "suite": "Opportunities",
+      "file": "/Users/nick/Documents/web test/test-cases/opportunities/TC003_create_dropdown.spec.js",
+      "line": 18,
+      "project": "chromium",
+      "status": "timedOut",
+      "duration": 120081,
+      "attempts": 1,
+      "error": {
+        "message": "Test timeout of 60000ms exceeded.",
+        "stack": "Test timeout of 60000ms exceeded."
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/opportunities-TC003_create-a1f23-te-Opportunity-menu-appears-chromium/error-context.md",
+          "contentType": "text/markdown"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    }
+  ]
+}

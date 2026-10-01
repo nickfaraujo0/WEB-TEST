@@ -1,0 +1,431 @@
+{
+  "id": "run-1790657662972-3e8a4a",
+  "startedAt": "2026-09-29T04:54:22.978Z",
+  "finishedAt": "2026-09-29T04:55:41.362Z",
+  "status": "passed",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headed",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 14,
+  "executions": 14,
+  "expectedExecutions": 14,
+  "stats": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 1
+  },
+  "durationMs": 78384,
+  "tests": [
+    {
+      "title": "TC003 - Invalid Email",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC003_invalid_email.spec.js",
+      "line": 16,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 15477,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/0-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/0-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC004 - Empty Fields",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC004_empty_fields.spec.js",
+      "line": 15,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 15736,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/1-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/1-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Invalid Password",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC002_invalid_password.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 15939,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/2-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/2-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC001 - Valid Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC001_valid_login.spec.js",
+      "line": 12,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 20025,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/3-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/3-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC006 - Remember Me",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC006_remember_me.spec.js",
+      "line": 22,
+      "project": "chromium",
+      "status": "skipped",
+      "duration": 14769,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/4-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/4-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": "No \"Remember Me\" control on the login page — see file header."
+    },
+    {
+      "title": "TC008 - Login with Deactivated Account (gap)",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC008_deactivated_account.spec.js",
+      "line": 26,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 11392,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/5-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/5-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC007 - Invalid Email Format",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC007_invalid_email_format.spec.js",
+      "line": 17,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 17093,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/6-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/6-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC005 - Password Recovery Link",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC005_password_recovery_link.spec.js",
+      "line": 17,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 18105,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/7-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/7-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC012 - Whitespace-Padded Email Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC012_whitespace_padded_email.spec.js",
+      "line": 23,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 15063,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/8-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/8-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC011 - Case-Insensitive Email Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC011_case_insensitive_email.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 15577,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/9-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/9-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC010 - Password Field Masked",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC010_password_field_masked.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 18195,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/10-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/10-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC009 - Login Session Expiry",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC009_session_expiry.spec.js",
+      "line": 19,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 22113,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/11-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/11-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC013 - Enter Key Submits The Login Form",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC013_enter_key_submits_form.spec.js",
+      "line": 20,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 13087,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/12-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/12-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC014 - End-to-End Login Journey",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js",
+      "line": 35,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 22089,
+      "attempts": 1,
+      "error": null,
+      "steps": [
+        {
+          "title": "Login page loads with a masked password field",
+          "error": false,
+          "duration": 5067
+        },
+        {
+          "title": "Empty submit is rejected",
+          "error": false,
+          "duration": 2709
+        },
+        {
+          "title": "Wrong password is rejected",
+          "error": false,
+          "duration": 2973
+        },
+        {
+          "title": "Valid login (uppercase email, Enter key) lands on Buzz",
+          "error": false,
+          "duration": 1795
+        },
+        {
+          "title": "Profile menu shows the signed-in account",
+          "error": false,
+          "duration": 1348
+        },
+        {
+          "title": "Session survives a reload and /login bounces back to Buzz",
+          "error": false,
+          "duration": 1899
+        },
+        {
+          "title": "Cancelling logout keeps the session",
+          "error": false,
+          "duration": 1638
+        },
+        {
+          "title": "Confirming logout signs out and protects Buzz",
+          "error": false,
+          "duration": 3110
+        }
+      ],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/13-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657662972-3e8a4a/13-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

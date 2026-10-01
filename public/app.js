@@ -1185,7 +1185,10 @@
       skipped = 0,
       durationSum = 0,
       durationCount = 0;
+    var known = Object.keys(STATE.testsById).length > 0;
     Object.keys(STATE.testHistory).forEach(function (key) {
+      // Only cases that still exist — history also holds results for deleted/renamed specs.
+      if (known && !STATE.testsById[key]) return;
       var pt = mostRecentPoint(STATE.testHistory[key]);
       if (!pt) return;
       if (pt.status === 'passed') passed++;
@@ -1250,13 +1253,120 @@
             '<tr><td class="cell-id">' + shortId(r.id) + '</td><td class="cell-name">' + r.totalCases + ' cases</td><td>' +
             r.browsers.map(bchip).join(' ') +
             '</td><td class="mono">' + r.executions + '</td>' +
-            '<td class="mono" style="color:var(--success);">' + r.stats.passed + '</td>' +
+            '<td class="mono">' + r.stats.passed + '</td>' +
             '<td class="mono" style="color:' + (r.stats.failed ? 'var(--danger)' : 'var(--text-faint)') + ';">' + r.stats.failed + '</td>' +
             '<td class="mono">' + fmtDuration(r.durationMs) + '</td><td>' + badge(r.status === 'passed' ? 'passed' : r.status === 'cancelled' ? 'skipped' : 'failed') + '</td>' +
             '<td class="cell-id">' + fmtWhen(r.finishedAt) + '</td></tr>'
           );
         })
         .join('') || '<tr><td colspan="9" style="text-align:center;color:var(--text-faint);padding:30px;">No runs yet — start one from Test Runs.</td></tr>';
+    renderOverviewExtras();
+  }
+
+  // The rest of the Overview: run trend, suite-wide standing, per-suite health, currently
+  // failing tests and open bugs. Safe to call whenever any of its sources (suites, test
+  // history, run history, reports, bugs) lands — it renders whatever is there so far.
+  function ovStack(p, f, sk, total) {
+    var w = function (n) { return (total ? (n / total) * 100 : 0) + '%'; };
+    return '<div class="ov-stack"><i class="p" style="width:' + w(p) + '"></i><i class="f" style="width:' + w(f) + '"></i><i class="s" style="width:' + w(sk) + '"></i></div>';
+  }
+  function ovRate(p, f) {
+    return p + f ? Math.round((p / (p + f)) * 100) + '%' : '—';
+  }
+  function renderOverviewExtras() {
+    // ---- latest result of every case, per suite and per browser ----
+    var all = { p: 0, f: 0, s: 0, n: 0 };
+    var browsers = {};
+    var rows = STATE.suites.map(function (suite) {
+      var st = { name: suite.name, cases: suite.cases.length, p: 0, f: 0, s: 0, n: 0, last: null };
+      suite.cases.forEach(function (c) {
+        var entry = STATE.testHistory[c.id];
+        var pt = mostRecentPoint(entry);
+        if (!pt) { st.n++; return; }
+        if (pt.status === 'passed') st.p++;
+        else if (pt.status === 'skipped') st.s++;
+        else st.f++;
+        if (!st.last || pt.finishedAt > st.last) st.last = pt.finishedAt;
+        Object.keys(entry.byProject).forEach(function (proj) {
+          var b = (browsers[proj] = browsers[proj] || { p: 0, f: 0, s: 0 });
+          var s2 = entry.byProject[proj].status;
+          if (s2 === 'passed') b.p++;
+          else if (s2 === 'skipped') b.s++;
+          else b.f++;
+        });
+      });
+      all.p += st.p; all.f += st.f; all.s += st.s; all.n += st.n;
+      return st;
+    });
+    var totalCases = all.p + all.f + all.s + all.n;
+    $('kpi-notrun').textContent = totalCases ? all.n : '—';
+    $('kpi-notrun-sub').textContent = totalCases ? Math.round((all.n / totalCases) * 100) + '% of all cases' : 'of all cases';
+
+    // ---- where the suite stands ----
+    var legend = [['Passing', all.p, 'var(--accent)'], ['Failing', all.f, 'var(--danger)'], ['Skipped', all.s, 'var(--border-strong)'], ['Not yet run', all.n, 'var(--surface-3)']];
+    var browserKeys = Object.keys(browsers).sort();
+    $('ov-coverage').innerHTML = !totalCases
+      ? '<div class="ov-empty">No test cases found.</div>'
+      : ovStack(all.p, all.f, all.s, totalCases) +
+        '<div class="ov-legend">' +
+        legend.map(function (l) {
+          return '<div><div class="n">' + l[1] + '</div><div class="l"><span class="sw" style="background:' + l[2] + '"></span>' + l[0] + '</div></div>';
+        }).join('') +
+        '</div><div class="ov-h3">By browser</div>' +
+        (browserKeys.map(function (k) {
+          var b = browsers[k];
+          var ran = b.p + b.f + b.s;
+          return '<div class="ov-brow"><div>' + bchip(k) + '</div>' + ovStack(b.p, b.f, b.s, ran) +
+            '<div class="r">' + ovRate(b.p, b.f) + ' · ' + ran + ' run</div></div>';
+        }).join('') || '<div class="ov-empty" style="padding:8px 0;">Nothing has run yet.</div>');
+
+    // ---- suite health ----
+    $('ov-suites').innerHTML = rows.map(function (r) {
+      return '<tr><td class="cell-name">' + esc(r.name) + '</td><td class="mono">' + r.cases + '</td><td>' + ovStack(r.p, r.f, r.s, r.cases) + '</td>' +
+        '<td class="mono">' + r.p + '</td>' +
+        '<td class="mono" style="color:' + (r.f ? 'var(--danger)' : 'var(--text-faint)') + ';">' + r.f + '</td>' +
+        '<td class="mono" style="color:' + (r.n ? 'var(--text-muted)' : 'var(--text-faint)') + ';">' + r.n + '</td>' +
+        '<td class="mono">' + ovRate(r.p, r.f) + '</td><td class="cell-id">' + (r.last ? fmtWhen(r.last) : 'never') + '</td></tr>';
+    }).join('') || '<tr><td colspan="8" class="ov-empty">No suites found.</td></tr>';
+
+    // ---- pass rate by run (oldest -> newest) ----
+    var runs = STATE.historyRuns.filter(function (r) { return r.stats.passed + r.stats.failed > 0; }).slice(0, 14).reverse();
+    if (!runs.length) {
+      $('ov-trend').innerHTML = '<div class="ov-empty">No runs yet — start one from Test Runs.</div>';
+    } else {
+      var sum = 0;
+      var bars = runs.map(function (r) {
+        var rate = Math.round((r.stats.passed / (r.stats.passed + r.stats.failed)) * 100);
+        sum += rate;
+        var tip = shortId(r.id) + ' · ' + r.stats.passed + ' passed, ' + r.stats.failed + ' failed · ' + fmtWhen(r.finishedAt);
+        return '<div class="col' + (rate < 70 ? ' low' : '') + '" title="' + esc(tip) + '"><span class="pct">' + rate + '</span><div class="track"><div class="bar" style="height:' + Math.max(rate, 3) + '%"></div></div></div>';
+      }).join('');
+      $('ov-trend').innerHTML = '<div class="ov-trend">' + bars + '</div><div class="ov-trend-foot"><span>' + fmtWhen(runs[0].finishedAt) +
+        '</span><span>Average ' + Math.round(sum / runs.length) + '% over ' + runs.length + ' run' + (runs.length === 1 ? '' : 's') + '</span><span>' + fmtWhen(runs[runs.length - 1].finishedAt) + '</span></div>';
+    }
+
+    // ---- needs attention ----
+    var rep = STATE.reports;
+    if (rep) {
+      var broken = rep.broken || [];
+      $('ov-attention-sub').textContent = all.f + ' failing · ' + (rep.flaky || []).length + ' flaky · ' + (rep.crossBrowser || []).length + ' differ between browsers';
+      $('ov-attention').innerHTML = broken.slice(0, 6).map(function (b) {
+        return '<div class="ov-item"><div class="main"><div class="t">' + esc(b.title) + '</div><div class="m"><span>' + esc(b.suite) + '</span>' + bchip(b.project) +
+          '<span>failing for ' + b.runsFailing + ' run' + (b.runsFailing === 1 ? '' : 's') + '</span></div>' +
+          (b.errorMessage ? '<div class="e">' + esc(String(b.errorMessage).split('\n')[0]) + '</div>' : '') +
+          '</div><div class="side">since ' + fmtWhen(b.failingSince) + '</div></div>';
+      }).join('') || '<div class="ov-empty">Nothing is failing right now.</div>';
+    }
+
+    // ---- open bugs ----
+    var sevOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+    var open = (STATE.bugs || []).filter(function (b) { return !/fixed|closed|resolved/i.test(b.status || ''); });
+    open.sort(function (a, b) { return (sevOrder[a.severity] == null ? 9 : sevOrder[a.severity]) - (sevOrder[b.severity] == null ? 9 : sevOrder[b.severity]); });
+    $('ov-bugs-sub').textContent = open.length + ' open of ' + (STATE.bugs || []).length + ' logged';
+    $('ov-bugs').innerHTML = open.slice(0, 6).map(function (b) {
+      return '<div class="ov-item"><div class="main"><div class="t">' + esc(b.title) + '</div><div class="m"><span class="mono">' + esc(b.id) + '</span><span class="ov-sev ' + esc(b.severity || '') + '">' + esc(b.severity || 'unrated') + '</span>' +
+        (b.browsers || []).map(bchip).join('') + '</div></div><div class="side">found ' + esc(b.foundAt || '—') + '</div></div>';
+    }).join('') || '<div class="ov-empty">No open bugs.</div>';
   }
 
   // ---------------------------------------------------------------------
@@ -1582,6 +1692,7 @@
       .then(function (data) {
         if (myId !== reportsReqId) return; // a newer request already landed — drop this stale one
         STATE.reports = data;
+        renderOverviewExtras();
         renderSuiteSummary(data.suites || []);
         renderFlaky(data.flaky || []);
         renderBroken(data.broken || []);
@@ -2097,6 +2208,7 @@
       })
       .then(function (data) {
         STATE.bugs = data.bugs || [];
+        renderOverviewExtras();
         renderBugs();
       })
       .catch(function () {
@@ -2671,6 +2783,7 @@
       loadQueue();
       if ($('bug-drawer').classList.contains('show')) renderBugTestList();
       loadGit();
+      loadReports();
       return loadBugs();
     });
 })();

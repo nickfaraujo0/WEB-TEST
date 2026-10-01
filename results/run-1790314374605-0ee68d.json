@@ -1,0 +1,193 @@
+{
+  "id": "run-1790314374605-0ee68d",
+  "startedAt": "2026-09-25T05:32:54.608Z",
+  "finishedAt": "2026-09-25T05:34:10.344Z",
+  "status": "cancelled",
+  "browsers": [
+    "chromium",
+    "firefox",
+    "webkit"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 1,
+  "executions": 3,
+  "expectedExecutions": 3,
+  "stats": {
+    "passed": 0,
+    "failed": 3,
+    "skipped": 0
+  },
+  "durationMs": 75736,
+  "tests": [
+    {
+      "title": "TC014 - End-to-End Login Journey",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js",
+      "line": 35,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 21057,
+      "attempts": 3,
+      "error": {
+        "message": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('dialog')\nExpected substring: \"Invalid email or password\"\nReceived string:    \"Login FailedToo many attempts. Try again laterOK\"\nTimeout: 15000ms\n\nCall log:\n  - Expect \"toContainText\" getByRole('dialog') with timeout 15000ms\n  - waiting for getByRole('dialog')\n    - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error ant-zoom-appear ant-zoom-appear-active ant-zoom\">…</div>\n    27 × unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n       - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error\">…</div>\n    - unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n",
+        "stack": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('dialog')\nExpected substring: \"Invalid email or password\"\nReceived string:    \"Login FailedToo many attempts. Try again laterOK\"\nTimeout: 15000ms\n\nCall log:\n  - Expect \"toContainText\" getByRole('dialog') with timeout 15000ms\n  - waiting for getByRole('dialog')\n    - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error ant-zoom-appear ant-zoom-appear-active ant-zoom\">…</div>\n    27 × unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n       - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error\">…</div>\n    - unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n\n    at /Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js:73:41\n    at /Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js:71:3"
+      },
+      "steps": [
+        {
+          "title": "Login page loads with a masked password field",
+          "error": false,
+          "duration": 2766
+        },
+        {
+          "title": "Empty submit is rejected",
+          "error": false,
+          "duration": 1534
+        },
+        {
+          "title": "Wrong password is rejected",
+          "error": true,
+          "duration": 15111
+        }
+      ],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-chromium-retry2/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-chromium-retry2/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-chromium-retry2/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-chromium-retry2/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Assertion",
+      "reason": null
+    },
+    {
+      "title": "TC014 - End-to-End Login Journey",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js",
+      "line": 35,
+      "project": "webkit",
+      "status": "failed",
+      "duration": 25010,
+      "attempts": 2,
+      "error": {
+        "message": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('dialog')\nExpected substring: \"Invalid email or password\"\nReceived string:    \"Login FailedToo many attempts. Try again laterOK\"\nTimeout: 15000ms\n\nCall log:\n  - Expect \"toContainText\" getByRole('dialog') with timeout 15000ms\n  - waiting for getByRole('dialog')\n    - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error ant-zoom-appear ant-zoom-appear-start ant-zoom\">…</div>\n    28 × unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n       - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error\">…</div>\n    - unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n",
+        "stack": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('dialog')\nExpected substring: \"Invalid email or password\"\nReceived string:    \"Login FailedToo many attempts. Try again laterOK\"\nTimeout: 15000ms\n\nCall log:\n  - Expect \"toContainText\" getByRole('dialog') with timeout 15000ms\n  - waiting for getByRole('dialog')\n    - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error ant-zoom-appear ant-zoom-appear-start ant-zoom\">…</div>\n    28 × unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n       - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error\">…</div>\n    - unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n\n    at /Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js:73:41\n    at /Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js:71:3"
+      },
+      "steps": [
+        {
+          "title": "Login page loads with a masked password field",
+          "error": false,
+          "duration": 4113
+        },
+        {
+          "title": "Empty submit is rejected",
+          "error": false,
+          "duration": 2003
+        },
+        {
+          "title": "Wrong password is rejected",
+          "error": true,
+          "duration": 15314
+        }
+      ],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-webkit-retry1/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-webkit-retry1/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-webkit-retry1/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-webkit-retry1/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Assertion",
+      "reason": null
+    },
+    {
+      "title": "TC014 - End-to-End Login Journey",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js",
+      "line": 35,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 21971,
+      "attempts": 2,
+      "error": {
+        "message": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('dialog')\nExpected substring: \"Invalid email or password\"\nReceived string:    \"Login FailedToo many attempts. Try again laterOK\"\nTimeout: 15000ms\n\nCall log:\n  - Expect \"toContainText\" getByRole('dialog') with timeout 15000ms\n  - waiting for getByRole('dialog')\n    - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error ant-zoom-appear ant-zoom-appear-prepare ant-zoom\">…</div>\n    27 × unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n       - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error\">…</div>\n    - unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n",
+        "stack": "Error: expect(locator).toContainText(expected) failed\n\nLocator: getByRole('dialog')\nExpected substring: \"Invalid email or password\"\nReceived string:    \"Login FailedToo many attempts. Try again laterOK\"\nTimeout: 15000ms\n\nCall log:\n  - Expect \"toContainText\" getByRole('dialog') with timeout 15000ms\n  - waiting for getByRole('dialog')\n    - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error ant-zoom-appear ant-zoom-appear-prepare ant-zoom\">…</div>\n    27 × unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n       - locator resolved to <div role=\"dialog\" aria-modal=\"true\" class=\"ant-modal css-1xg9z9n ant-modal-confirm ant-modal-confirm-error\">…</div>\n    - unexpected value \"Login FailedToo many attempts. Try again laterOK\"\n\n    at /Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js:73:41\n    at /Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js:71:3"
+      },
+      "steps": [
+        {
+          "title": "Login page loads with a masked password field",
+          "error": false,
+          "duration": 3557
+        },
+        {
+          "title": "Empty submit is rejected",
+          "error": false,
+          "duration": 1381
+        },
+        {
+          "title": "Wrong password is rejected",
+          "error": true,
+          "duration": 15128
+        }
+      ],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-firefox-retry1/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-firefox-retry1/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-firefox-retry1/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-firefox-retry1/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Assertion",
+      "reason": null
+    }
+  ]
+}

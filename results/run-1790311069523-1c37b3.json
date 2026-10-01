@@ -1,0 +1,195 @@
+{
+  "id": "run-1790311069523-1c37b3",
+  "startedAt": "2026-09-25T04:37:49.524Z",
+  "finishedAt": "2026-09-25T04:40:16.020Z",
+  "status": "failed",
+  "browsers": [
+    "chromium",
+    "firefox"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 4,
+  "executions": 8,
+  "expectedExecutions": 8,
+  "stats": {
+    "passed": 6,
+    "failed": 2,
+    "skipped": 0
+  },
+  "durationMs": 146496,
+  "tests": [
+    {
+      "title": "TC004 - Empty Fields",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC004_empty_fields.spec.js",
+      "line": 15,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 16150,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC005 - Password Recovery Link",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC005_password_recovery_link.spec.js",
+      "line": 17,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 16220,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC001 - Verify that Buzz is the default screen",
+      "suite": "Buzz",
+      "file": "/Users/nick/Documents/web test/test-cases/buzz/TC001_buzz_default_screen.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 16479,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Verify Buzz list is scrollable",
+      "suite": "Buzz",
+      "file": "/Users/nick/Documents/web test/test-cases/buzz/TC002_buzz_list_scrollable.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 21924,
+      "attempts": 3,
+      "error": {
+        "message": "Error: expect(locator).toBeInViewport() failed\n\nLocator:  locator('.infinite-scroll-component > div.shadow-lg').last()\nExpected: in viewport\nReceived: viewport ratio 0\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toBeInViewport\" locator('.infinite-scroll-component > div.shadow-lg').last() with timeout 15000ms\n  - waiting for locator('.infinite-scroll-component > div.shadow-lg').last()\n    32 × locator resolved to <div id=\"FxEBH0GCsNlTq1TJTji4\" class=\"w-screen sm:w-full border-solid  xs:border-adminSubtle bg-white shadow-lg z-0↵       sm:rounded-card border-[0.5px] xs:border-[1px] pt-6 pb-2 xs:my-4 max-w-[680px] mx-auto\">…</div>\n       - unexpected value \"viewport ratio 0\"\n",
+        "stack": "Error: expect(locator).toBeInViewport() failed\n\nLocator:  locator('.infinite-scroll-component > div.shadow-lg').last()\nExpected: in viewport\nReceived: viewport ratio 0\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toBeInViewport\" locator('.infinite-scroll-component > div.shadow-lg').last() with timeout 15000ms\n  - waiting for locator('.infinite-scroll-component > div.shadow-lg').last()\n    32 × locator resolved to <div id=\"FxEBH0GCsNlTq1TJTji4\" class=\"w-screen sm:w-full border-solid  xs:border-adminSubtle bg-white shadow-lg z-0↵       sm:rounded-card border-[0.5px] xs:border-[1px] pt-6 pb-2 xs:my-4 max-w-[680px] mx-auto\">…</div>\n       - unexpected value \"viewport ratio 0\"\n\n    at /Users/nick/Documents/web test/test-cases/buzz/TC002_buzz_list_scrollable.spec.js:31:26"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-chromium-retry2/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-chromium-retry2/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-chromium-retry2/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-chromium-retry2/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Assertion",
+      "reason": null
+    },
+    {
+      "title": "TC004 - Empty Fields",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC004_empty_fields.spec.js",
+      "line": 15,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 41716,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC001 - Verify that Buzz is the default screen",
+      "suite": "Buzz",
+      "file": "/Users/nick/Documents/web test/test-cases/buzz/TC001_buzz_default_screen.spec.js",
+      "line": 14,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 45772,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC005 - Password Recovery Link",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC005_password_recovery_link.spec.js",
+      "line": 17,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 13672,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Verify Buzz list is scrollable",
+      "suite": "Buzz",
+      "file": "/Users/nick/Documents/web test/test-cases/buzz/TC002_buzz_list_scrollable.spec.js",
+      "line": 14,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 21921,
+      "attempts": 3,
+      "error": {
+        "message": "Error: expect(locator).toBeInViewport() failed\n\nLocator:  locator('.infinite-scroll-component > div.shadow-lg').last()\nExpected: in viewport\nReceived: viewport ratio 0\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toBeInViewport\" locator('.infinite-scroll-component > div.shadow-lg').last() with timeout 15000ms\n  - waiting for locator('.infinite-scroll-component > div.shadow-lg').last()\n    32 × locator resolved to <div id=\"GYLBsrPbU04rdDVgbPKU\" class=\"w-screen sm:w-full border-solid  xs:border-adminSubtle bg-white shadow-lg z-0↵       sm:rounded-card border-[0.5px] xs:border-[1px] pt-6 pb-2 xs:my-4 max-w-[680px] mx-auto\">…</div>\n       - unexpected value \"viewport ratio 0\"\n",
+        "stack": "Error: expect(locator).toBeInViewport() failed\n\nLocator:  locator('.infinite-scroll-component > div.shadow-lg').last()\nExpected: in viewport\nReceived: viewport ratio 0\nTimeout:  15000ms\n\nCall log:\n  - Expect \"toBeInViewport\" locator('.infinite-scroll-component > div.shadow-lg').last() with timeout 15000ms\n  - waiting for locator('.infinite-scroll-component > div.shadow-lg').last()\n    32 × locator resolved to <div id=\"GYLBsrPbU04rdDVgbPKU\" class=\"w-screen sm:w-full border-solid  xs:border-adminSubtle bg-white shadow-lg z-0↵       sm:rounded-card border-[0.5px] xs:border-[1px] pt-6 pb-2 xs:my-4 max-w-[680px] mx-auto\">…</div>\n       - unexpected value \"viewport ratio 0\"\n\n    at /Users/nick/Documents/web test/test-cases/buzz/TC002_buzz_list_scrollable.spec.js:31:26"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-firefox-retry2/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-firefox-retry2/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-firefox-retry2/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/buzz-TC002_buzz_list_scrol-4204f-ify-Buzz-list-is-scrollable-firefox-retry2/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Assertion",
+      "reason": null
+    }
+  ]
+}

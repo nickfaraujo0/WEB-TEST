@@ -19,6 +19,24 @@ const TEST_RESULTS_DIR = path.join(ROOT, 'test-results');
 const TEST_CASES_DIR = path.join(ROOT, 'test-cases');
 
 const app = express();
+// Shared/hosted mode: set HIVE_AUTH_USER + HIVE_AUTH_PASS to require a login on everything.
+// Loopback requests are exempt — the Playwright reporter posts run events back to this
+// server over 127.0.0.1 from inside the container.
+(function () {
+  const user = process.env.HIVE_AUTH_USER;
+  const pass = process.env.HIVE_AUTH_PASS;
+  if (!user || !pass) return;
+  const want = Buffer.from(user + ':' + pass);
+  app.use((req, res, next) => {
+    const a = req.socket.remoteAddress || '';
+    if (a === '127.0.0.1' || a === '::1' || a === '::ffff:127.0.0.1') return next();
+    const m = /^Basic (.+)$/.exec(req.headers.authorization || '');
+    const got = m ? Buffer.from(m[1], 'base64') : Buffer.alloc(0);
+    if (got.length === want.length && crypto.timingSafeEqual(got, want)) return next();
+    res.set('WWW-Authenticate', 'Basic realm="HIVE"').status(401).send('Login required');
+  });
+})();
+
 app.use(express.json({ limit: '4mb' })); // frame screenshots (base64 JPEG) can be larger than the 100kb default
 app.use(express.static(path.join(ROOT, 'public')));
 

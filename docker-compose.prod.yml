@@ -1,0 +1,35 @@
+# Shared/hosted deployment:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Adds HTTPS via Caddy and closes direct access to port 4000. Requires HIVE_AUTH_USER/PASS in .env.
+services:
+  hive:
+    ports: !reset []
+    restart: unless-stopped
+    environment:
+      - BASE_URL=${BASE_URL:-https://hive-dev.thegritcity.com}
+      # Safe here only because the dashboard itself requires a login (HIVE_AUTH_*).
+      - SHEET_ALLOW_REMOTE=1
+      - HIVE_AUTH_USER=${HIVE_AUTH_USER:?set HIVE_AUTH_USER in .env}
+      - HIVE_AUTH_PASS=${HIVE_AUTH_PASS:?set HIVE_AUTH_PASS in .env}
+    # server/google-key.json is git-ignored; mount it in so the Google Sheet integration works.
+    volumes:
+      - ./results:/app/results
+      - ./test-results:/app/test-results
+      - ./data:/app/data
+      - ./test-cases:/app/test-cases
+      - ./server/google-key.json:/app/server/google-key.json:ro
+      - ./server/sheet-config.json:/app/server/sheet-config.json
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - HIVE_DOMAIN=${HIVE_DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - hive
+volumes:
+  caddy_data:

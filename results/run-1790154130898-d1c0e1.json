@@ -1,0 +1,71 @@
+{
+  "id": "run-1790154130898-d1c0e1",
+  "startedAt": "2026-09-23T09:02:10.898Z",
+  "finishedAt": "2026-09-23T09:02:22.564Z",
+  "status": "passed",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "dev",
+    "mode": "headless",
+    "workers": 2,
+    "retries": false
+  },
+  "totalCases": 3,
+  "executions": 3,
+  "expectedExecutions": 3,
+  "stats": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0
+  },
+  "durationMs": 11666,
+  "tests": [
+    {
+      "title": "TC001 - Valid Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC001_valid_login.spec.js",
+      "line": 12,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6327,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Invalid Password",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC002_invalid_password.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6510,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC003 - Invalid Email",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC003_invalid_email.spec.js",
+      "line": 16,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 3800,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "run-1789625836453-7e80bc",
+  "startedAt": "2026-09-17T06:17:16.457Z",
+  "finishedAt": "2026-09-17T06:18:31.636Z",
+  "status": "cancelled",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "production",
+    "mode": "headless",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 1,
+  "executions": 1,
+  "expectedExecutions": 1,
+  "stats": {
+    "passed": 0,
+    "failed": 1,
+    "skipped": 0
+  },
+  "durationMs": 75179,
+  "tests": [
+    {
+      "title": "TC001 - Valid Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC001_valid_login.spec.js",
+      "line": 12,
+      "project": "chromium",
+      "status": "timedOut",
+      "duration": 30214,
+      "attempts": 2,
+      "error": {
+        "message": "Test timeout of 30000ms exceeded.",
+        "stack": "Test timeout of 30000ms exceeded."
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC001_valid_login-TC001---Valid-Login-chromium-retry1/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC001_valid_login-TC001---Valid-Login-chromium-retry1/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC001_valid_login-TC001---Valid-Login-chromium-retry1/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC001_valid_login-TC001---Valid-Login-chromium-retry1/trace.zip",
+          "contentType": "application/zip"
+        }
+      ]
+    }
+  ]
+}
