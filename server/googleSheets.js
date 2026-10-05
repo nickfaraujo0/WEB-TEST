@@ -59,6 +59,7 @@ function config() {
   return {
     configured: !!(sheetId() && key),
     hasSheetId: !!sheetId(),
+    url: sheetId() ? 'https://docs.google.com/spreadsheets/d/' + encodeURIComponent(sheetId()) + '/edit' : null,
     hasKey: !!key,
     serviceAccountEmail: key ? key.client_email : null,
     keyFile: path.relative(ROOT, keyFilePath()),

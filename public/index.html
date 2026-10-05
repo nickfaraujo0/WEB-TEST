@@ -85,10 +85,6 @@
     </div>
 
     <div class="sidebar-bottom">
-      <div class="connect-row">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v6M15 3v6M6 9h12l-1 4a5 5 0 0 1-10 0L6 9Z"/><path d="M12 17v4"/></svg>
-        Connect CI
-      </div>
       <div class="stat-block">
         <div class="sh"><span class="l">Tests</span><span class="v" id="sb-ratio">0 / 0</span></div>
         <div class="stat-track"><div class="stat-fill" id="sb-fill" style="width:0%;"></div></div>
@@ -539,6 +535,7 @@
       <div class="topbar">
         <div><h1>Google Sheet</h1><div class="sub" id="sheet-sub">Edit the team sheet without leaving the dashboard</div></div>
         <div style="display:flex;gap:8px;">
+          <a class="btn" id="sheet-open" href="#" target="_blank" rel="noopener noreferrer" hidden>Open in Google Sheets ↗</a>
           <button class="btn" id="sheet-refresh">Refresh</button>
           <button class="btn primary" id="sheet-sync-creds">Sync credentials from code</button>
         </div>

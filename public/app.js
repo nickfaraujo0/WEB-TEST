@@ -2582,6 +2582,9 @@
     return sheetJson('/api/sheet/status')
       .then(function (st) {
         SHEET.status = st;
+        var open = $('sheet-open');
+        open.hidden = !st.url;
+        if (st.url) open.href = st.url;
         var ready = st.configured && !st.error;
         $('sheet-setup').hidden = ready;
         $('sheet-panel').hidden = !ready;
