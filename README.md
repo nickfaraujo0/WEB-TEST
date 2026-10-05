@@ -32,6 +32,23 @@ Firefox and WebKit, then dig into failures, flaky tests and history.
 
 ## Quick start
 
+### Fastest: the setup script
+
+```bash
+git clone https://github.com/TheGritCity/qagent-web-automation.git
+cd qagent-web-automation
+./setup.sh
+```
+
+It creates `.env`, checks for `server/google-key.json`, then starts the dashboard at
+**http://localhost:4000** with **Docker**, the standard way to run it. If Docker isn't installed or
+running, it falls back to plain Node (needs Node 20.12+). Force plain Node with `./setup.sh node`.
+Docker Desktop must be running before you start.
+
+The secrets are not in git. Get the filled-in `.env` and `server/google-key.json` from the team
+vault: `.env` goes in the repo root and `google-key.json` goes in `server/`. The manual steps
+below do the same thing by hand.
+
 ### 1. Test account credentials
 
 The suites sign in with real Hive dev accounts. These are **not** in the repo; they live in a
@@ -44,7 +61,7 @@ cp .env.example .env
 Fill in the values (ask a teammate). Playwright loads `.env` for the CLI, the dashboard and
 Docker alike. A test whose account isn't set fails with a message naming the missing variable.
 
-### 2a. Docker (recommended)
+### 2a. Docker (standard)
 
 Uses Microsoft's Playwright image, which ships all three browsers and their OS libraries, so it
 behaves the same on macOS, Windows and Linux. Requires only Docker (one-time ~2–3 GB image).
@@ -56,7 +73,7 @@ docker compose up --build
 Open **http://localhost:4000**. `results/`, `test-results/`, `data/` and `test-cases/` are
 bind-mounted, so history survives rebuilds and editing a spec needs no rebuild.
 
-### 2b. Without Docker
+### 2b. Without Docker (fallback)
 
 Requires Node.js 20.12+ (the config uses `process.loadEnvFile`).
 
@@ -111,6 +128,7 @@ artifacts/         Archived screenshots/videos/traces (last 20 runs, git-ignored
 test-results/      Playwright's own output, wiped each run (git-ignored)
 data/              Bug log and queue
 playwright.config.js   Projects: chromium, firefox, webkit
+setup.sh           One-command setup (Docker by default, Node fallback)
 Dockerfile, docker-compose*.yml, Caddyfile   Deployment
 ```
 
@@ -175,7 +193,7 @@ as **Editor**. The **Open in Google Sheets** button on the Google Sheet page is 
 
 ## Hosting for a team
 
-See [DEPLOY.md](DEPLOY.md). In short:
+Hosted mode is not documented yet. In short:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
