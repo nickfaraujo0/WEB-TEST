@@ -1,164 +1,183 @@
 # HIVE
 
-A web dashboard for selecting, running, and reviewing Playwright test suites. Runs
-locally as a small Node/Express app — no build step, no framework.
+A web dashboard for selecting, running and reviewing [Playwright](https://playwright.dev) test
+suites for the Hive web app (`hive-dev.thegritcity.com`).
 
-## Setup
+HIVE is a small Node/Express app with a plain HTML/CSS/JS front end — no build step, no
+framework, no database. Pick suites in the browser, watch them run live across Chromium,
+Firefox and WebKit, then dig into failures, flaky tests and history.
 
-### Test account credentials (do this first)
+## Features
 
-The suites sign in with real Hive dev accounts. Their emails and passwords are **not** in the
-repo — they go in a git-ignored `.env` file at the repo root:
+- **Test Runs** — choose suites or individual cases, browsers, environment, headed/headless
+  mode, workers and retries, then run. Runs can be queued; one executes at a time.
+- **Live Run** — real-time pass/fail board per browser, an embedded terminal, a live ETA, and a
+  small live screenshot of each browser (~every 700 ms).
+- **Results** — every run is saved with error messages, stack traces, steps and attachments
+  (screenshots, video, trace.zip).
+- **Test Cases** — last status and full per-browser history for every case.
+- **Reports** — suite summary, flaky-test detection, currently failing tests (with streak
+  length) and browser mismatches.
+- **Bugs** — a built-in bug log linked to failing tests.
+- **Git** — working-tree status, history and diffs of the test code.
+- **Google Sheet** — view and append to the master test sheet, and sync test credentials.
+- **Source editor** — view and edit spec files from the dashboard.
+
+## Quick start
+
+### 1. Test account credentials
+
+The suites sign in with real Hive dev accounts. These are **not** in the repo; they live in a
+git-ignored `.env` at the repo root.
 
 ```bash
 cp .env.example .env
 ```
 
-Then fill in the values (ask a teammate for them). Playwright loads `.env` automatically, for
-the CLI, the dashboard and Docker alike. A test that needs an account that isn't set fails
-with a message naming the missing variable.
+Fill in the values (ask a teammate). Playwright loads `.env` for the CLI, the dashboard and
+Docker alike. A test whose account isn't set fails with a message naming the missing variable.
 
+### 2a. Docker (recommended)
 
-### Docker (recommended — same environment on every machine)
-
-Playwright browsers need real OS-level libraries (fonts, codecs, GPU/display deps) that
-differ by platform and are the single biggest source of "works on my machine" failures —
-Docker sidesteps all of that by using Microsoft's own Playwright image, which ships
-Chromium/Firefox/WebKit already installed and working. What this actually buys anyone
-else running HIVE:
-
-- **One prerequisite instead of several** — just Docker installed. No "do you have
-  Node.js, the right version, did `npm install` run in the repo root and not
-  `test-cases/`, does Playwright have the OS libraries it needs" — all of that is already
-  baked into the image.
-- **Identical environment everywhere** — Windows, Mac, and Linux all run the exact same
-  container, so there's no host `node_modules` to get wrong and no OS-specific failure
-  mode (this is what fixes a "module not found" error from a fresh clone on Windows).
-- **One command to run it** — `docker compose up --build`, then open the dashboard. No
-  install dance to walk someone through.
-
-The one real tradeoff: a ~2-3GB one-time image download, since it bundles all three real
-browser engines *and* their OS-level dependencies (Playwright installed the normal way
-downloads less because it assumes the host already has those libraries — which is exactly
-the assumption that breaks on an unfamiliar machine).
+Uses Microsoft's Playwright image, which ships all three browsers and their OS libraries, so it
+behaves the same on macOS, Windows and Linux. Requires only Docker (one-time ~2–3 GB image).
 
 ```bash
 docker compose up --build
 ```
 
-Then open **http://localhost:4000**. Saved run history (`results/`), Playwright's
-screenshot/video/trace output (`test-results/`), and `test-cases/` are bind-mounted from
-the host, so run history survives a rebuild and editing or adding a spec doesn't need one.
+Open **http://localhost:4000**. `results/`, `test-results/`, `data/` and `test-cases/` are
+bind-mounted, so history survives rebuilds and editing a spec needs no rebuild.
 
-Without Compose:
+### 2b. Without Docker
 
-```bash
-docker build -t hive .
-docker run -p 4000:4000 -v "$(pwd)/results:/app/results" -v "$(pwd)/test-cases:/app/test-cases" hive
-```
-
-### Without Docker
+Requires Node.js 20.12+ (the config uses `process.loadEnvFile`).
 
 ```bash
-npm install
-npx playwright install   # downloads the Chromium/Firefox/WebKit binaries Playwright drives
+npm install                # run from the repo root, not test-cases/
+npx playwright install     # downloads Chromium, Firefox and WebKit
 npm start
 ```
 
-Then open **http://localhost:4000**. `npm install` must run from the repo root (not
-`test-cases/`, which has its own `package.json` for an unrelated reason — see below) or the
-server's own dependencies (Express, Playwright) never get installed.
+Open **http://localhost:4000**.
 
-## How it works
-
-- **Test Runs** — pick suites/cases and browsers, configure environment/mode/workers/retries,
-  then Run Tests. This POSTs to the server, which spawns the real `playwright test` CLI
-  with your selection as `file:line` arguments and `--project=<browser>` flags.
-- **Live Run** — a custom Playwright reporter (`server/reporter.js`) streams `test-begin` /
-  `test-end` events out of the running process over HTTP back to the server, which relays
-  them to the browser via Server-Sent Events. The three-column board updates in real time
-  as tests actually execute — this isn't simulated. Each column also shows a small live
-  screenshot of that browser (refreshed ~every 700ms) via `test-cases/_hive-live.mjs`, a
-  drop-in `page` fixture every spec imports instead of `@playwright/test` directly — no
-  need for headed mode or an external window to watch a run happen.
-- **Results** — every run is saved to `results/<runId>.json`, including real error messages,
-  stack traces, step-by-step breakdowns, and attachments (screenshots, video, trace.zip)
-  that Playwright captured on failure. Click a failed row to see all of it.
-- **Test Cases** — each row shows when it was last run and its latest status; click a row
-  to open its full history (every saved run it appeared in, per browser).
-- **Reports** — flaky-test detection over the last 10 runs, plus two
-  reports built from your full saved history (`server/testHistory.js`): **Currently
-  failing**, showing how many consecutive runs (and how long) each broken test has stayed
-  broken, per browser; and **Browser mismatches**, tests whose latest result differs
-  across browsers (passing on Chromium, failing on WebKit, etc.).
-
-## Project layout
+## Architecture
 
 ```
-server/           Express app, custom reporter, results store, test discovery
-public/           Frontend — index.html, styles.css, app.js (no build step)
-test-cases/       Playwright specs (see "Test cases" below)
-results/          Saved run JSON (gitignored)
+Browser (public/)
+   │  REST /api/*              ▲ SSE /api/stream (events + live frames)
+   ▼                           │
+Express server (server/index.js, port 4000)
+   │  spawn `playwright test file:line --project=… --workers=…`
+   ▼
+Playwright child process ── test-cases/**
+   ├─ server/reporter.js     ── POST /internal/event ─▶ server ─SSE─▶ browser
+   └─ test-cases/_hive-live.mjs ─ POST /internal/frame ─▶ server ─SSE─▶ browser
+```
+
+1. The dashboard `POST`s a selection to `/api/run`.
+2. The server spawns the real `playwright test` CLI with `file:line` arguments and
+   `--project=<browser>` flags.
+3. A custom reporter (`server/reporter.js`) posts `test-begin`/`test-end` events back to the
+   server over loopback, which relays them to the browser via Server-Sent Events.
+4. Each spec imports `page` from `_hive-live.mjs`, which streams periodic screenshots the same way.
+5. On completion the run is saved to `results/<runId>.json` and its artifacts are archived to
+   `artifacts/<runId>/`.
+
+### Project layout
+
+```
+server/            Express app and supporting modules
+  index.js           routes, run/queue management, SSE
+  reporter.js        custom Playwright reporter
+  store.js           run records + artifact archiving
+  testLister.js      discovers tests via `playwright test --list`
+  testHistory.js     per-test history, flaky/failing/mismatch reports
+  bugStore.js        bug log (data/bugs.json)
+  gitInfo.js         git status/history/diff
+  googleSheets.js, credentialsSheet.js   Google Sheet integration
+  classify.js        failure classification
+public/            Front end: index.html, app.js, styles.css, sheet.css
+test-cases/        Playwright specs, grouped by feature (+ shared helpers)
+results/           Saved run JSON (one file per run)
+artifacts/         Archived screenshots/videos/traces (last 20 runs, git-ignored)
+test-results/      Playwright's own output, wiped each run (git-ignored)
+data/              Bug log and queue
 playwright.config.js   Projects: chromium, firefox, webkit
+Dockerfile, docker-compose*.yml, Caddyfile   Deployment
 ```
 
-## Test cases
+## Test suites
 
-Drop Playwright spec files into `test-cases/` (`*.spec.js` or `*.spec.ts`). The dashboard
-discovers tests by running `playwright test --list`, so anything Playwright can see there
-shows up automatically on the Test Runs page — nothing to register by hand.
+All suites run against `https://hive-dev.thegritcity.com`.
 
-### What's here now
+| Suite | Specs | Covers |
+|---|---:|---|
+| `login/` | 14 | Valid/invalid login, password recovery, session expiry |
+| `onboarding/` | 18 | Sign-up flow, role-specific fields, validation |
+| `buzz/` | 54 | Buzz feed: create/edit/delete, recipients, boards, sharing, formatting |
+| `likes-comments/` | 34 | Likes and comments |
+| `opportunities/` | 27 | Listings: create, apply, eligibility, uploads, sharing |
+| `courses/` | 116 | Courses and schedule |
+| `profile/` | 31 | Profile |
+| `reports/` | 34 | Attendance and assessment reports |
 
-Four suites imported from `DroidSwarm/DroidSwarmQAgent-Knowledge/tests/web`, all running
-against `https://hive-dev.thegritcity.com`:
+The master list of test cases is the live Google Sheet "(master)". Blue tabs are the cases
+already ported to web; uncoloured tabs are still to port.
 
-- **login/** (12 cases) — valid/invalid login, password recovery, session expiry
-- **buzz/** (16 cases) — the Buzz feed: create/edit/delete, role restrictions, sharing
-- **onboarding/** (18 cases) — sign-up flow, role-specific fields, validation
-- **opportunities/** (26 cases) — listings: create, apply, eligibility, file upload, sharing
+### Writing a test
 
-Each feature folder has its own page-object file(s) (e.g. `login/login-page.js`) that the
-`TC0xx_*.spec.js` files import from — keep new specs for a feature in the same folder so
-they can share the page object instead of duplicating selectors.
+Drop a `TC0xx_name.spec.js` into the matching `test-cases/<feature>/` folder. The dashboard finds
+it automatically via `playwright test --list` — nothing to register.
 
-Login credentials live in `test-cases/login/credentials.js` — throwaway dev-account
-fallbacks (`nolan@wafer.ee` etc.), overridable by setting the matching env var
-(`HIVE_VALID_EMAIL`, `HIVE_VALID_PASSWORD`, ...) before `npm start`.
+- Import `test`/`expect` and the `page` fixture from `_hive-live.mjs` (not directly from
+  `@playwright/test`) so the live screenshot stream works.
+- Keep selectors in the feature's page-object files (e.g. `buzz/buzz-page.js`) rather than duplicating them.
+- `test-cases/` is an ES-module boundary (`"type": "module"`); the server stays CommonJS.
+- To respect the Environment picker use relative URLs (`page.goto('/login')`, resolved against
+  `BASE_URL`). The existing page objects hardcode the dev URL.
 
-`test-cases/` is an ES module boundary (`test-cases/package.json` sets `"type": "module"`)
-because these specs use `import`/`export` — the rest of the project (the server) stays
-CommonJS. New specs can use either `import` or `require`, since Playwright's test runner
-supports both regardless of this setting; only plain `.js` files run *outside* Playwright's
-own transform would need to match.
+**How suites are grouped in the dashboard:** a file with two or more top-level `test.describe`
+blocks keeps each as its own suite; otherwise tests are grouped by parent folder. Nested describes
+are folded into the title as `Parent > Child > test`.
 
-### How suites are grouped in the dashboard
+## Configuration
 
-- A file with **two or more** distinct top-level `test.describe(...)` blocks keeps each one
-  as its own suite, named after the describe title — the author deliberately split it.
-- Everything else — a file with no `describe()`, or exactly one wrapping a couple of related
-  checks (the pattern most of the specs above use: one `TC0xx_*.spec.js` file per test case)
-  — is grouped by its **parent folder**, so `login/TC001_valid_login.spec.js` and eleven
-  siblings all land under one "Login" suite instead of twelve tiny ones.
-- Describe blocks nested deeper than that are folded into the case title as
-  `Parent > Child > test name`.
+Set in `.env` (see `.env.example`) or the environment.
 
-## Environments
+| Variable | Purpose |
+|---|---|
+| `HIVE_VALID_EMAIL` / `_PASSWORD` | Main Professor (Faculty) account |
+| `HIVE_STUDENT_EMAIL` / `_PASSWORD` | Student account |
+| `HIVE_PROFESSOR2_EMAIL` / `_PASSWORD` | Second Professor |
+| `HIVE_DEACTIVATED_EMAIL` / `_PASSWORD` | Deactivated account (Login TC008) |
+| `BASE_URL` | Environment under test (default `https://hive-dev.thegritcity.com`) |
+| `PORT` | Dashboard port (default `4000`) |
+| `ARTIFACT_KEEP_RUNS` | Runs whose artifacts are kept (default `20`) |
+| `HIVE_AUTH_USER` / `HIVE_AUTH_PASS` | Require basic-auth login on the dashboard (hosted mode) |
+| `HIVE_DOMAIN` | Public hostname Caddy serves in hosted mode |
+| `GOOGLE_SERVICE_ACCOUNT_FILE`, `GOOGLE_SHEET_ID` | Google Sheet integration |
+| `SHEET_ALLOW_REMOTE` | Allow Sheet routes for non-local requests (only safe behind auth) |
+| `HIVE_STUDENT_POOL_EMAIL_PATTERN` / `_RANGE` / `_PASSWORD` | Student account pool used by the credentials sync |
 
-The Environment picker on Test Runs (Dev / Staging / Production) sets `BASE_URL` for the
-run, matched to the URLs on the Settings page. **Dev** defaults to
-`https://hive-dev.thegritcity.com`, matching where the imported suites actually run —
-their page objects hardcode this URL directly rather than reading `BASE_URL`, so it works
-regardless of which environment card is selected. Staging/Production are still
-placeholders; edit `ENV_URLS` in `public/app.js` (and the Settings page markup) once those
-exist.
+### Google Sheet integration
 
-Tests run against the `baseURL` Playwright config option, which the dashboard sets from the
-`BASE_URL` environment variable per run. The imported suites hardcode
-`https://hive-dev.thegritcity.com` directly in their page objects rather than using
-`baseURL`, so they work the same regardless of which environment card is selected. A new
-suite that wants to respect the picker should use relative paths instead:
+Place a service-account key at `server/google-key.json` (git-ignored) and configure
+`server/sheet-config.json`. Share the sheet with the service account's email.
 
-```js
-await page.goto('/login'); // resolved against BASE_URL
+## Hosting for a team
+
+See [DEPLOY.md](DEPLOY.md). In short:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+This adds Caddy for automatic HTTPS, closes direct access to port 4000, and requires
+`HIVE_AUTH_USER`/`HIVE_AUTH_PASS`. Never expose port 4000 directly: `/api/source` can rewrite specs,
+which are executed code.
+
+## Languages and stack
+
+JavaScript throughout (Node.js/CommonJS server, vanilla browser JS, ES-module test helpers), plus
+HTML, CSS, JSON and YAML config. Runtime dependencies: `express` and `@playwright/test`.

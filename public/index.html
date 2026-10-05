@@ -106,19 +106,20 @@
       <div class="topbar">
         <div><h1>Overview</h1><div class="sub">Playwright suite health across environments</div></div>
         <div style="display:flex;align-items:center;gap:16px;">
-          <div class="live-pill"><span class="dot"></span>Live</div>
-          <button class="icon-btn" title="Environment"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
+          <button type="button" class="live-pill" title="Open Live Run"><span class="dot"></span><span class="lp-text">Connecting…</span></button>
+          <div class="env-pop-wrap"><div class="env-pop" id="env-pop" hidden></div></div>
+          <button class="icon-btn" id="env-btn" title="Environment"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
         </div>
       </div>
       <div class="content view">
         <div class="kpi-row">
-          <div class="kpi"><div class="lbl">Cases</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h11v16H9z"/><path d="M4 4h2v16H4z"/></svg><div class="val" id="kpi-cases">—</div><div class="sub" id="kpi-cases-sub">—</div></div>
-          <div class="kpi"><div class="lbl">Passed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 12 2.5 2.5L16 9"/></svg><div class="val" id="kpi-passed">—</div><div class="sub">across suite</div></div>
+          <div class="kpi"><div class="lbl">Test cases</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h11v16H9z"/><path d="M4 4h2v16H4z"/></svg><div class="val" id="kpi-cases">—</div><div class="sub" id="kpi-cases-sub">—</div></div>
+          <div class="kpi"><div class="lbl">Passed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 12 2.5 2.5L16 9"/></svg><div class="val success" id="kpi-passed">—</div><div class="sub">across suite</div></div>
           <div class="kpi"><div class="lbl">Failed</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m9 9 6 6M15 9l-6 6"/></svg><div class="val danger" id="kpi-failed">—</div><div class="sub">across suite</div></div>
-          <div class="kpi"><div class="lbl">Skipped</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9v6h-6"/></svg><div class="val" id="kpi-skipped">—</div><div class="sub">across suite</div></div>
-          <div class="kpi"><div class="lbl">Not run</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg><div class="val" id="kpi-notrun">—</div><div class="sub" id="kpi-notrun-sub">of all cases</div></div>
+          <div class="kpi"><div class="lbl">Skipped</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9v6h-6"/></svg><div class="val skip" id="kpi-skipped">—</div><div class="sub">across suite</div></div>
+          <div class="kpi"><div class="lbl">Not yet run</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></svg><div class="val" id="kpi-notrun">—</div><div class="sub" id="kpi-notrun-sub">of all cases</div></div>
           <div class="kpi"><div class="lbl">Pass rate</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M11 19V5M18 19v-6"/></svg><div class="val accent" id="kpi-passrate">—</div><div class="sub" id="kpi-passrate-sub">across suite</div></div>
-          <div class="kpi"><div class="lbl">Avg time</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><div class="val" id="kpi-avgtime">—</div><div class="sub">per execution, across suite</div></div>
+          <div class="kpi"><div class="lbl">Avg exec time</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><div class="val" id="kpi-avgtime">—</div><div class="sub">per execution, across suite</div></div>
           <div class="kpi"><div class="lbl">Latest run</div><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M10 8.5 16 12l-6 3.5v-7Z" fill="currentColor" stroke="none"/></svg><div class="val" id="kpi-latest">—</div><div class="sub" id="kpi-latest-sub">—</div></div>
         </div>
 
@@ -217,7 +218,7 @@
     <section class="view" id="view-runs" hidden>
       <div class="topbar">
         <div><h1>Test Runs</h1><div class="sub">Configure and launch a Playwright run</div></div>
-        <div class="live-pill"><span class="dot"></span>Live</div>
+        <button type="button" class="live-pill" title="Open Live Run"><span class="dot"></span><span class="lp-text">Connecting…</span></button>
       </div>
       <div class="content">
 

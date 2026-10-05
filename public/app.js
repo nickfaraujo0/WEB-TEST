@@ -1128,6 +1128,80 @@
       });
   }
 
+  // ---------------------------------------------------------------------
+  // Topbar: live status pill + environment popover
+  // ---------------------------------------------------------------------
+  function setLivePill(cls, text) {
+    document.querySelectorAll('.live-pill').forEach(function (el) {
+      el.classList.remove('running', 'offline');
+      if (cls) el.classList.add(cls);
+      el.querySelector('.lp-text').textContent = text;
+    });
+  }
+  function pollLivePill() {
+    Promise.all([
+      fetch('/api/status').then(function (r) { return r.json(); }),
+      fetch('/api/queue').then(function (r) { return r.json(); }),
+    ])
+      .then(function (res) {
+        var queued = (res[1].queue || []).length;
+        if (res[0].active) {
+          var n = (res[0].tests || []).length;
+          setLivePill('running', 'Running ' + n + ' test' + (n === 1 ? '' : 's') + (queued ? ' · ' + queued + ' queued' : ''));
+        } else {
+          setLivePill('', 'Idle');
+        }
+      })
+      .catch(function () {
+        setLivePill('offline', 'Offline');
+      });
+  }
+  document.querySelectorAll('.live-pill').forEach(function (el) {
+    el.addEventListener('click', function () {
+      showView('live');
+    });
+  });
+  pollLivePill();
+  setInterval(pollLivePill, 4000);
+
+  function checkEnv() {
+    var pop = $('env-pop');
+    var card = document.querySelector('.env-card[data-env="' + STATE.env + '"] .name');
+    pop.innerHTML =
+      '<div class="ep-name">' + (card ? card.textContent : STATE.env) + '</div>' +
+      '<div class="ep-url">' + (ENV_URLS[STATE.env] || '') + '</div>' +
+      '<div class="ep-status" id="ep-status"><i></i><span>Checking…</span></div>' +
+      '<div class="ep-actions"><button class="link-btn" id="ep-recheck">Check again</button>' +
+      '<button class="link-btn" id="ep-change">Change environment →</button></div>';
+    $('ep-recheck').addEventListener('click', checkEnv);
+    $('ep-change').addEventListener('click', function () {
+      pop.hidden = true;
+      showView('runs');
+    });
+    fetch('/api/env/ping?env=' + encodeURIComponent(STATE.env))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var st = $('ep-status');
+        if (!st) return;
+        st.className = 'ep-status ' + (d.ok ? 'up' : 'down');
+        st.querySelector('span').textContent = d.ok
+          ? 'Reachable · HTTP ' + d.status + ' · ' + d.ms + ' ms'
+          : 'Unreachable' + (d.status ? ' · HTTP ' + d.status : d.error ? ' · ' + d.error : '');
+      })
+      .catch(function () {
+        var st = $('ep-status');
+        if (st) { st.className = 'ep-status down'; st.querySelector('span').textContent = 'Dashboard server offline'; }
+      });
+  }
+  $('env-btn').addEventListener('click', function (e) {
+    e.stopPropagation();
+    var pop = $('env-pop');
+    pop.hidden = !pop.hidden;
+    if (!pop.hidden) checkEnv();
+  });
+  $('env-pop').addEventListener('click', function (e) { e.stopPropagation(); });
+  document.addEventListener('click', function () { $('env-pop').hidden = true; });
+
   // Resume a run already in progress (e.g. after a page reload).
   // Resolves true if it attached the live board to an active run.
   function resumeIfActive() {
@@ -1185,10 +1259,7 @@
       skipped = 0,
       durationSum = 0,
       durationCount = 0;
-    var known = Object.keys(STATE.testsById).length > 0;
     Object.keys(STATE.testHistory).forEach(function (key) {
-      // Only cases that still exist — history also holds results for deleted/renamed specs.
-      if (known && !STATE.testsById[key]) return;
       var pt = mostRecentPoint(STATE.testHistory[key]);
       if (!pt) return;
       if (pt.status === 'passed') passed++;
@@ -1253,7 +1324,7 @@
             '<tr><td class="cell-id">' + shortId(r.id) + '</td><td class="cell-name">' + r.totalCases + ' cases</td><td>' +
             r.browsers.map(bchip).join(' ') +
             '</td><td class="mono">' + r.executions + '</td>' +
-            '<td class="mono">' + r.stats.passed + '</td>' +
+            '<td class="mono" style="color:var(--success);">' + r.stats.passed + '</td>' +
             '<td class="mono" style="color:' + (r.stats.failed ? 'var(--danger)' : 'var(--text-faint)') + ';">' + r.stats.failed + '</td>' +
             '<td class="mono">' + fmtDuration(r.durationMs) + '</td><td>' + badge(r.status === 'passed' ? 'passed' : r.status === 'cancelled' ? 'skipped' : 'failed') + '</td>' +
             '<td class="cell-id">' + fmtWhen(r.finishedAt) + '</td></tr>'
@@ -1303,7 +1374,7 @@
     $('kpi-notrun-sub').textContent = totalCases ? Math.round((all.n / totalCases) * 100) + '% of all cases' : 'of all cases';
 
     // ---- where the suite stands ----
-    var legend = [['Passing', all.p, 'var(--accent)'], ['Failing', all.f, 'var(--danger)'], ['Skipped', all.s, 'var(--border-strong)'], ['Not yet run', all.n, 'var(--surface-3)']];
+    var legend = [['Passing', all.p, 'var(--success)'], ['Failing', all.f, 'var(--danger)'], ['Skipped', all.s, 'var(--skip)'], ['Not yet run', all.n, 'var(--surface-3)']];
     var browserKeys = Object.keys(browsers).sort();
     $('ov-coverage').innerHTML = !totalCases
       ? '<div class="ov-empty">No test cases found.</div>'
@@ -1323,9 +1394,9 @@
     // ---- suite health ----
     $('ov-suites').innerHTML = rows.map(function (r) {
       return '<tr><td class="cell-name">' + esc(r.name) + '</td><td class="mono">' + r.cases + '</td><td>' + ovStack(r.p, r.f, r.s, r.cases) + '</td>' +
-        '<td class="mono">' + r.p + '</td>' +
+        '<td class="mono" style="color:var(--success);">' + r.p + '</td>' +
         '<td class="mono" style="color:' + (r.f ? 'var(--danger)' : 'var(--text-faint)') + ';">' + r.f + '</td>' +
-        '<td class="mono" style="color:' + (r.n ? 'var(--text-muted)' : 'var(--text-faint)') + ';">' + r.n + '</td>' +
+        '<td class="mono" style="color:' + (r.n ? 'var(--text)' : 'var(--text-faint)') + ';">' + r.n + '</td>' +
         '<td class="mono">' + ovRate(r.p, r.f) + '</td><td class="cell-id">' + (r.last ? fmtWhen(r.last) : 'never') + '</td></tr>';
     }).join('') || '<tr><td colspan="8" class="ov-empty">No suites found.</td></tr>';
 
@@ -1339,7 +1410,7 @@
         var rate = Math.round((r.stats.passed / (r.stats.passed + r.stats.failed)) * 100);
         sum += rate;
         var tip = shortId(r.id) + ' · ' + r.stats.passed + ' passed, ' + r.stats.failed + ' failed · ' + fmtWhen(r.finishedAt);
-        return '<div class="col' + (rate < 70 ? ' low' : '') + '" title="' + esc(tip) + '"><span class="pct">' + rate + '</span><div class="track"><div class="bar" style="height:' + Math.max(rate, 3) + '%"></div></div></div>';
+        return '<div class="col" title="' + esc(tip) + '"><span class="pct">' + rate + '</span><div class="bar' + (rate < 70 ? ' low' : rate < 95 ? ' mid' : '') + '" style="height:' + Math.max(rate, 3) * 0.8 + '%"></div></div>';
       }).join('');
       $('ov-trend').innerHTML = '<div class="ov-trend">' + bars + '</div><div class="ov-trend-foot"><span>' + fmtWhen(runs[0].finishedAt) +
         '</span><span>Average ' + Math.round(sum / runs.length) + '% over ' + runs.length + ' run' + (runs.length === 1 ? '' : 's') + '</span><span>' + fmtWhen(runs[runs.length - 1].finishedAt) + '</span></div>';

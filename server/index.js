@@ -105,6 +105,24 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// Reachability check for a target environment. Only known env keys — never an arbitrary URL.
+const ENV_URLS = {
+  local: 'https://hive-dev.thegritcity.com',
+  staging: 'https://staging.hive-app.dev',
+  production: 'https://hive-app.dev',
+};
+app.get('/api/env/ping', async (req, res) => {
+  const url = ENV_URLS[req.query.env];
+  if (!url) return res.status(400).json({ ok: false, error: 'unknown env' });
+  const started = Date.now();
+  try {
+    const r = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(8000) });
+    res.json({ ok: r.status < 500, status: r.status, ms: Date.now() - started });
+  } catch (err) {
+    res.json({ ok: false, error: err.name === 'TimeoutError' ? 'timed out' : 'no response', ms: Date.now() - started });
+  }
+});
+
 // ---------------------------------------------------------------------------
 // Kick off a run
 // ---------------------------------------------------------------------------
