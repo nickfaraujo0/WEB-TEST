@@ -1,0 +1,52 @@
+{
+  "id": "run-1790581852012-f0cb21",
+  "startedAt": "2026-09-28T07:50:52.013Z",
+  "finishedAt": "2026-09-28T07:51:05.000Z",
+  "status": "passed",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 1,
+    "retries": false
+  },
+  "totalCases": 1,
+  "executions": 1,
+  "expectedExecutions": 1,
+  "stats": {
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0
+  },
+  "durationMs": 12987,
+  "tests": [
+    {
+      "title": "TC001 - Verify that Buzz is the default screen",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/buzz/TC001_buzz_default_screen.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 10376,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790581852012-f0cb21/0-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790581852012-f0cb21/0-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

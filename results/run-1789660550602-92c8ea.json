@@ -1,0 +1,39 @@
+{
+  "id": "run-1789660550602-92c8ea",
+  "startedAt": "2026-09-17T15:55:50.606Z",
+  "finishedAt": "2026-09-17T15:55:51.981Z",
+  "status": "passed",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 1,
+    "retries": false
+  },
+  "totalCases": 1,
+  "executions": 1,
+  "expectedExecutions": 1,
+  "stats": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 1
+  },
+  "durationMs": 1375,
+  "tests": [
+    {
+      "title": "TC008 - Login with Deactivated Account",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC008_deactivated_account.spec.js",
+      "line": 24,
+      "project": "chromium",
+      "status": "skipped",
+      "duration": 1,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": []
+    }
+  ]
+}

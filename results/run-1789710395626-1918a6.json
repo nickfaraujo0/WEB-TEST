@@ -1,0 +1,95 @@
+{
+  "id": "run-1789710395626-1918a6",
+  "startedAt": "2026-09-18T05:46:35.629Z",
+  "finishedAt": "2026-09-18T05:47:16.420Z",
+  "status": "failed",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 1,
+    "retries": false
+  },
+  "totalCases": 3,
+  "executions": 3,
+  "expectedExecutions": 3,
+  "stats": {
+    "passed": 2,
+    "failed": 1,
+    "skipped": 0
+  },
+  "durationMs": 40791,
+  "tests": [
+    {
+      "title": "TC025 - Verify you can create an event",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/opportunities/TC025_create_event.spec.js",
+      "line": 20,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6358,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC026 - Verify Event Type dropdown lists sub-categories and can switch to Jobs/Internship",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/opportunities/TC026_event_type_dropdown_lists_all_types.spec.js",
+      "line": 18,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 26158,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('.ant-select-item-option').filter({ hasText: 'Jobs' }).first()\n    - locator resolved to <div title=\"Jobs\" aria-selected=\"false\" class=\"ant-select-item ant-select-item-option\">…</div>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\" xs:px-[2rem] max-w-[800px] mx-auto\">…</div> from <div id=\"root\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not stable\n    - retrying click action\n      - waiting 100ms\n    38 × waiting for element to be visible, enabled and stable\n       - element is not visible\n     - retrying click action\n       - waiting 500ms\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for locator('.ant-select-item-option').filter({ hasText: 'Jobs' }).first()\n    - locator resolved to <div title=\"Jobs\" aria-selected=\"false\" class=\"ant-select-item ant-select-item-option\">…</div>\n  - attempting click action\n    2 × waiting for element to be visible, enabled and stable\n      - element is visible, enabled and stable\n      - scrolling into view if needed\n      - done scrolling\n      - <div class=\" xs:px-[2rem] max-w-[800px] mx-auto\">…</div> from <div id=\"root\">…</div> subtree intercepts pointer events\n    - retrying click action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and stable\n      - element is not stable\n    - retrying click action\n      - waiting 100ms\n    38 × waiting for element to be visible, enabled and stable\n       - element is not visible\n     - retrying click action\n       - waiting 500ms\n\n    at CreateOpportunityPage.selectJobType (/Users/nick/Documents/web test/test-cases/opportunities/create-opportunity-page.js:36:89)\n    at /Users/nick/Documents/web test/test-cases/opportunities/TC026_event_type_dropdown_lists_all_types.spec.js:34:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/opportunities-TC026_event_-eef8d-n-switch-to-Jobs-Internship-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/opportunities-TC026_event_-eef8d-n-switch-to-Jobs-Internship-chromium/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/opportunities-TC026_event_-eef8d-n-switch-to-Jobs-Internship-chromium/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/opportunities-TC026_event_-eef8d-n-switch-to-Jobs-Internship-chromium/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC027 - Verify Create Event has both a Registration Deadline and an Event Date",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/opportunities/TC027_event_has_deadline_and_event_date.spec.js",
+      "line": 13,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 5014,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

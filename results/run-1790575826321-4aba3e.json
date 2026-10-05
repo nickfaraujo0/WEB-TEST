@@ -1,0 +1,1916 @@
+{
+  "id": "run-1790575826321-4aba3e",
+  "startedAt": "2026-09-28T06:10:26.323Z",
+  "finishedAt": "2026-09-28T06:33:53.498Z",
+  "status": "cancelled",
+  "browsers": [
+    "chromium",
+    "firefox",
+    "webkit"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 1,
+    "retries": false
+  },
+  "totalCases": 51,
+  "executions": 93,
+  "expectedExecutions": 153,
+  "stats": {
+    "passed": 67,
+    "failed": 26,
+    "skipped": 0
+  },
+  "durationMs": 1407175,
+  "tests": [
+    {
+      "title": "TC001 - Verify the Divisions sidebar lists every division in the course",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC001_divisions_sidebar_lists_all_divisions.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 9840,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Verify the currently selected division tab is visually highlighted",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC002_selected_division_is_highlighted.spec.js",
+      "line": 6,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 8015,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC003 - Verify selecting a different division loads that division's own session list",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC003_division_switch_loads_its_own_sessions.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 9258,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC004 - Verify the hamburger icon collapses and expands the Divisions sidebar",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC004_hamburger_toggles_sidebar.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 8474,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC005 - Verify the course header (name + code) stays constant across divisions",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC005_course_header_persists_across_divisions.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 13440,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC006 - Verify switching divisions resets the calendar back to the default month",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC006_division_switch_resets_calendar_month.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 13791,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC007 - Verify the Schedule calendar opens on the current month by default",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC007_calendar_opens_on_current_month.spec.js",
+      "line": 8,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 17535,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC008 - Verify Load Next Month appends further sessions without dropping earlier ones",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC008_load_next_month_appends_sessions.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 18683,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC009 - Verify filtering Participants by one batch excludes \"All Participants\" sessions",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC009_participants_filter_excludes_all_participants_sessions.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 34342,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC009_participants_filter_excludes_all_participants_sessions.spec.js:12:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC009_participants-0c0df-s-All-Participants-sessions-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC009_participants-0c0df-s-All-Participants-sessions-chromium/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC009_participants-0c0df-s-All-Participants-sessions-chromium/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC009_participants-0c0df-s-All-Participants-sessions-chromium/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC010 - Verify the Filters dialog's Session Type checkbox narrows the session list",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC010_filters_session_type_narrows_list.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 9386,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC011 - Verify the Filters dialog's Faculty checkbox narrows the session list",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC011_filters_faculty_narrows_list.spec.js",
+      "line": 13,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 9654,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC012 - Verify Filters' \"Clear all\" resets Session Type and Faculty selections",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC012_filters_clear_all_resets.spec.js",
+      "line": 18,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 10451,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC013 - Verify a session card shows date/time, duration, batches, title, type and faculty",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC013_session_card_shows_key_fields.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 8227,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC014 - Verify no \"View Past Sessions\" / \"View Upcoming Sessions\" control exists (gap)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC014_no_view_past_upcoming_toggle.spec.js",
+      "line": 8,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6613,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC015 - Verify \"Add Lesson Diary\" is visually dim but fully clickable (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC015_add_lesson_diary_looks_disabled_but_is_clickable.spec.js",
+      "line": 8,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 10098,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC016 - Verify a session card's \"...\" menu opens with Edit/Reschedule/Delete Session",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC016_card_menu_has_edit_reschedule_delete.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 12225,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC017 - Verify New Session defaults: today's date, Duration 1h, Lecture, Batches All",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC017_new_session_dialog_defaults.spec.js",
+      "line": 15,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 24825,
+      "attempts": 1,
+      "error": {
+        "message": "Error: expect(locator).toHaveClass(expected) failed\n\nLocator: getByRole('dialog').filter({ hasText: 'New Session' }).getByRole('button', { name: 'All', exact: true })\nTimeout: 15000ms\nExpected pattern: /bg-subtleBlue/\nReceived string:  \"px-4 py-1.5 rounded-lg border text-md font-medium transition-all\n\t\tbg-white text-adminTitle border-gray-300 hover:border-brandGreen\n\t\tcursor-pointer\"\n\nCall log:\n  - Expect \"toHaveClass\" getByRole('dialog').filter({ hasText: 'New Session' }).getByRole('button', { name: 'All', exact: true }) with timeout 15000ms\n  - waiting for getByRole('dialog').filter({ hasText: 'New Session' }).getByRole('button', { name: 'All', exact: true })\n    34 × locator resolved to <button type=\"button\" class=\"px-4 py-1.5 rounded-lg border text-md font-medium transition-all↵⇆⇆bg-white text-adminTitle border-gray-300 hover:border-brandGreen↵⇆⇆cursor-pointer\">All</button>\n       - unexpected value \"px-4 py-1.5 rounded-lg border text-md font-medium transition-all\n\t\tbg-white text-adminTitle border-gray-300 hover:border-brandGreen\n\t\tcursor-pointer\"\n",
+        "stack": "Error: expect(locator).toHaveClass(expected) failed\n\nLocator: getByRole('dialog').filter({ hasText: 'New Session' }).getByRole('button', { name: 'All', exact: true })\nTimeout: 15000ms\nExpected pattern: /bg-subtleBlue/\nReceived string:  \"px-4 py-1.5 rounded-lg border text-md font-medium transition-all\n\t\tbg-white text-adminTitle border-gray-300 hover:border-brandGreen\n\t\tcursor-pointer\"\n\nCall log:\n  - Expect \"toHaveClass\" getByRole('dialog').filter({ hasText: 'New Session' }).getByRole('button', { name: 'All', exact: true }) with timeout 15000ms\n  - waiting for getByRole('dialog').filter({ hasText: 'New Session' }).getByRole('button', { name: 'All', exact: true })\n    34 × locator resolved to <button type=\"button\" class=\"px-4 py-1.5 rounded-lg border text-md font-medium transition-all↵⇆⇆bg-white text-adminTitle border-gray-300 hover:border-brandGreen↵⇆⇆cursor-pointer\">All</button>\n       - unexpected value \"px-4 py-1.5 rounded-lg border text-md font-medium transition-all\n\t\tbg-white text-adminTitle border-gray-300 hover:border-brandGreen\n\t\tcursor-pointer\"\n\n    at /Users/nick/Documents/web test/test-cases/courses/TC017_new_session_dialog_defaults.spec.js:26:42"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-chromium/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-chromium/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-chromium/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Assertion",
+      "reason": null
+    },
+    {
+      "title": "TC018 - Verify the default \"All\" Batches pill cannot be deselected by clicking it again",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC018_batches_all_cannot_be_deselected.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7052,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC019 - Verify Session Type pills in New Session are mutually exclusive",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC019_session_type_pills_mutually_exclusive.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7527,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC020 - Verify Select Unit pills start unselected and can be toggled",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC020_select_unit_pills_toggle_individually.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7516,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC021 - Verify Topics Covered has a Bold/Italic/Underline/Link/list rich-text toolbar",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC021_topics_covered_rich_text_toolbar.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6404,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC022 - Verify closing New Session without creating leaves no new session behind",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC022_cancel_discards_new_session.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 9308,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC023 - Verify creating a session with default values adds a new \"NOW\" card",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC023_create_session_adds_card.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 24134,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC023_create_session_adds_card.spec.js:11:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-chromium/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-chromium/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-chromium/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC024 - Verify New Session has no field to give a session a custom title (gap)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC024_no_session_title_field.spec.js",
+      "line": 8,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7681,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC025 - Verify a division with no sessions offers \"Set Up Your Semester\" and \"Add Session\"",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC025_empty_division_offers_setup_or_add_session.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7496,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC026 - Verify Edit Session prefills Date/Time/Duration/Type/Faculty from the saved session",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC026_edit_session_prefills_datetime_type_faculty_location.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7984,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC027 - Verify Edit Session does not prefill Participants, even for \"All Participants\" (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC027_edit_session_participants_not_prefilled.spec.js",
+      "line": 12,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7694,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC028 - Verify Edit Session does not prefill the previously saved Unit (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC028_edit_session_unit_not_prefilled.spec.js",
+      "line": 9,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6946,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC029 - Verify Edit Session does not prefill Course Outcomes (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC029_edit_session_course_outcomes_not_prefilled.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 8018,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC030 - Verify Edit Session has a Teaching/Learning Method checklist, never prefilled (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC030_edit_session_teaching_method_not_prefilled.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 8216,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC031 - Verify Course Outcomes lists exactly this course's own defined outcomes",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC031_course_outcomes_match_course_definition.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 8443,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC032 - Verify Attendance Records button navigates to that session's attendance history",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC032_attendance_records_button_navigates.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 11044,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC033 - Verify Planned Topic, Covered Topic and Remarks are separate rich-text fields",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC033_edit_session_topic_and_remarks_are_rich_text.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7539,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC034 - Verify Save Changes on Edit Session fails with a \"Buzzt!\" conflict error (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC034_save_changes_fails_with_conflict_error.spec.js",
+      "line": 24,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 23740,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC034_save_changes_fails_with_conflict_error.spec.js:28:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC034_save_changes-3d86c-a-Buzzt-conflict-error-bug--chromium/test-failed-1.png",
+          "contentType": "image/png"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC035 - Verify the student's Session Details view is fully read-only with no Save button",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC035_student_edit_session_view_is_read_only.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 7385,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC036 - Verify Reschedule Session defaults \"New date & time\" to the session's current value",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC036_reschedule_dialog_defaults_current_datetime.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 24795,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC036_reschedule_dialog_defaults_current_datetime.spec.js:9:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-chromium/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-chromium/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-chromium/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC037 - Verify Reschedule Session Save moves the session to the new date",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC037_reschedule_updates_session.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 25559,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC037_reschedule_updates_session.spec.js:11:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC037_reschedule_u-5c7e5-the-session-to-the-new-date-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC037_reschedule_u-5c7e5-the-session-to-the-new-date-chromium/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC037_reschedule_u-5c7e5-the-session-to-the-new-date-chromium/error-context.md",
+          "contentType": "text/markdown"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC038 - Verify Reschedule Session Cancel leaves the session's date unchanged",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC038_reschedule_cancel_discards.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 23470,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC038_reschedule_cancel_discards.spec.js:9:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC038_reschedule_c-ac336-he-session-s-date-unchanged-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC039 - Verify the Delete Session confirm dialog's exact copy and buttons",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC039_delete_confirm_dialog_copy.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 24241,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC039_delete_confirm_dialog_copy.spec.js:14:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC039_delete_confi-092a8-og-s-exact-copy-and-buttons-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC039_delete_confi-092a8-og-s-exact-copy-and-buttons-chromium/error-context.md",
+          "contentType": "text/markdown"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC040 - Verify confirming Delete Session removes the session from the calendar",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC040_delete_removes_session.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 25416,
+      "attempts": 1,
+      "error": {
+        "message": "Error: The default \"now\" slot conflicts with an existing session — clean up the conflicting session by hand and rerun.",
+        "stack": "Error: The default \"now\" slot conflicts with an existing session — clean up the conflicting session by hand and rerun.\n    at /Users/nick/Documents/web test/test-cases/courses/TC040_delete_removes_session.spec.js:31:11"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC040_delete_remov-e3f1a-e-session-from-the-calendar-chromium/test-failed-1.png",
+          "contentType": "image/png"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC041 - Verify Edit Schedule Step 1 shows editable Semester start/end dates",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC041_edit_schedule_semester_dates_editable.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 19296,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC042 - Verify Step 1's weekly grid shows one row per day with slots or \"Add Time Slot\"",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC042_edit_schedule_weekly_grid_shows_slots.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 12649,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC043 - Verify \"Add Time Slot\" requires Session Timing/Type/Participants before enabling",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC043_add_time_slot_dialog_requires_fields.spec.js",
+      "line": 8,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 11504,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC044 - Verify Step 2 offers \"Bulk import via CSV\" (recommended) and \"Add manually\"",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC044_step2_offers_bulk_import_or_manual.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 23940,
+      "attempts": 1,
+      "error": {
+        "message": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByText('Add topic sequence', { exact: true })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByText('Add topic sequence', { exact: true }) with timeout 15000ms\n  - waiting for getByText('Add topic sequence', { exact: true })\n",
+        "stack": "Error: expect(locator).toBeVisible() failed\n\nLocator: getByText('Add topic sequence', { exact: true })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"toBeVisible\" getByText('Add topic sequence', { exact: true }) with timeout 15000ms\n  - waiting for getByText('Add topic sequence', { exact: true })\n\n    at /Users/nick/Documents/web test/test-cases/courses/TC044_step2_offers_bulk_import_or_manual.spec.js:11:71"
+      },
+      "steps": [],
+      "attachments": [],
+      "category": "Assertion",
+      "reason": null
+    },
+    {
+      "title": "TC045 - Verify Preview generates one row per week between semester start and end",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC045_preview_generates_weekly_rows.spec.js",
+      "line": 8,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 12834,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC046 - Verify exiting the Edit Schedule wizard shows an \"All changes will be lost\" confirmation",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC046_wizard_exit_shows_confirmation.spec.js",
+      "line": 11,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 13595,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC047 - Verify \"Create Schedule\" is reachable at the Preview step (not exercised)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC047_create_schedule_button_present_at_preview.spec.js",
+      "line": 11,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 12197,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC048 - Verify the 3-step indicator (Add Timetable / Add Topic Sequence / Preview) updates",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC048_wizard_step_indicator_progresses.spec.js",
+      "line": 9,
+      "project": "chromium",
+      "status": "failed",
+      "duration": 16047,
+      "attempts": 1,
+      "error": {
+        "message": "Error: browserContext.close: ENOSPC: no space left on device, write",
+        "stack": "Error: browserContext.close: ENOSPC: no space left on device, write"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC048_wizard_step_-deb78-ic-Sequence-Preview-updates-chromium/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC049 - Verify the student has no Divisions sidebar, Add Session, or Edit Schedule",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC049_student_has_no_divisions_or_edit_controls.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 5827,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC050 - Verify a student's session card shows a status badge instead of professor actions",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC050_student_card_shows_status_badge.spec.js",
+      "line": 11,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6101,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC051 - Verify a student cannot reach Edit/Reschedule/Delete Session (no \"...\" menu)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC051_student_has_no_card_menu.spec.js",
+      "line": 13,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6478,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC001 - Verify the Divisions sidebar lists every division in the course",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC001_divisions_sidebar_lists_all_divisions.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 13826,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Verify the currently selected division tab is visually highlighted",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC002_selected_division_is_highlighted.spec.js",
+      "line": 6,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7641,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC003 - Verify selecting a different division loads that division's own session list",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC003_division_switch_loads_its_own_sessions.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 8958,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC004 - Verify the hamburger icon collapses and expands the Divisions sidebar",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC004_hamburger_toggles_sidebar.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7984,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC005 - Verify the course header (name + code) stays constant across divisions",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC005_course_header_persists_across_divisions.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 9720,
+      "attempts": 1,
+      "error": {
+        "message": "Error: browserContext.close: ENOSPC: no space left on device, write",
+        "stack": "Error: browserContext.close: ENOSPC: no space left on device, write"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC005_course_heade-38e01-s-constant-across-divisions-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC006 - Verify switching divisions resets the calendar back to the default month",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC006_division_switch_resets_calendar_month.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 11904,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC007 - Verify the Schedule calendar opens on the current month by default",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC007_calendar_opens_on_current_month.spec.js",
+      "line": 8,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7473,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC008 - Verify Load Next Month appends further sessions without dropping earlier ones",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC008_load_next_month_appends_sessions.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 9466,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC009 - Verify filtering Participants by one batch excludes \"All Participants\" sessions",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC009_participants_filter_excludes_all_participants_sessions.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 8488,
+      "attempts": 1,
+      "error": {
+        "message": "Error: browserContext.close: ENOSPC: no space left on device, write",
+        "stack": "Error: browserContext.close: ENOSPC: no space left on device, write"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC009_participants-0c0df-s-All-Participants-sessions-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC009_participants-0c0df-s-All-Participants-sessions-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC010 - Verify the Filters dialog's Session Type checkbox narrows the session list",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC010_filters_session_type_narrows_list.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 12749,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC011 - Verify the Filters dialog's Faculty checkbox narrows the session list",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC011_filters_faculty_narrows_list.spec.js",
+      "line": 13,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 10156,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC012 - Verify Filters' \"Clear all\" resets Session Type and Faculty selections",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC012_filters_clear_all_resets.spec.js",
+      "line": 18,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 10971,
+      "attempts": 1,
+      "error": {
+        "message": "Error: browserContext.close: ENOSPC: no space left on device, open '/Users/nick/Documents/web test/test-results/.playwright-artifacts-14/traces/resources/fac186b25bf85634d9c22ef160bb54f1.jsonl'",
+        "stack": "Error: browserContext.close: ENOSPC: no space left on device, open '/Users/nick/Documents/web test/test-results/.playwright-artifacts-14/traces/resources/fac186b25bf85634d9c22ef160bb54f1.jsonl'"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC012_filters_clea-6ff93-Type-and-Faculty-selections-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC012_filters_clea-6ff93-Type-and-Faculty-selections-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC013 - Verify a session card shows date/time, duration, batches, title, type and faculty",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC013_session_card_shows_key_fields.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 30553,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC013_session_card_shows_key_fields.spec.js:7:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC013_session_card-48c4b-ches-title-type-and-faculty-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC013_session_card-48c4b-ches-title-type-and-faculty-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC013_session_card-48c4b-ches-title-type-and-faculty-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC013_session_card-48c4b-ches-title-type-and-faculty-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC014 - Verify no \"View Past Sessions\" / \"View Upcoming Sessions\" control exists (gap)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC014_no_view_past_upcoming_toggle.spec.js",
+      "line": 8,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 12356,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC015 - Verify \"Add Lesson Diary\" is visually dim but fully clickable (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC015_add_lesson_diary_looks_disabled_but_is_clickable.spec.js",
+      "line": 8,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 8750,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC016 - Verify a session card's \"...\" menu opens with Edit/Reschedule/Delete Session",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC016_card_menu_has_edit_reschedule_delete.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 9828,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC017 - Verify New Session defaults: today's date, Duration 1h, Lecture, Batches All",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC017_new_session_dialog_defaults.spec.js",
+      "line": 15,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 28574,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC017_new_session_dialog_defaults.spec.js:17:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC017_new_session_-ce678-tion-1h-Lecture-Batches-All-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC018 - Verify the default \"All\" Batches pill cannot be deselected by clicking it again",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC018_batches_all_cannot_be_deselected.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 17457,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC019 - Verify Session Type pills in New Session are mutually exclusive",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC019_session_type_pills_mutually_exclusive.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 15584,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC020 - Verify Select Unit pills start unselected and can be toggled",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC020_select_unit_pills_toggle_individually.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 20024,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC021 - Verify Topics Covered has a Bold/Italic/Underline/Link/list rich-text toolbar",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC021_topics_covered_rich_text_toolbar.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 12589,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC022 - Verify closing New Session without creating leaves no new session behind",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC022_cancel_discards_new_session.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 29028,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC022_cancel_discards_new_session.spec.js:7:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC022_cancel_disca-23dbf-eaves-no-new-session-behind-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC022_cancel_disca-23dbf-eaves-no-new-session-behind-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC022_cancel_disca-23dbf-eaves-no-new-session-behind-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC022_cancel_disca-23dbf-eaves-no-new-session-behind-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC023 - Verify creating a session with default values adds a new \"NOW\" card",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC023_create_session_adds_card.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 33310,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC023_create_session_adds_card.spec.js:11:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC023_create_sessi-2283a--values-adds-a-new-NOW-card-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC024 - Verify New Session has no field to give a session a custom title (gap)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC024_no_session_title_field.spec.js",
+      "line": 8,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 29627,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC024_no_session_title_field.spec.js:10:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC024_no_session_t-64de5-session-a-custom-title-gap--firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC024_no_session_t-64de5-session-a-custom-title-gap--firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC024_no_session_t-64de5-session-a-custom-title-gap--firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC024_no_session_t-64de5-session-a-custom-title-gap--firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC025 - Verify a division with no sessions offers \"Set Up Your Semester\" and \"Add Session\"",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC025_empty_division_offers_setup_or_add_session.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 9350,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC026 - Verify Edit Session prefills Date/Time/Duration/Type/Faculty from the saved session",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC026_edit_session_prefills_datetime_type_faculty_location.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 10935,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC027 - Verify Edit Session does not prefill Participants, even for \"All Participants\" (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC027_edit_session_participants_not_prefilled.spec.js",
+      "line": 12,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7429,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC028 - Verify Edit Session does not prefill the previously saved Unit (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC028_edit_session_unit_not_prefilled.spec.js",
+      "line": 9,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7841,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC029 - Verify Edit Session does not prefill Course Outcomes (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC029_edit_session_course_outcomes_not_prefilled.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 26498,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Mechanics of Solids', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Mechanics of Solids', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC029_edit_session_course_outcomes_not_prefilled.spec.js:9:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC029_edit_session-6da2a-refill-Course-Outcomes-bug--firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC029_edit_session-6da2a-refill-Course-Outcomes-bug--firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC029_edit_session-6da2a-refill-Course-Outcomes-bug--firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC029_edit_session-6da2a-refill-Course-Outcomes-bug--firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC030 - Verify Edit Session has a Teaching/Learning Method checklist, never prefilled (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC030_edit_session_teaching_method_not_prefilled.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 8349,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC031 - Verify Course Outcomes lists exactly this course's own defined outcomes",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC031_course_outcomes_match_course_definition.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 9047,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC032 - Verify Attendance Records button navigates to that session's attendance history",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC032_attendance_records_button_navigates.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7796,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC033 - Verify Planned Topic, Covered Topic and Remarks are separate rich-text fields",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC033_edit_session_topic_and_remarks_are_rich_text.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7930,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC034 - Verify Save Changes on Edit Session fails with a \"Buzzt!\" conflict error (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC034_save_changes_fails_with_conflict_error.spec.js",
+      "line": 24,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 24318,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC034_save_changes_fails_with_conflict_error.spec.js:28:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC034_save_changes-3d86c-a-Buzzt-conflict-error-bug--firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC034_save_changes-3d86c-a-Buzzt-conflict-error-bug--firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC034_save_changes-3d86c-a-Buzzt-conflict-error-bug--firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC034_save_changes-3d86c-a-Buzzt-conflict-error-bug--firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC035 - Verify the student's Session Details view is fully read-only with no Save button",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC035_student_edit_session_view_is_read_only.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7196,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC036 - Verify Reschedule Session defaults \"New date & time\" to the session's current value",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC036_reschedule_dialog_defaults_current_datetime.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 26676,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC036_reschedule_dialog_defaults_current_datetime.spec.js:7:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC036_reschedule_d-8e7a5-the-session-s-current-value-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC037 - Verify Reschedule Session Save moves the session to the new date",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC037_reschedule_updates_session.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 27018,
+      "attempts": 1,
+      "error": {
+        "message": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared",
+        "stack": "Error: withDisposableSession: New Session dialog neither closed nor showed a conflict dialog, and no new session appeared\n    at withDisposableSession (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:99:13)\n    at /Users/nick/Documents/web test/test-cases/courses/TC037_reschedule_updates_session.spec.js:11:3"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC037_reschedule_u-5c7e5-the-session-to-the-new-date-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC037_reschedule_u-5c7e5-the-session-to-the-new-date-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC037_reschedule_u-5c7e5-the-session-to-the-new-date-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC037_reschedule_u-5c7e5-the-session-to-the-new-date-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC038 - Verify Reschedule Session Cancel leaves the session's date unchanged",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC038_reschedule_cancel_discards.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 27387,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC038_reschedule_cancel_discards.spec.js:7:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC038_reschedule_c-ac336-he-session-s-date-unchanged-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC038_reschedule_c-ac336-he-session-s-date-unchanged-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC038_reschedule_c-ac336-he-session-s-date-unchanged-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC038_reschedule_c-ac336-he-session-s-date-unchanged-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC039 - Verify the Delete Session confirm dialog's exact copy and buttons",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC039_delete_confirm_dialog_copy.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 28721,
+      "attempts": 1,
+      "error": {
+        "message": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n",
+        "stack": "TimeoutError: locator.click: Timeout 20000ms exceeded.\nCall log:\n  - waiting for getByText('Data Structures and Algorithms', { exact: true }).first()\n\n    at CoursesPage.openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-page.js:70:33)\n    at openCourse (/Users/nick/Documents/web test/test-cases/courses/courses-helpers.js:31:17)\n    at /Users/nick/Documents/web test/test-cases/courses/TC039_delete_confirm_dialog_copy.spec.js:12:19"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC039_delete_confi-092a8-og-s-exact-copy-and-buttons-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC039_delete_confi-092a8-og-s-exact-copy-and-buttons-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC039_delete_confi-092a8-og-s-exact-copy-and-buttons-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC039_delete_confi-092a8-og-s-exact-copy-and-buttons-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Timeout",
+      "reason": null
+    },
+    {
+      "title": "TC040 - Verify confirming Delete Session removes the session from the calendar",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC040_delete_removes_session.spec.js",
+      "line": 14,
+      "project": "firefox",
+      "status": "failed",
+      "duration": 32958,
+      "attempts": 1,
+      "error": {
+        "message": "Error: The default \"now\" slot conflicts with an existing session — clean up the conflicting session by hand and rerun.",
+        "stack": "Error: The default \"now\" slot conflicts with an existing session — clean up the conflicting session by hand and rerun.\n    at /Users/nick/Documents/web test/test-cases/courses/TC040_delete_removes_session.spec.js:31:11"
+      },
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC040_delete_remov-e3f1a-e-session-from-the-calendar-firefox/test-failed-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC040_delete_remov-e3f1a-e-session-from-the-calendar-firefox/video.webm",
+          "contentType": "video/webm"
+        },
+        {
+          "name": "error-context",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC040_delete_remov-e3f1a-e-session-from-the-calendar-firefox/error-context.md",
+          "contentType": "text/markdown"
+        },
+        {
+          "name": "trace",
+          "path": "/Users/nick/Documents/web test/test-results/courses-TC040_delete_remov-e3f1a-e-session-from-the-calendar-firefox/trace.zip",
+          "contentType": "application/zip"
+        }
+      ],
+      "category": "Error",
+      "reason": null
+    },
+    {
+      "title": "TC041 - Verify Edit Schedule Step 1 shows editable Semester start/end dates",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC041_edit_schedule_semester_dates_editable.spec.js",
+      "line": 5,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 11233,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC042 - Verify Step 1's weekly grid shows one row per day with slots or \"Add Time Slot\"",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC042_edit_schedule_weekly_grid_shows_slots.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 9864,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

@@ -1,0 +1,886 @@
+{
+  "id": "run-1790590003095-461de7",
+  "startedAt": "2026-09-28T10:06:43.096Z",
+  "finishedAt": "2026-09-28T10:12:17.656Z",
+  "status": "passed",
+  "browsers": [
+    "chromium",
+    "firefox",
+    "webkit"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 1,
+    "retries": false
+  },
+  "totalCases": 11,
+  "executions": 33,
+  "expectedExecutions": 33,
+  "stats": {
+    "passed": 33,
+    "failed": 0,
+    "skipped": 0
+  },
+  "durationMs": 334560,
+  "tests": [
+    {
+      "title": "TC010 - Verify the second professor sees their own profile",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC010_second_professor_own_email.spec.js",
+      "line": 11,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 5440,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/0-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/0-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC016 - Verify Cancel leaves the typed text in Display Name (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC016_cancel_keeps_typed_text.spec.js",
+      "line": 12,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 5797,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/1-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/1-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC017 - Verify an empty Display Name shows no error and Save stays enabled (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC017_empty_display_name_not_blocked.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 5285,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/2-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/2-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC018 - Verify Display Name has no maximum length (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC018_display_name_no_max_length.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6795,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/3-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/3-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC019 - Verify Display Name keeps leading and trailing spaces (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC019_display_name_not_trimmed.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 6351,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/4-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/4-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC021 - Verify a future Date of Birth can be selected (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC021_future_dob_allowed.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 11168,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/5-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/5-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC022 - Verify Joining Year stays read-only in edit mode",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC022_joining_year_read_only.spec.js",
+      "line": 7,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 9870,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/6-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/6-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC024 - Verify Save Changes does not persist a new Display Name (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC024_save_display_name_does_not_persist.spec.js",
+      "line": 17,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 9885,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/7-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/7-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC025 - Verify Save Changes with no edits gives no feedback and stays in edit mode (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC025_save_without_edits_stays_in_edit_mode.spec.js",
+      "line": 11,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 10958,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/8-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/8-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC026 - Verify Save Changes does not persist a new Date of Birth (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC026_save_dob_does_not_persist.spec.js",
+      "line": 12,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 16504,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/9-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/9-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC029 - Verify the Enrollment label is misspelled \"Emrolment Number\" (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC029_enrollment_label_typo.spec.js",
+      "line": 10,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 5934,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/10-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/10-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC010 - Verify the second professor sees their own profile",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC010_second_professor_own_email.spec.js",
+      "line": 11,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 11634,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/11-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/11-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC016 - Verify Cancel leaves the typed text in Display Name (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC016_cancel_keeps_typed_text.spec.js",
+      "line": 12,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 10710,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/12-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/12-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC017 - Verify an empty Display Name shows no error and Save stays enabled (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC017_empty_display_name_not_blocked.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7424,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/13-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/13-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC018 - Verify Display Name has no maximum length (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC018_display_name_no_max_length.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7267,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/14-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/14-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC019 - Verify Display Name keeps leading and trailing spaces (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC019_display_name_not_trimmed.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 10410,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/15-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/15-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC021 - Verify a future Date of Birth can be selected (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC021_future_dob_allowed.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 9837,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/16-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/16-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC022 - Verify Joining Year stays read-only in edit mode",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC022_joining_year_read_only.spec.js",
+      "line": 7,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 6679,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/17-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/17-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC024 - Verify Save Changes does not persist a new Display Name (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC024_save_display_name_does_not_persist.spec.js",
+      "line": 17,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 11569,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/18-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/18-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC025 - Verify Save Changes with no edits gives no feedback and stays in edit mode (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC025_save_without_edits_stays_in_edit_mode.spec.js",
+      "line": 11,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 10339,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/19-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/19-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC026 - Verify Save Changes does not persist a new Date of Birth (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC026_save_dob_does_not_persist.spec.js",
+      "line": 12,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 17845,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/20-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/20-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC029 - Verify the Enrollment label is misspelled \"Emrolment Number\" (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC029_enrollment_label_typo.spec.js",
+      "line": 10,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 7780,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/21-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/21-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC010 - Verify the second professor sees their own profile",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC010_second_professor_own_email.spec.js",
+      "line": 11,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 6459,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/22-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/22-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC016 - Verify Cancel leaves the typed text in Display Name (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC016_cancel_keeps_typed_text.spec.js",
+      "line": 12,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 7558,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/23-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/23-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC017 - Verify an empty Display Name shows no error and Save stays enabled (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC017_empty_display_name_not_blocked.spec.js",
+      "line": 10,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 5358,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/24-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/24-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC018 - Verify Display Name has no maximum length (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC018_display_name_no_max_length.spec.js",
+      "line": 10,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 8208,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/25-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/25-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC019 - Verify Display Name keeps leading and trailing spaces (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC019_display_name_not_trimmed.spec.js",
+      "line": 10,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 7452,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/26-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/26-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC021 - Verify a future Date of Birth can be selected (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC021_future_dob_allowed.spec.js",
+      "line": 10,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 14512,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/27-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/27-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC022 - Verify Joining Year stays read-only in edit mode",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC022_joining_year_read_only.spec.js",
+      "line": 7,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 9026,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/28-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/28-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC024 - Verify Save Changes does not persist a new Display Name (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC024_save_display_name_does_not_persist.spec.js",
+      "line": 17,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 12860,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/29-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/29-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC025 - Verify Save Changes with no edits gives no feedback and stays in edit mode (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC025_save_without_edits_stays_in_edit_mode.spec.js",
+      "line": 11,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 19569,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/30-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/30-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC026 - Verify Save Changes does not persist a new Date of Birth (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC026_save_dob_does_not_persist.spec.js",
+      "line": 12,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 18513,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/31-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/31-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC029 - Verify the Enrollment label is misspelled \"Emrolment Number\" (bug)",
+      "suite": null,
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC029_enrollment_label_typo.spec.js",
+      "line": 10,
+      "project": "webkit",
+      "status": "passed",
+      "duration": 6200,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/32-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790590003095-461de7/32-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

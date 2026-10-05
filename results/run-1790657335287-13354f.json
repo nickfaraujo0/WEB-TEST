@@ -1,0 +1,286 @@
+{
+  "id": "run-1790657335287-13354f",
+  "startedAt": "2026-09-29T04:48:55.291Z",
+  "finishedAt": "2026-09-29T04:52:01.106Z",
+  "status": "passed",
+  "browsers": [
+    "chromium"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 10,
+  "executions": 10,
+  "expectedExecutions": 10,
+  "stats": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "durationMs": 185815,
+  "tests": [
+    {
+      "title": "TC004 - Empty Fields",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC004_empty_fields.spec.js",
+      "line": 15,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 32009,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/0-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/0-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC010 - Password Field Masked",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC010_password_field_masked.spec.js",
+      "line": 14,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 47928,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/1-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/1-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC004 - Verify submit button is enabled once the sign-up form is complete",
+      "suite": "Onboarding",
+      "file": "/Users/nick/Documents/web test/test-cases/onboarding/TC004_submit_button_enabled_when_filled.spec.js",
+      "line": 18,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 5977,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/2-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/2-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC006 - Verify role selection dropdown on the form page (N/A on web)",
+      "suite": "Onboarding",
+      "file": "/Users/nick/Documents/web test/test-cases/onboarding/TC006_role_dropdown.spec.js",
+      "line": 19,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 3608,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/3-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/3-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC007 - Verify the Schedule calendar opens on the current month by default",
+      "suite": "Courses",
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC007_calendar_opens_on_current_month.spec.js",
+      "line": 8,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 63521,
+      "attempts": 2,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/4-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/4-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Verify the currently selected division tab is visually highlighted",
+      "suite": "Courses",
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC002_selected_division_is_highlighted.spec.js",
+      "line": 6,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 64499,
+      "attempts": 2,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/5-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/5-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC004 - Verify the hamburger icon collapses and expands the Divisions sidebar",
+      "suite": "Courses",
+      "file": "/Users/nick/Documents/web test/test-cases/courses/TC004_hamburger_toggles_sidebar.spec.js",
+      "line": 5,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 63753,
+      "attempts": 2,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/6-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/6-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC001 - Verify the Edit button unlocks the profile form in place",
+      "suite": "Profile",
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC001_edit_button_opens_edit_mode.spec.js",
+      "line": 18,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 64300,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/7-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/7-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC005 - Verify the faculty profile form shape",
+      "suite": "Profile",
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC005_faculty_profile_form_shape.spec.js",
+      "line": 18,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 10587,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/8-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/8-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC007 - Verify a logged-out visit to /profile redirects to login",
+      "suite": "Profile",
+      "file": "/Users/nick/Documents/web test/test-cases/profile/TC007_logged_out_redirects_to_login.spec.js",
+      "line": 9,
+      "project": "chromium",
+      "status": "passed",
+      "duration": 26044,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/9-0-test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/artifacts/run-1790657335287-13354f/9-1-video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    }
+  ]
+}

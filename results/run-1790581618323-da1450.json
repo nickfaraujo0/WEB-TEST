@@ -1,0 +1,431 @@
+{
+  "id": "run-1790581618323-da1450",
+  "startedAt": "2026-09-28T07:46:58.328Z",
+  "finishedAt": "2026-09-28T07:49:56.255Z",
+  "status": "passed",
+  "browsers": [
+    "firefox"
+  ],
+  "config": {
+    "environment": "local",
+    "mode": "headless",
+    "workers": 4,
+    "retries": true
+  },
+  "totalCases": 14,
+  "executions": 14,
+  "expectedExecutions": 14,
+  "stats": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 1
+  },
+  "durationMs": 177927,
+  "tests": [
+    {
+      "title": "TC003 - Invalid Email",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC003_invalid_email.spec.js",
+      "line": 16,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 56327,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC003_invalid_email-TC003---Invalid-Email-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC003_invalid_email-TC003---Invalid-Email-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC004 - Empty Fields",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC004_empty_fields.spec.js",
+      "line": 15,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 59125,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC004_empty_fields-TC004---Empty-Fields-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC004_empty_fields-TC004---Empty-Fields-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC002 - Invalid Password",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC002_invalid_password.spec.js",
+      "line": 14,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 59591,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC002_invalid_password-TC002---Invalid-Password-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC002_invalid_password-TC002---Invalid-Password-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC001 - Valid Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC001_valid_login.spec.js",
+      "line": 12,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 61527,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC001_valid_login-TC001---Valid-Login-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC001_valid_login-TC001---Valid-Login-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC005 - Password Recovery Link",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC005_password_recovery_link.spec.js",
+      "line": 17,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 22743,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC005_password_recov-2c45a-05---Password-Recovery-Link-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC005_password_recov-2c45a-05---Password-Recovery-Link-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC006 - Remember Me",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC006_remember_me.spec.js",
+      "line": 22,
+      "project": "firefox",
+      "status": "skipped",
+      "duration": 21539,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC006_remember_me-TC006---Remember-Me-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC006_remember_me-TC006---Remember-Me-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": "No \"Remember Me\" control on the login page — see file header."
+    },
+    {
+      "title": "TC007 - Invalid Email Format",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC007_invalid_email_format.spec.js",
+      "line": 17,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 28147,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC007_invalid_email_-1dd94-C007---Invalid-Email-Format-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC007_invalid_email_-1dd94-C007---Invalid-Email-Format-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC008 - Login with Deactivated Account (gap)",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC008_deactivated_account.spec.js",
+      "line": 26,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 29467,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC008_deactivated_ac-648f5-th-Deactivated-Account-gap--firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC008_deactivated_ac-648f5-th-Deactivated-Account-gap--firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC010 - Password Field Masked",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC010_password_field_masked.spec.js",
+      "line": 14,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 21534,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC010_password_field-17884-010---Password-Field-Masked-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC010_password_field-17884-010---Password-Field-Masked-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC012 - Whitespace-Padded Email Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC012_whitespace_padded_email.spec.js",
+      "line": 23,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 20514,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC012_whitespace_pad-fba03-itespace-Padded-Email-Login-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC012_whitespace_pad-fba03-itespace-Padded-Email-Login-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC011 - Case-Insensitive Email Login",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC011_case_insensitive_email.spec.js",
+      "line": 14,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 25735,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC011_case_insensiti-5572a-ase-Insensitive-Email-Login-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC011_case_insensiti-5572a-ase-Insensitive-Email-Login-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC009 - Login Session Expiry",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC009_session_expiry.spec.js",
+      "line": 19,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 38647,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC009_session_expiry-TC009---Login-Session-Expiry-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC009_session_expiry-TC009---Login-Session-Expiry-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC013 - Enter Key Submits The Login Form",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC013_enter_key_submits_form.spec.js",
+      "line": 20,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 18616,
+      "attempts": 1,
+      "error": null,
+      "steps": [],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC013_enter_key_subm-913da--Key-Submits-The-Login-Form-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC013_enter_key_subm-913da--Key-Submits-The-Login-Form-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    },
+    {
+      "title": "TC014 - End-to-End Login Journey",
+      "suite": "Login",
+      "file": "/Users/nick/Documents/web test/test-cases/login/TC014_end_to_end_login_journey.spec.js",
+      "line": 35,
+      "project": "firefox",
+      "status": "passed",
+      "duration": 47460,
+      "attempts": 1,
+      "error": null,
+      "steps": [
+        {
+          "title": "Login page loads with a masked password field",
+          "error": false,
+          "duration": 6812
+        },
+        {
+          "title": "Empty submit is rejected",
+          "error": false,
+          "duration": 1924
+        },
+        {
+          "title": "Wrong password is rejected",
+          "error": false,
+          "duration": 2091
+        },
+        {
+          "title": "Valid login (uppercase email, Enter key) lands on Buzz",
+          "error": false,
+          "duration": 1318
+        },
+        {
+          "title": "Profile menu shows the signed-in account",
+          "error": false,
+          "duration": 1989
+        },
+        {
+          "title": "Session survives a reload and /login bounces back to Buzz",
+          "error": false,
+          "duration": 5877
+        },
+        {
+          "title": "Cancelling logout keeps the session",
+          "error": false,
+          "duration": 17626
+        },
+        {
+          "title": "Confirming logout signs out and protects Buzz",
+          "error": false,
+          "duration": 6918
+        }
+      ],
+      "attachments": [
+        {
+          "name": "screenshot",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-firefox/test-finished-1.png",
+          "contentType": "image/png"
+        },
+        {
+          "name": "video",
+          "path": "/Users/nick/Documents/web test/test-results/login-TC014_end_to_end_log-fa9b6----End-to-End-Login-Journey-firefox/video.webm",
+          "contentType": "video/webm"
+        }
+      ],
+      "category": null,
+      "reason": null
+    }
+  ]
+}
