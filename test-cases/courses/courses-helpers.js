@@ -165,15 +165,6 @@ export async function openEditSession(courses, card) {
   await expect(courses.sessionDetailsHeading()).toBeVisible({ timeout: 15000 });
 }
 
-/** Clicks Save Changes on Edit Session and waits for the success dialog, then closes it. */
-export async function saveEditSession(courses) {
-  await courses.saveChangesButton().click();
-  const ok = courses.saveSuccessDialog();
-  await expect(ok).toBeVisible({ timeout: 15000 });
-  await ok.getByRole('button', { name: 'Close', exact: true }).click();
-  await expect(ok).toBeHidden();
-}
-
 /** "D MMMM YYYY" as the Hive date pickers display it, e.g. "29 September 2026". */
 export function pickerDate(d) {
   return `${d.getDate()} ${d.toLocaleString('en-GB', { month: 'long' })} ${d.getFullYear()}`;

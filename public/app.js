@@ -636,10 +636,6 @@
     $('run-btn-label').textContent = STATE.currentRunId ? 'Queue this run' : 'Run tests';
   }
 
-  function queueDescription(body) {
-    return body.tests.length + ' cases · ' + body.browsers.length + ' browsers';
-  }
-
   function queuedRunMs(body) {
     return estimateRunMs(body.tests, body.browsers, body.parallel === false ? 1 : body.workers);
   }

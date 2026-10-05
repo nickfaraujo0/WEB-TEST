@@ -86,8 +86,6 @@
   @media (prefers-reduced-motion: no-preference){ .navdot{animation:pulse 1.4s ease-in-out infinite;} }
 
   .sidebar-bottom{display:flex; flex-direction:column; gap:12px;}
-  .connect-row{display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:9px; color:var(--text-muted); font-weight:600; font-size:12.5px; cursor:pointer;}
-  .connect-row:hover{background:var(--surface-2); color:var(--text);}
   .stat-block{border-top:1px solid var(--border); padding-top:12px;}
   .stat-block .sh{display:flex; align-items:baseline; justify-content:space-between; padding:0 2px 8px;}
   .stat-block .sh .l{font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint);}
@@ -317,9 +315,6 @@
   .code-line .ln{flex:none; width:46px; text-align:right; padding:0 12px 0 0; color:var(--text-faint); user-select:none; font-family:var(--font-mono); font-size:12px; line-height:1.7;}
   .code-line .lc{white-space:pre; font-family:var(--font-mono); font-size:12.5px; line-height:1.7; color:var(--text); padding-right:16px;}
 
-  .summary-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-top:1px solid var(--border); background:var(--surface-2); border-radius:0 0 var(--radius) var(--radius);}
-  .summary-bar .txt{font-size:13px; font-weight:600;}
-  .summary-bar .txt b{font-family:var(--font-mono); color:var(--accent); font-weight:700;}
 
   /* ---------- Live run view ---------- */
   .live-head{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;}
@@ -333,11 +328,6 @@
   .live-stat-eta .n{color:var(--accent);}
   .live-stat .n{font-family:var(--font-display); font-weight:800; font-size:20px; font-variant-numeric:tabular-nums;}
   .live-stat .l{font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
-  .live-list{display:flex; flex-direction:column;}
-  .live-row{display:flex; align-items:center; gap:12px; padding:10px 18px; border-bottom:1px solid var(--border); font-size:12.8px;}
-  .live-row:last-child{border-bottom:none;}
-  .live-row .nm{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500;}
-  .live-row .du{font-family:var(--font-mono); color:var(--text-faint); font-size:11.5px; width:52px; text-align:right; flex:none;}
 
   /* ---------- Live run: 3-column per-browser board ---------- */
   .live-cols{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; align-items:start;}
@@ -400,15 +390,10 @@
   .step .si{width:16px; height:16px; border-radius:50%; flex:none; margin-top:1px; display:flex; align-items:center; justify-content:center;}
   .step.ok .si{background:var(--success-soft); color:var(--success);}
   .step.bad .si{background:var(--danger-soft); color:var(--danger);}
-  .console-line{font-family:var(--font-mono); font-size:11.5px; padding:3px 0; display:flex; gap:8px;}
-  .console-line .tag{flex:none; font-weight:700; width:44px;}
-  .console-line.warn .tag{color:var(--accent);} .console-line.error .tag{color:var(--danger);} .console-line.log .tag{color:var(--text-faint);}
   .shot{border-radius:8px; overflow:hidden; border:1px solid var(--border);}
   .shot .chrome{background:var(--surface-3); padding:7px 10px; display:flex; gap:5px; align-items:center;}
   .shot .chrome span{width:8px; height:8px; border-radius:50%; background:var(--text-faint); opacity:.5;}
   .shot .frame{background:#0e1117; padding:22px 18px; position:relative; min-height:150px;}
-  .shot .ui-line{height:9px; background:#232a36; border-radius:4px; margin-bottom:9px;}
-  .shot .fail-target{border:2px solid var(--danger); border-radius:6px; padding:8px 10px; background:rgba(239,68,68,.12); display:inline-flex; align-items:center; gap:6px; font-size:11px; color:var(--danger); font-family:var(--font-mono); margin-top:6px;}
 
   .results-grid{display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start;}
   .recent-runs{position:sticky; top:16px; overflow:hidden auto; max-height:calc(100vh - 32px);}
