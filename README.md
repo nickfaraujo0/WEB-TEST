@@ -7,8 +7,13 @@ HIVE is a small Node/Express app with a plain HTML/CSS/JS front end — no build
 framework, no database. Pick suites in the browser, watch them run live across Chromium,
 Firefox and WebKit, then dig into failures, flaky tests and history.
 
+> The project and its environment variables are called HIVE; the dashboard UI itself is branded
+> **QAgent**.
+
 ## Features
 
+- **Overview** — at-a-glance health: pass rate by run, suite health, tests needing attention
+  and open bugs.
 - **Test Runs** — choose suites or individual cases, browsers, environment, headed/headless
   mode, workers and retries, then run. Runs can be queued; one executes at a time.
 - **Live Run** — real-time pass/fail board per browser, an embedded terminal, a live ETA, and a
@@ -20,7 +25,9 @@ Firefox and WebKit, then dig into failures, flaky tests and history.
   length) and browser mismatches.
 - **Bugs** — a built-in bug log linked to failing tests.
 - **Git** — working-tree status, history and diffs of the test code.
-- **Google Sheet** — view and append to the master test sheet, and sync test credentials.
+- **Google Sheet** — view, edit and append to the master test sheet, sync test credentials, and
+  jump to the sheet with the **Open in Google Sheets** button.
+- **Settings** — environments, defaults and notifications.
 - **Source editor** — view and edit spec files from the dashboard.
 
 ## Quick start
@@ -162,8 +169,9 @@ Set in `.env` (see `.env.example`) or the environment.
 
 ### Google Sheet integration
 
-Place a service-account key at `server/google-key.json` (git-ignored) and configure
-`server/sheet-config.json`. Share the sheet with the service account's email.
+Place a service-account key at `server/google-key.json` (git-ignored) and set the sheet id via
+`GOOGLE_SHEET_ID` or `server/sheet-config.json`. Share the sheet with the service account's email
+as **Editor**. The **Open in Google Sheets** button on the Google Sheet page is built from that id.
 
 ## Hosting for a team
 
